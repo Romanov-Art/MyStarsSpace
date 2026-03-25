@@ -3,6 +3,7 @@ import { t, type Locale } from '../i18n/index.js';
 import { getTheme } from '../config/themes.js';
 import { getLocalSiderealTime } from '../core/astronomy.js';
 import { equatorialToHorizontal, stereographicProjection } from '../core/coordinates.js';
+import { constellationData } from '../data/constellations.js';
 import type { City, StarData } from '../types/index.js';
 
 interface PosterPreviewProps {
@@ -105,35 +106,7 @@ function generateRealisticStars(): StarData[] {
 
 const allStars = generateRealisticStars();
 
-// ──────────────────────────────────────────────────────────────────
-// CONSTELLATION LINES — major visible constellations
-// ──────────────────────────────────────────────────────────────────
-const constellationData = [
-  // Orion
-  { name: 'Ori', lines: [[5.919, 7.407, 5.419, 6.350], [5.419, 6.350, 5.533, -0.299], [5.533, -0.299, 5.603, -1.202], [5.603, -1.202, 5.679, -1.943], [5.679, -1.943, 5.796, -9.670], [5.533, -0.299, 5.242, -8.202], [5.919, 7.407, 5.603, -1.202]] },
-  // Ursa Major (Big Dipper)
-  { name: 'UMa', lines: [[11.062, 61.751, 11.031, 56.382], [11.031, 56.382, 11.897, 53.695], [11.897, 53.695, 12.257, 57.032], [12.257, 57.032, 12.900, 55.960], [12.900, 55.960, 13.399, 54.926], [13.399, 54.926, 13.792, 49.313]] },
-  // Cassiopeia
-  { name: 'Cas', lines: [[0.153, 59.150, 0.675, 56.537], [0.675, 56.537, 0.945, 60.717], [0.945, 60.717, 1.430, 60.235], [1.430, 60.235, 1.907, 63.670]] },
-  // Cygnus (Northern Cross)
-  { name: 'Cyg', lines: [[20.690, 45.280, 20.370, 40.257], [20.370, 40.257, 19.512, 27.960], [20.370, 40.257, 20.770, 33.970], [20.370, 40.257, 19.939, 35.083]] },
-  // Leo
-  { name: 'Leo', lines: [[10.140, 11.967, 10.333, 19.842], [10.333, 19.842, 11.237, 20.524], [11.237, 20.524, 11.818, 14.572], [10.333, 19.842, 9.764, 23.774]] },
-  // Gemini
-  { name: 'Gem', lines: [[7.755, 28.026, 7.577, 31.888], [7.577, 31.888, 6.629, 25.131], [7.755, 28.026, 7.068, 20.570], [6.629, 25.131, 6.383, 22.514]] },
-  // Lyra
-  { name: 'Lyr', lines: [[18.616, 38.784, 18.746, 37.605], [18.746, 37.605, 18.982, 32.689], [18.982, 32.689, 18.834, 33.363], [18.834, 33.363, 18.746, 37.605]] },
-  // Scorpius (head area)
-  { name: 'Sco', lines: [[16.006, -22.622, 16.090, -19.806], [16.090, -19.806, 16.353, -25.593], [16.353, -25.593, 16.490, -26.432], [16.490, -26.432, 16.836, -34.293]] },
-  // Taurus
-  { name: 'Tau', lines: [[4.599, 16.509, 4.477, 15.962], [4.477, 15.962, 4.330, 15.628], [4.599, 16.509, 4.382, 17.543], [4.382, 17.543, 5.438, 28.608]] },
-  // Canis Major
-  { name: 'CMa', lines: [[6.752, -16.716, 6.378, -17.956], [6.378, -17.956, 6.338, -23.834], [6.752, -16.716, 7.029, -15.633], [7.029, -15.633, 7.063, -26.393], [6.338, -23.834, 7.063, -26.393]] },
-  // Perseus
-  { name: 'Per', lines: [[3.405, 49.861, 3.080, 53.506], [3.080, 53.506, 3.079, 40.956], [3.079, 40.956, 3.964, 40.010], [3.964, 40.010, 4.107, 47.713]] },
-  // Auriga
-  { name: 'Aur', lines: [[5.278, 45.998, 5.992, 44.948], [5.992, 44.948, 5.995, 37.213], [5.995, 37.213, 5.108, 41.076], [5.108, 41.076, 5.278, 45.998]] },
-];
+
 
 // ──────────────────────────────────────────────────────────────────
 // COMPONENT
@@ -186,7 +159,7 @@ export default function PosterPreview({
 
     // ── Stars ──
     const lst = getLocalSiderealTime(dateTime, selectedCity.lon);
-    drawStars(ctx, center, radius, lst, selectedCity.lat, theme, size);
+    drawStars(ctx, center, radius, lst, selectedCity.lat, theme, size, layers.constellationNames);
 
     // ── Constellation lines ──
     if (layers.constellationLines) {
@@ -266,6 +239,7 @@ function drawStars(
   lst: number, lat: number,
   theme: { stars: string },
   size: number,
+  showNames: boolean = false,
 ) {
   const scale = size / 500; // normalize to ~500px reference
   ctx.fillStyle = theme.stars;
@@ -312,6 +286,15 @@ function drawStars(
     ctx.beginPath();
     ctx.arc(x, y, starSize, 0, Math.PI * 2);
     ctx.fill();
+
+    // Draw star name label
+    if (showNames && star.name && star.magnitude < 2.5) {
+      ctx.globalAlpha = 0.85;
+      ctx.font = `${Math.max(8, 9 * scale)}px sans-serif`;
+      ctx.fillStyle = theme.stars;
+      ctx.fillText(star.name, x + starSize + 3, y + 3);
+      ctx.fillStyle = theme.stars;
+    }
   }
 
   ctx.globalAlpha = 1;
