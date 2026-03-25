@@ -31,6 +31,7 @@ export default function App() {
   const [selectedSize, setSelectedSize] = useState<PosterSize>(posterSizes[1]); // 30x40
   const [showTime, setShowTime] = useState(true);
   const [posterFont, setPosterFont] = useState('Cormorant Garamond');
+  const [posterFontSize, setPosterFontSize] = useState(16);
 
   // Initialize subtitles with city and date
   React.useEffect(() => {
@@ -160,7 +161,9 @@ export default function App() {
           {/* Font Selector */}
           <FontSelector
             selectedFont={posterFont}
+            selectedFontSize={posterFontSize}
             onChange={setPosterFont}
+            onFontSizeChange={setPosterFontSize}
             locale={locale}
           />
         </div>
@@ -178,6 +181,7 @@ export default function App() {
             subtitles={subtitles}
             showTime={showTime}
             posterFont={posterFont}
+            posterFontSize={posterFontSize}
           />
 
           {/* Size Selector */}

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-/** 15 curated Google Fonts for poster text — each with a distinct character */
+/** 15 curated Google Fonts for poster text */
 export const POSTER_FONTS = [
   { name: 'Cormorant Garamond', category: 'serif', weight: '400;500;600' },
   { name: 'Playfair Display', category: 'serif', weight: '400;500;700' },
@@ -17,6 +17,15 @@ export const POSTER_FONTS = [
   { name: 'Comfortaa', category: 'display', weight: '300;400;500' },
   { name: 'Caveat', category: 'handwriting', weight: '400;500;700' },
   { name: 'Parisienne', category: 'handwriting', weight: '400' },
+];
+
+/** Preset font sizes */
+export const FONT_SIZE_PRESETS = [
+  { label: 'S', value: 12 },
+  { label: 'M', value: 16 },
+  { label: 'L', value: 20 },
+  { label: 'XL', value: 24 },
+  { label: 'XXL', value: 30 },
 ];
 
 /** Build Google Fonts CSS URL for all fonts */
@@ -41,7 +50,9 @@ function loadAllFonts() {
 
 interface FontSelectorProps {
   selectedFont: string;
+  selectedFontSize: number;
   onChange: (fontName: string) => void;
+  onFontSizeChange: (size: number) => void;
   locale: string;
 }
 
@@ -60,7 +71,7 @@ const PREVIEW_TEXT: Record<string, string> = {
   tr: 'Bu gökyüzünün altında',
 };
 
-export default function FontSelector({ selectedFont, onChange, locale }: FontSelectorProps) {
+export default function FontSelector({ selectedFont, selectedFontSize, onChange, onFontSizeChange, locale }: FontSelectorProps) {
   useEffect(() => { loadAllFonts(); }, []);
 
   const preview = PREVIEW_TEXT[locale] || PREVIEW_TEXT.en;
@@ -70,6 +81,26 @@ export default function FontSelector({ selectedFont, onChange, locale }: FontSel
       <div className="panel-section__title">
         {locale === 'ru' ? 'Шрифт' : 'Font'}
       </div>
+
+      {/* Font Size Selector */}
+      <div className="font-size-selector">
+        <span className="font-size-selector__label">
+          {locale === 'ru' ? 'Размер' : 'Size'}
+        </span>
+        <div className="font-size-selector__buttons">
+          {FONT_SIZE_PRESETS.map(preset => (
+            <button
+              key={preset.value}
+              className={`font-size-btn ${selectedFontSize === preset.value ? 'font-size-btn--active' : ''}`}
+              onClick={() => onFontSizeChange(preset.value)}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Font Family Selector */}
       <div className="font-selector__list">
         {POSTER_FONTS.map(font => (
           <button

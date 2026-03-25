@@ -18,6 +18,7 @@ interface PosterPreviewProps {
   subtitles: { line1: string; line2: string; line3: string };
   showTime: boolean;
   posterFont: string;
+  posterFontSize: number;
 }
 
 // ──────────────────────────────────────────────────────────────────
@@ -113,7 +114,7 @@ const allStars = generateRealisticStars();
 // COMPONENT
 // ──────────────────────────────────────────────────────────────────
 export default function PosterPreview({
-  themeId, locale, selectedCity, date, time, layers, phrase, subtitles, showTime, posterFont,
+  themeId, locale, selectedCity, date, time, layers, phrase, subtitles, showTime, posterFont, posterFontSize,
 }: PosterPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const theme = getTheme(themeId);
@@ -196,7 +197,7 @@ export default function PosterPreview({
         </div>
 
         <div className="poster__text" style={{ fontFamily: `"${posterFont}", serif` }}>
-          <div className="poster__phrase">{phrase}</div>
+          <div className="poster__phrase" style={{ fontSize: `${posterFontSize}px` }}>{phrase}</div>
           <div>
             <div className="poster__subtitle-line poster__subtitle-line--main">{subtitles.line1}</div>
             <div className="poster__subtitle-line">{subtitles.line2}</div>
