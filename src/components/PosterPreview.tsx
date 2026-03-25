@@ -286,14 +286,44 @@ function drawStars(
     ctx.beginPath();
     ctx.arc(x, y, starSize, 0, Math.PI * 2);
     ctx.fill();
+  }
 
-    // Draw star name label
-    if (showNames && star.name && star.magnitude < 2.5) {
-      ctx.globalAlpha = 0.85;
-      ctx.font = `${Math.max(8, 9 * scale)}px sans-serif`;
-      ctx.fillStyle = theme.stars;
-      ctx.fillText(star.name, x + starSize + 3, y + 3);
-      ctx.fillStyle = theme.stars;
+  // ── Smart star name labels: pick 3-5 best, avoid edge & overlap ──
+  if (showNames) {
+    const FAMOUS = ['Polaris','Sirius','Vega','Arcturus','Capella','Deneb','Altair',
+      'Betelgeuse','Rigel','Antares','Spica','Regulus','Procyon','Aldebaran','Fomalhaut','Canopus'];
+    const MAX_LABELS = 5;
+    const MIN_GAP = 60 * scale;
+    const EDGE_LIMIT = radius * 0.80;
+    const placed: { x: number; y: number }[] = [];
+
+    // Collect visible famous stars sorted by magnitude (brightest first)
+    const candidates: { name: string; x: number; y: number; mag: number }[] = [];
+    for (const star of allStars) {
+      if (!star.name || !FAMOUS.includes(star.name)) continue;
+      const hz = equatorialToHorizontal(star.ra, star.dec, lat, lst);
+      if (hz.altitude < 2) continue;
+      const proj = stereographicProjection(hz.altitude, hz.azimuth, radius);
+      const sx = center + proj.x;
+      const sy = center + proj.y;
+      const dist = Math.sqrt((sx - center) ** 2 + (sy - center) ** 2);
+      if (dist > EDGE_LIMIT) continue;
+      candidates.push({ name: star.name, x: sx, y: sy, mag: star.magnitude });
+    }
+    candidates.sort((a, b) => a.mag - b.mag);
+
+    ctx.font = `${Math.max(8, 9 * scale)}px sans-serif`;
+    ctx.fillStyle = theme.stars;
+
+    for (const c of candidates) {
+      if (placed.length >= MAX_LABELS) break;
+      const tooClose = placed.some(p =>
+        Math.sqrt((c.x - p.x) ** 2 + (c.y - p.y) ** 2) < MIN_GAP
+      );
+      if (tooClose) continue;
+      ctx.globalAlpha = 0.9;
+      ctx.fillText(c.name, c.x + 5, c.y - 5);
+      placed.push({ x: c.x, y: c.y });
     }
   }
 
