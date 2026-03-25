@@ -1,0 +1,38 @@
+/**
+ * Chinese translations (中文)
+ */
+import { registerLocale } from '../index.js';
+
+const zh: Record<string, string> = {
+  'cardinal.north': '北', 'cardinal.south': '南', 'cardinal.east': '东', 'cardinal.west': '西',
+  'ui.city': '城市', 'ui.date': '日期', 'ui.time': '时间', 'ui.theme': '主题',
+  'ui.layers': '图层', 'ui.meridians': '经纬线', 'ui.constellations': '星座',
+  'ui.constellation_names': '星座名称', 'ui.milky_way': '银河',
+  'ui.export_png': '下载PNG', 'ui.phrase': '短语', 'ui.size': '尺寸', 'ui.language': '语言',
+  'poster.under_this_sky': '在这片星空下',
+  'poster.the_night_we_met': '我们相遇的那个夜晚',
+  'poster.stars_of_your_birth': '你出生那天的星空',
+  'poster.our_special_night': '我们的特别之夜',
+  'poster.written_in_stars': '写在星星上的故事',
+  'poster.moment_in_time': '时光的瞬间',
+  'category.birthday': '生日', 'category.wedding': '婚礼',
+  'category.relationship': '爱情', 'category.memorial': '纪念日',
+  'category.baby': '新生儿', 'category.custom': '自定义文字',
+  'phrase.birthday.1': '你出生那天的天空',
+  'phrase.birthday.2': '在这些星星下，你来到了这个世界',
+  'phrase.birthday.3': '生日的星空',
+  'phrase.wedding.1': '婚礼当天的星空',
+  'phrase.wedding.2': '在这些星星下，我们说了"我愿意"',
+  'phrase.wedding.3': '我们最美好日子的星星',
+  'phrase.relationship.1': '我们相遇的那个夜晚',
+  'phrase.relationship.2': '星空下的初吻',
+  'phrase.relationship.3': '见证我们爱情的星星',
+  'month.1': '一月', 'month.2': '二月', 'month.3': '三月',
+  'month.4': '四月', 'month.5': '五月', 'month.6': '六月',
+  'month.7': '七月', 'month.8': '八月', 'month.9': '九月',
+  'month.10': '十月', 'month.11': '十一月', 'month.12': '十二月',
+  'theme.black': '黑色', 'theme.white': '白色', 'theme.navy': '深蓝色',
+};
+
+registerLocale('zh', zh);
+export default zh;
