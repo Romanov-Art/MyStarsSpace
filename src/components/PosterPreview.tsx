@@ -242,11 +242,12 @@ function drawGrid(
   theme: { grid: string },
   size: number,
 ) {
+  const s = size / 500;
   ctx.strokeStyle = theme.grid;
 
   // Altitude circles every 10°
-  ctx.lineWidth = 0.4;
-  ctx.globalAlpha = 0.35;
+  ctx.lineWidth = Math.max(0.8, 0.5 * s);
+  ctx.globalAlpha = 0.4;
   for (let alt = 10; alt < 90; alt += 10) {
     const r = radius * Math.tan(((90 - alt) / 2) * Math.PI / 180) / Math.tan(45 * Math.PI / 180);
     ctx.beginPath();
@@ -255,8 +256,8 @@ function drawGrid(
   }
 
   // Azimuth lines every 10°
-  ctx.lineWidth = 0.3;
-  ctx.globalAlpha = 0.25;
+  ctx.lineWidth = Math.max(0.5, 0.4 * s);
+  ctx.globalAlpha = 0.3;
   for (let az = 0; az < 360; az += 10) {
     const azRad = (az * Math.PI) / 180;
     ctx.beginPath();
@@ -266,8 +267,8 @@ function drawGrid(
   }
 
   // Major azimuth lines every 30° (thicker)
-  ctx.lineWidth = 0.5;
-  ctx.globalAlpha = 0.4;
+  ctx.lineWidth = Math.max(1.0, 0.7 * s);
+  ctx.globalAlpha = 0.5;
   for (let az = 0; az < 360; az += 30) {
     const azRad = (az * Math.PI) / 180;
     ctx.beginPath();
@@ -302,30 +303,30 @@ function drawStars(
     const dist = Math.sqrt((x - center) ** 2 + (y - center) ** 2);
     if (dist > radius) continue;
 
-    // Much smaller star sizes — matching atlas-stars.ru proportions
+    // Star sizes — ensure minimum pixel visibility
     let starSize: number;
     if (star.magnitude < 0) {
-      starSize = 1.8 * scale;
+      starSize = Math.max(2.5, 2.0 * scale);
     } else if (star.magnitude < 1) {
-      starSize = 1.4 * scale;
+      starSize = Math.max(2.0, 1.6 * scale);
     } else if (star.magnitude < 2) {
-      starSize = 1.0 * scale;
+      starSize = Math.max(1.5, 1.2 * scale);
     } else if (star.magnitude < 3) {
-      starSize = 0.7 * scale;
+      starSize = Math.max(1.2, 0.9 * scale);
     } else if (star.magnitude < 4) {
-      starSize = 0.5 * scale;
+      starSize = Math.max(0.9, 0.7 * scale);
     } else if (star.magnitude < 5) {
-      starSize = 0.35 * scale;
+      starSize = Math.max(0.6, 0.5 * scale);
     } else {
-      starSize = 0.25 * scale;
+      starSize = Math.max(0.5, 0.4 * scale);
     }
 
-    // Opacity: brighter stars are more opaque
+    // Opacity: brighter stars fully opaque, dim stars still visible
     const alpha = star.magnitude < 2 ? 1.0 :
-                  star.magnitude < 3 ? 0.9 :
-                  star.magnitude < 4 ? 0.75 :
-                  star.magnitude < 5 ? 0.55 :
-                  0.35;
+                  star.magnitude < 3 ? 0.95 :
+                  star.magnitude < 4 ? 0.85 :
+                  star.magnitude < 5 ? 0.7 :
+                  0.5;
 
     ctx.globalAlpha = alpha;
     ctx.beginPath();
@@ -344,8 +345,8 @@ function drawConstellations(
   size: number,
 ) {
   ctx.strokeStyle = theme.constellationLines;
-  ctx.lineWidth = 0.6 * (size / 500);
-  ctx.globalAlpha = 0.55;
+  ctx.lineWidth = Math.max(1.0, 0.8 * (size / 500));
+  ctx.globalAlpha = 0.65;
 
   for (const constellation of constellationData) {
     for (const line of constellation.lines) {
