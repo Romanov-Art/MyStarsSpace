@@ -131,19 +131,19 @@ export default function PosterPreview({
     if (!parent) return;
 
     // Canvas fills the square frame container
-    const size = Math.min(parent.clientWidth, parent.clientHeight);
+    const cssSize = Math.min(parent.clientWidth, parent.clientHeight);
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = size * dpr;
-    canvas.height = size * dpr;
-    canvas.style.width = `${size}px`;
-    canvas.style.height = `${size}px`;
+    // Draw in PHYSICAL pixels for crisp Retina rendering
+    const size = Math.round(cssSize * dpr);
+    canvas.width = size;
+    canvas.height = size;
+    canvas.style.width = `${cssSize}px`;
+    canvas.style.height = `${cssSize}px`;
 
     const ctx = canvas.getContext('2d')!;
-    ctx.imageSmoothingEnabled = false;
-    ctx.scale(dpr, dpr);
+    // DO NOT use ctx.scale(dpr,dpr) — we draw in physical pixels directly
 
     const center = size / 2;
-    // Star circle radius computed from frame config: innerDiameter / (2 * frameSize)
     const radius = size * frame.starRadiusFraction;
 
     // ── Transparent background — SVG frame is behind via CSS ──
@@ -221,8 +221,8 @@ function drawGrid(
   ctx.strokeStyle = theme.grid;
 
   // Altitude circles every 10°
-  ctx.lineWidth = 0.6;
-  ctx.globalAlpha = 0.45;
+  ctx.lineWidth = Math.max(1, 0.8 * (size / 500));
+  ctx.globalAlpha = 0.4;
   for (let alt = 10; alt < 90; alt += 10) {
     const r = radius * Math.tan(((90 - alt) / 2) * Math.PI / 180) / Math.tan(45 * Math.PI / 180);
     ctx.beginPath();
@@ -231,8 +231,8 @@ function drawGrid(
   }
 
   // Azimuth lines every 10°
-  ctx.lineWidth = 0.5;
-  ctx.globalAlpha = 0.35;
+  ctx.lineWidth = Math.max(1, 0.6 * (size / 500));
+  ctx.globalAlpha = 0.3;
   for (let az = 0; az < 360; az += 10) {
     const azRad = (az * Math.PI) / 180;
     ctx.beginPath();
@@ -252,7 +252,6 @@ function drawStars(
   size: number,
   showNames: boolean = false,
 ) {
-  const scale = size / 500; // normalize to ~500px reference
   ctx.fillStyle = theme.stars;
 
   for (const star of allStars) {
@@ -268,22 +267,23 @@ function drawStars(
     const dist = Math.sqrt((x - center) ** 2 + (y - center) ** 2);
     if (dist > radius) continue;
 
-    // Star sizes — crisp minimum sizes to prevent blur
+    // Star sizes in PHYSICAL pixels (size is already in physical px)
+    const scale = size / 500;
     let starSize: number;
     if (star.magnitude < 0) {
-      starSize = 1.8 * scale;
+      starSize = Math.max(2, 2.0 * scale);
     } else if (star.magnitude < 1) {
-      starSize = 1.4 * scale;
+      starSize = Math.max(1.5, 1.5 * scale);
     } else if (star.magnitude < 2) {
-      starSize = 1.0 * scale;
+      starSize = Math.max(1.2, 1.1 * scale);
     } else if (star.magnitude < 3) {
-      starSize = 0.7 * scale;
+      starSize = Math.max(1, 0.8 * scale);
     } else if (star.magnitude < 4) {
-      starSize = Math.max(0.5, 0.5 * scale);
+      starSize = Math.max(0.8, 0.6 * scale);
     } else if (star.magnitude < 5) {
-      starSize = Math.max(0.4, 0.35 * scale);
+      starSize = Math.max(0.6, 0.45 * scale);
     } else {
-      starSize = Math.max(0.3, 0.25 * scale);
+      starSize = Math.max(0.5, 0.35 * scale);
     }
 
     // Opacity: brighter stars are more opaque
@@ -301,6 +301,7 @@ function drawStars(
 
   // ── Smart star name labels: pick 3-5 best, avoid edge & overlap ──
   if (showNames) {
+    const scale = size / 500;
     const FAMOUS = ['Polaris','Sirius','Vega','Arcturus','Capella','Deneb','Altair',
       'Betelgeuse','Rigel','Antares','Spica','Regulus','Procyon','Aldebaran','Fomalhaut','Canopus'];
     const MAX_LABELS = 5;
@@ -323,7 +324,7 @@ function drawStars(
     }
     candidates.sort((a, b) => a.mag - b.mag);
 
-    ctx.font = `${Math.max(8, 9 * scale)}px sans-serif`;
+    ctx.font = `${Math.max(10, 10 * scale)}px sans-serif`;
     ctx.fillStyle = theme.stars;
 
     for (const c of candidates) {
@@ -349,8 +350,8 @@ function drawConstellations(
   size: number,
 ) {
   ctx.strokeStyle = theme.constellationLines;
-  ctx.lineWidth = 0.6 * (size / 500);
-  ctx.globalAlpha = 0.55;
+  ctx.lineWidth = Math.max(1, 0.8 * (size / 500));
+  ctx.globalAlpha = 0.5;
 
   for (const constellation of constellationData) {
     for (const line of constellation.lines) {
