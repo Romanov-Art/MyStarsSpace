@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useMemo } from 'react';
 import { t, type Locale } from '../i18n/index.js';
 import { getTheme } from '../config/themes.js';
+import { getDefaultFrame } from '../config/frames.js';
 import { getLocalSiderealTime } from '../core/astronomy.js';
 import { equatorialToHorizontal, stereographicProjection } from '../core/coordinates.js';
 import { constellationData } from '../data/constellations.js';
@@ -116,6 +117,7 @@ export default function PosterPreview({
 }: PosterPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const theme = getTheme(themeId);
+  const frame = getDefaultFrame();
 
   const dateTime = useMemo(() => {
     return new Date(Date.UTC(date.year, date.month - 1, date.day, time.hours, time.minutes));
@@ -128,6 +130,7 @@ export default function PosterPreview({
     const parent = canvas.parentElement;
     if (!parent) return;
 
+    // Canvas fills the square frame container
     const size = Math.min(parent.clientWidth, parent.clientHeight);
     const dpr = window.devicePixelRatio || 1;
     canvas.width = size * dpr;
@@ -140,14 +143,20 @@ export default function PosterPreview({
     ctx.scale(dpr, dpr);
 
     const center = size / 2;
-    const radius = size * 0.48;
+    // Star circle radius computed from frame config: innerDiameter / (2 * frameSize)
+    const radius = size * frame.starRadiusFraction;
 
-    // ── Fill with theme background ──
+    // ── Transparent background — SVG frame is behind via CSS ──
+    ctx.clearRect(0, 0, size, size);
+
+    // ── Fill star circle with theme background ──
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(center, center, radius, 0, Math.PI * 2);
     ctx.fillStyle = theme.background;
-    ctx.fillRect(0, 0, size, size);
+    ctx.fill();
 
     // ── Clip to star map circle ──
-    ctx.save();
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, Math.PI * 2);
     ctx.clip();
@@ -168,12 +177,21 @@ export default function PosterPreview({
 
     ctx.restore();
 
-  }, [themeId, selectedCity, dateTime, layers, theme, locale]);
+  }, [themeId, selectedCity, dateTime, layers, theme, locale, frame]);
 
   return (
     <div className="poster-frame">
       <div className={`poster-canvas poster-canvas--${themeId}`}>
-        <div className="poster__starmap-container">
+        {/* Square frame container: SVG as background, canvas on top */}
+        <div
+          className="poster__starmap-container"
+          style={{
+            backgroundImage: `url(/${frame.filename})`,
+            backgroundSize: '100% 100%',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
           <canvas ref={canvasRef} className="poster__starmap-canvas" />
         </div>
 
@@ -186,13 +204,6 @@ export default function PosterPreview({
           </div>
         </div>
       </div>
-      {/* SVG frame ON TOP — mask ring hides star overflow, center is transparent */}
-      <img
-        src="/black-frame.svg"
-        alt=""
-        className="poster__frame-overlay"
-        style={{ filter: themeId === 'white' ? 'invert(1)' : 'none' }}
-      />
     </div>
   );
 }

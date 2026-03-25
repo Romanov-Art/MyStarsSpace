@@ -382,27 +382,18 @@ html, body {
 .poster-canvas--navy { background: #2A2F41; border-color: #2A2F41; color: #fff; }
 
 .poster__starmap-container {
-  width: 90%;
+  width: 100%;
   aspect-ratio: 1;
-  margin: 4% 0;
   position: relative;
+  overflow: hidden;
 }
 
 .poster__starmap-canvas {
-  width: 100%;
-  height: 100%;
-}
-
-/* SVG frame overlay ON TOP — mask ring hides star overflow */
-.poster__frame-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none;
-  z-index: 10;
-  object-fit: fill;
 }
 
 /* Cardinal directions */
