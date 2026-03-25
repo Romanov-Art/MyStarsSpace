@@ -166,20 +166,10 @@ export default function PosterPreview({
     ctx.scale(dpr, dpr);
 
     const center = size / 2;
-    const radius = size * 0.46;
+    const radius = size * 0.39;
 
-    // ── Clear ──
-    ctx.fillStyle = theme.background;
-    ctx.fillRect(0, 0, size, size);
-
-    // ── Single circle border (SVG frame overlays on top) ──
-    ctx.strokeStyle = theme.grid;
-    ctx.lineWidth = 0.8;
-    ctx.globalAlpha = 0.5;
-    ctx.beginPath();
-    ctx.arc(center, center, radius, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.globalAlpha = 1;
+    // ── Clear with transparent background (SVG frame is behind) ──
+    ctx.clearRect(0, 0, size, size);
 
     // ── Clip to star map circle ──
     ctx.save();
@@ -208,6 +198,14 @@ export default function PosterPreview({
   return (
     <div className="poster-frame">
       <div className={`poster-canvas poster-canvas--${themeId}`}>
+        {/* Layer 1: SVG frame as background */}
+        <img
+          src="/black-frame.svg"
+          alt=""
+          className="poster__frame-bg"
+          style={{ filter: themeId === 'white' ? 'invert(1)' : 'none' }}
+        />
+        {/* Layer 2: Stars canvas (transparent bg, renders on top of SVG) */}
         <div className="poster__starmap-container">
           <canvas ref={canvasRef} className="poster__starmap-canvas" />
         </div>
@@ -221,13 +219,6 @@ export default function PosterPreview({
           </div>
         </div>
       </div>
-      {/* SVG frame overlay — covers full poster */}
-      <img
-        src="/black-frame.svg"
-        alt=""
-        className="poster__frame-overlay"
-        style={{ filter: themeId === 'white' ? 'invert(1)' : 'none' }}
-      />
     </div>
   );
 }
@@ -242,12 +233,11 @@ function drawGrid(
   theme: { grid: string },
   size: number,
 ) {
-  const s = size / 500;
   ctx.strokeStyle = theme.grid;
 
   // Altitude circles every 10°
-  ctx.lineWidth = Math.max(0.8, 0.5 * s);
-  ctx.globalAlpha = 0.4;
+  ctx.lineWidth = 0.4;
+  ctx.globalAlpha = 0.35;
   for (let alt = 10; alt < 90; alt += 10) {
     const r = radius * Math.tan(((90 - alt) / 2) * Math.PI / 180) / Math.tan(45 * Math.PI / 180);
     ctx.beginPath();
@@ -256,20 +246,9 @@ function drawGrid(
   }
 
   // Azimuth lines every 10°
-  ctx.lineWidth = Math.max(0.5, 0.4 * s);
-  ctx.globalAlpha = 0.3;
+  ctx.lineWidth = 0.3;
+  ctx.globalAlpha = 0.25;
   for (let az = 0; az < 360; az += 10) {
-    const azRad = (az * Math.PI) / 180;
-    ctx.beginPath();
-    ctx.moveTo(center, center);
-    ctx.lineTo(center - radius * Math.sin(azRad), center - radius * Math.cos(azRad));
-    ctx.stroke();
-  }
-
-  // Major azimuth lines every 30° (thicker)
-  ctx.lineWidth = Math.max(1.0, 0.7 * s);
-  ctx.globalAlpha = 0.5;
-  for (let az = 0; az < 360; az += 30) {
     const azRad = (az * Math.PI) / 180;
     ctx.beginPath();
     ctx.moveTo(center, center);
@@ -303,30 +282,30 @@ function drawStars(
     const dist = Math.sqrt((x - center) ** 2 + (y - center) ** 2);
     if (dist > radius) continue;
 
-    // Star sizes — ensure minimum pixel visibility
+    // Star sizes — matching atlas-stars.ru proportions
     let starSize: number;
     if (star.magnitude < 0) {
-      starSize = Math.max(2.5, 2.0 * scale);
+      starSize = 1.8 * scale;
     } else if (star.magnitude < 1) {
-      starSize = Math.max(2.0, 1.6 * scale);
+      starSize = 1.4 * scale;
     } else if (star.magnitude < 2) {
-      starSize = Math.max(1.5, 1.2 * scale);
+      starSize = 1.0 * scale;
     } else if (star.magnitude < 3) {
-      starSize = Math.max(1.2, 0.9 * scale);
+      starSize = 0.7 * scale;
     } else if (star.magnitude < 4) {
-      starSize = Math.max(0.9, 0.7 * scale);
+      starSize = 0.5 * scale;
     } else if (star.magnitude < 5) {
-      starSize = Math.max(0.6, 0.5 * scale);
+      starSize = 0.35 * scale;
     } else {
-      starSize = Math.max(0.5, 0.4 * scale);
+      starSize = 0.25 * scale;
     }
 
-    // Opacity: brighter stars fully opaque, dim stars still visible
+    // Opacity: brighter stars are more opaque
     const alpha = star.magnitude < 2 ? 1.0 :
-                  star.magnitude < 3 ? 0.95 :
-                  star.magnitude < 4 ? 0.85 :
-                  star.magnitude < 5 ? 0.7 :
-                  0.5;
+                  star.magnitude < 3 ? 0.9 :
+                  star.magnitude < 4 ? 0.75 :
+                  star.magnitude < 5 ? 0.55 :
+                  0.35;
 
     ctx.globalAlpha = alpha;
     ctx.beginPath();
@@ -345,8 +324,8 @@ function drawConstellations(
   size: number,
 ) {
   ctx.strokeStyle = theme.constellationLines;
-  ctx.lineWidth = Math.max(1.0, 0.8 * (size / 500));
-  ctx.globalAlpha = 0.65;
+  ctx.lineWidth = 0.6 * (size / 500);
+  ctx.globalAlpha = 0.55;
 
   for (const constellation of constellationData) {
     for (const line of constellation.lines) {

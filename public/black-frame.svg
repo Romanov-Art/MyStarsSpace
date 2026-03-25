@@ -6,7 +6,7 @@
 	.st0{fill:#FFFFFF;}
 	.st1{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}
 	.st2{fill:none;stroke:#FFFFFF;stroke-width:0.5;stroke-miterlimit:10;}
-	.st3{stroke:#FFFFFF;stroke-width:0.5;stroke-miterlimit:10;}
+	.st3{fill:none;stroke:#FFFFFF;stroke-width:0.5;stroke-miterlimit:10;}
 	.st4{font-family:'Montserrat-Medium';}
 	.st5{font-size:15.3846px;}
 	.st6{letter-spacing:1;}

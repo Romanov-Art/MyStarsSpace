@@ -373,6 +373,8 @@ html, body {
   justify-content: flex-start;
   padding: 5%;
   border: 8px solid;
+  position: relative;
+  overflow: hidden;
 }
 
 .poster-canvas--black { background: #000; border-color: #000; color: #fff; }
@@ -384,6 +386,7 @@ html, body {
   aspect-ratio: 1;
   margin: 4% 0;
   position: relative;
+  z-index: 2;
 }
 
 .poster__starmap-canvas {
@@ -393,15 +396,22 @@ html, body {
   overflow: hidden;
 }
 
-.poster__frame-overlay {
+/* SVG frame as background — behind the canvas */
+.poster__frame-bg {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 2;
+  z-index: 1;
   object-fit: fill;
+}
+
+/* Text sits on top of SVG */
+.poster__text {
+  position: relative;
+  z-index: 2;
 }
 
 /* Cardinal directions */
