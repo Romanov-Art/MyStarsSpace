@@ -34,10 +34,13 @@ html, body {
   min-height: 100vh;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 #app {
   min-height: 100vh;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 /* ─── Header ──────────────────────────────────────────────────── */
@@ -113,8 +116,11 @@ html, body {
 @media (max-width: 768px) {
   .editor-layout {
     grid-template-columns: 1fr;
-    padding: 16px;
+    padding: 12px;
+    gap: 16px;
+    min-height: auto;
   }
+  .editor-layout__info { display: none; }
 }
 
 /* ─── Control Panel (Left) ─────────────────────────────────────── */
@@ -124,6 +130,8 @@ html, body {
   gap: 16px;
   overflow-y: auto;
   max-height: calc(100vh - 100px);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .control-panel {
@@ -353,6 +361,8 @@ html, body {
   flex-direction: column;
   align-items: center;
   gap: 24px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* ── Poster Preview ─── */
