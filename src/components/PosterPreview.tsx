@@ -228,6 +228,50 @@ export default function PosterPreview({
 // DRAWING FUNCTIONS
 // ──────────────────────────────────────────────────────────────────
 
+/** Convert B-V color index to RGB (approximation of blackbody star colors) */
+function bvToRGB(bv: number): [number, number, number] {
+  // Clamp to typical range
+  const t = Math.max(-0.4, Math.min(2.0, bv));
+
+  let r: number, g: number, b: number;
+
+  // Red channel
+  if (t < 0) {
+    r = 0.61 + 0.11 * t + 0.1 * t * t;
+  } else if (t < 0.4) {
+    r = 0.83 + 0.17 * t;
+  } else {
+    r = 1.0;
+  }
+
+  // Green channel
+  if (t < 0) {
+    g = 0.7 + 0.07 * t + 0.1 * t * t;
+  } else if (t < 0.4) {
+    g = 0.87 + 0.11 * t;
+  } else if (t < 1.6) {
+    g = 1.0 - 0.16 * (t - 0.4);
+  } else {
+    g = 0.81 - 0.5 * (t - 1.6);
+  }
+
+  // Blue channel
+  if (t < 0.4) {
+    b = 1.0;
+  } else if (t < 1.5) {
+    b = 1.0 - 0.47 * (t - 0.4);
+  } else if (t < 1.94) {
+    b = 0.48 - 1.09 * (t - 1.5);
+  } else {
+    b = 0.0;
+  }
+
+  return [
+    Math.round(Math.max(0, Math.min(1, r)) * 255),
+    Math.round(Math.max(0, Math.min(1, g)) * 255),
+    Math.round(Math.max(0, Math.min(1, b)) * 255),
+  ];
+}
 function drawGrid(
   ctx: CanvasRenderingContext2D,
   center: number, radius: number,
@@ -264,12 +308,12 @@ function drawStars(
   ctx: CanvasRenderingContext2D,
   center: number, radius: number,
   lst: number, lat: number,
-  theme: { stars: string },
+  theme: { stars: string; background: string },
   size: number,
   showNames: boolean = false,
   allStars: StarData[],
 ) {
-  ctx.fillStyle = theme.stars;
+  const isDarkTheme = theme.background !== '#ffffff';
 
   for (const star of allStars) {
     if (star.magnitude > 6.5) continue;
@@ -310,7 +354,27 @@ function drawStars(
                   star.magnitude < 5 ? 0.6 :
                   0.4;
 
+    // Star color from B-V index
+    const [r, g, b] = bvToRGB(star.bv ?? 0.6);
+    const starColor = isDarkTheme
+      ? `rgb(${r},${g},${b})`
+      : `rgb(${Math.round(r * 0.3)},${Math.round(g * 0.3)},${Math.round(b * 0.3)})`;
+
+    // Glow for bright stars (magnitude < 1.5 on dark themes)
+    if (isDarkTheme && star.magnitude < 1.5) {
+      const glowRadius = starSize * 3;
+      const glow = ctx.createRadialGradient(x, y, starSize * 0.5, x, y, glowRadius);
+      glow.addColorStop(0, `rgba(${r},${g},${b},${alpha * 0.35})`);
+      glow.addColorStop(1, `rgba(${r},${g},${b},0)`);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     ctx.globalAlpha = alpha;
+    ctx.fillStyle = starColor;
     ctx.beginPath();
     ctx.arc(x, y, starSize, 0, Math.PI * 2);
     ctx.fill();

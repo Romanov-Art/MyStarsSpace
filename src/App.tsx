@@ -96,7 +96,27 @@ export default function App() {
       img.onerror = reject;
       img.src = `/${getDefaultFrame().filename}`;
     });
-    ctx.drawImage(frameSvg, mapX, mapY, mapSize, mapSize);
+
+    if (themeId === 'white') {
+      // Invert frame colors for white theme (matches CSS filter: invert(1))
+      const tmpCanvas = document.createElement('canvas');
+      tmpCanvas.width = Math.round(mapSize);
+      tmpCanvas.height = Math.round(mapSize);
+      const tmpCtx = tmpCanvas.getContext('2d')!;
+      tmpCtx.drawImage(frameSvg, 0, 0, tmpCanvas.width, tmpCanvas.height);
+      const imgData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
+      const d = imgData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        d[i] = 255 - d[i];       // R
+        d[i + 1] = 255 - d[i + 1]; // G
+        d[i + 2] = 255 - d[i + 2]; // B
+        // Alpha stays the same
+      }
+      tmpCtx.putImageData(imgData, 0, 0);
+      ctx.drawImage(tmpCanvas, mapX, mapY, mapSize, mapSize);
+    } else {
+      ctx.drawImage(frameSvg, mapX, mapY, mapSize, mapSize);
+    }
 
     // 4) Draw star canvas on top (already includes background fill + clipping)
     ctx.drawImage(starCanvas, mapX, mapY, mapSize, mapSize);
