@@ -371,7 +371,9 @@ html, body {
   max-width: 500px;
   aspect-ratio: 3/4;
   position: relative;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: 2px;
+  overflow: hidden;
 }
 
 .poster-canvas {
@@ -388,7 +390,7 @@ html, body {
 }
 
 .poster-canvas--black { background: #000; border-color: #000; color: #fff; }
-.poster-canvas--white { background: #fff; border-color: #222; color: #000; }
+.poster-canvas--white { background: #fff; border-color: #bbb; color: #000; }
 .poster-canvas--navy { background: #2A2F41; border-color: #2A2F41; color: #fff; }
 
 .poster__starmap-container {
@@ -527,6 +529,13 @@ html, body {
   background: var(--color-accent-hover);
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(232, 64, 64, 0.3);
+}
+
+.export-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* ─── Right info column ───────────────────────────────────────── */

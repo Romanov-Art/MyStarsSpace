@@ -33,6 +33,7 @@ export default function App() {
   const [showTime, setShowTime] = useState(true);
   const [posterFont, setPosterFont] = useState('Cormorant Garamond');
   const [posterFontSize, setPosterFontSize] = useState(16);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Initialize subtitles with city and date
   React.useEffect(() => {
@@ -68,9 +69,12 @@ export default function App() {
   }, []);
 
   const handleExport = useCallback(async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
     // Find the star map canvas directly (it IS the .poster__starmap-canvas element)
     const starCanvas = document.querySelector('.poster__starmap-canvas') as HTMLCanvasElement;
-    if (!starCanvas) return;
+    if (!starCanvas) { setIsExporting(false); return; }
 
     const theme = getTheme(themeId);
     const W = 2000;
@@ -147,7 +151,10 @@ export default function App() {
     link.download = `starmap-${selectedCity.name}-${date.year}-${date.month}-${date.day}.png`;
     link.href = exportCanvas.toDataURL('image/png');
     link.click();
-  }, [phrase, subtitles, themeId, selectedSize, selectedCity, date, posterFont, posterFontSize]);
+    } finally {
+      setIsExporting(false);
+    }
+  }, [phrase, subtitles, themeId, selectedSize, selectedCity, date, posterFont, posterFontSize, isExporting]);
 
   return (
     <>
@@ -227,8 +234,11 @@ export default function App() {
           </div>
 
           {/* Export Button */}
-          <button className="export-btn" onClick={handleExport}>
-            {t('ui.export_png', locale)}
+          <button className="export-btn" onClick={handleExport} disabled={isExporting}>
+            {isExporting
+              ? (locale === 'ru' ? '⏳ Экспорт...' : '⏳ Exporting...')
+              : t('ui.export_png', locale)
+            }
           </button>
         </div>
 
