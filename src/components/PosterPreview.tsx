@@ -107,13 +107,31 @@ export default function PosterPreview({
   themeId, locale, selectedCity, date, time, layers, phrase, subtitles, showTime, posterFont, posterFontSize,
 }: PosterPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const theme = getTheme(themeId);
   const frame = getDefaultFrame();
   const [catalogLoaded, setCatalogLoaded] = useState(!!cachedStars);
+  const [containerSize, setContainerSize] = useState(0);
 
   // Load star catalog data on mount
   useEffect(() => {
     loadCatalogData().then(() => setCatalogLoaded(true));
+  }, []);
+
+  // Track container size for canvas resize
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const w = entry.contentRect.width;
+        if (w > 0) setContainerSize(w);
+      }
+    });
+    observer.observe(container);
+    // Initial size
+    setContainerSize(container.clientWidth);
+    return () => observer.disconnect();
   }, []);
 
   const dateTime = useMemo(() => {
@@ -121,15 +139,12 @@ export default function PosterPreview({
   }, [date, time]);
 
   useEffect(() => {
-    if (!catalogLoaded || !cachedStars) return;
+    if (!catalogLoaded || !cachedStars || containerSize === 0) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const parent = canvas.parentElement;
-    if (!parent) return;
-
     // Canvas fills the square frame container
-    const cssSize = Math.min(parent.clientWidth, parent.clientHeight);
+    const cssSize = containerSize;
     const dpr = window.devicePixelRatio || 1;
     // Draw in PHYSICAL pixels for crisp Retina rendering
     const size = Math.round(cssSize * dpr);
@@ -175,21 +190,24 @@ export default function PosterPreview({
 
     ctx.restore();
 
-  }, [themeId, selectedCity, dateTime, layers, theme, locale, frame, catalogLoaded]);
+  }, [themeId, selectedCity, dateTime, layers, theme, locale, frame, catalogLoaded, containerSize]);
 
   return (
     <div className="poster-frame">
       <div className={`poster-canvas poster-canvas--${themeId}`}>
-        {/* Square frame container: SVG as background, canvas on top */}
-        <div
-          className="poster__starmap-container"
-          style={{
-            backgroundImage: `url(/${frame.filename})`,
-            backgroundSize: '100% 100%',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
-        >
+        {/* Square frame container: separate frame div + canvas on top */}
+        <div ref={containerRef} className="poster__starmap-container">
+          {/* Frame background — can be inverted independently */}
+          <div
+            className="poster__frame-bg"
+            style={{
+              backgroundImage: `url(/${frame.filename})`,
+              backgroundSize: '100% 100%',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              filter: themeId === 'white' ? 'invert(1)' : 'none',
+            }}
+          />
           <canvas ref={canvasRef} className="poster__starmap-canvas" />
         </div>
 
