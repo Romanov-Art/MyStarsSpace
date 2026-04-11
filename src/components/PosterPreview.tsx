@@ -1,10 +1,9 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { t, type Locale } from '../i18n/index.js';
 import { getTheme } from '../config/themes.js';
 import { getDefaultFrame } from '../config/frames.js';
 import { getLocalSiderealTime } from '../core/astronomy.js';
 import { equatorialToHorizontal, stereographicProjection } from '../core/coordinates.js';
-import { constellationData } from '../data/constellations.js';
 import type { City, StarData } from '../types/index.js';
 
 interface PosterPreviewProps {
@@ -22,91 +21,82 @@ interface PosterPreviewProps {
 }
 
 // ──────────────────────────────────────────────────────────────────
-// STAR CATALOG — realistic sky distribution with ~6000 stars
+// STAR CATALOG — loaded from real d3-celestial stars.6.json (~9000 stars)
 // ──────────────────────────────────────────────────────────────────
-function generateRealisticStars(): StarData[] {
-  const stars: StarData[] = [];
-  let seed = 12345;
-  const rng = () => { seed = (seed * 48271) % 2147483647; return seed / 2147483647; };
 
-  // Galactic plane (Milky Way band) — denser star region
-  // Galactic center ≈ RA 17.76h, Dec -29°
-  for (let i = 0; i < 3000; i++) {
-    // Distribute along galactic plane with spread
-    const galLon = rng() * 360; // galactic longitude
-    const galLat = (rng() - 0.5) * 30; // ±15° from plane
+// Star name lookup: loaded separately from the GeoJSON properties
+const STAR_NAMES: Record<number, string> = {
+  // Map HIP IDs to common names for the brightest stars
+  32349: 'Sirius', 30438: 'Canopus', 69673: 'Arcturus', 91262: 'Vega',
+  24608: 'Capella', 24436: 'Rigel', 37279: 'Procyon', 27989: 'Betelgeuse',
+  97649: 'Altair', 21421: 'Aldebaran', 80763: 'Antares', 65474: 'Spica',
+  37826: 'Pollux', 113368: 'Fomalhaut', 102098: 'Deneb', 49669: 'Regulus',
+  36850: 'Castor', 11767: 'Polaris', 54061: 'Dubhe', 67301: 'Alkaid',
+  53910: 'Mizar', 59774: 'Megrez', 58001: 'Phecda', 53740: 'Merak',
+  62956: 'Alioth',
+};
 
-    // Simple galactic → equatorial (approximate)
-    const galLonRad = (galLon * Math.PI) / 180;
-    const galLatRad = (galLat * Math.PI) / 180;
-    // North galactic pole: RA=12.85h, Dec=27.13°
-    const ngpDec = (27.13 * Math.PI) / 180;
-    const ngpRA = 12.85;
-
-    const sinDec = Math.sin(ngpDec) * Math.sin(galLatRad) +
-      Math.cos(ngpDec) * Math.cos(galLatRad) * Math.cos(galLonRad - (33 * Math.PI / 180));
-    const dec = Math.asin(Math.max(-1, Math.min(1, sinDec))) * 180 / Math.PI;
-
-    const ra = (ngpRA + rng() * 24) % 24; // distribute around sky
-
-    // Magnitude: mostly dim (4-6.5), few bright
-    const mag = 2.5 + rng() * 4.0;
-
-    stars.push({ id: `g${i}`, ra, dec, magnitude: mag });
-  }
-
-  // Uniform sky distribution — non-galactic stars
-  for (let i = 0; i < 3000; i++) {
-    const ra = rng() * 24;
-    // Uniform on sphere: dec = asin(2u - 1)
-    const dec = Math.asin(2 * rng() - 1) * (180 / Math.PI);
-    const mag = 1.5 + rng() * 5.0;
-    stars.push({ id: `u${i}`, ra, dec, magnitude: mag });
-  }
-
-  // Named bright stars with accurate positions
-  const namedStars: StarData[] = [
-    { id: 'sirius', ra: 6.752, dec: -16.716, magnitude: -1.46, name: 'Sirius' },
-    { id: 'canopus', ra: 6.399, dec: -52.696, magnitude: -0.74, name: 'Canopus' },
-    { id: 'arcturus', ra: 14.261, dec: 19.182, magnitude: -0.05, name: 'Arcturus' },
-    { id: 'vega', ra: 18.616, dec: 38.784, magnitude: 0.03, name: 'Vega' },
-    { id: 'capella', ra: 5.278, dec: 45.998, magnitude: 0.08, name: 'Capella' },
-    { id: 'rigel', ra: 5.242, dec: -8.202, magnitude: 0.13, name: 'Rigel' },
-    { id: 'procyon', ra: 7.655, dec: 5.225, magnitude: 0.34, name: 'Procyon' },
-    { id: 'betelgeuse', ra: 5.919, dec: 7.407, magnitude: 0.42, name: 'Betelgeuse' },
-    { id: 'altair', ra: 19.846, dec: 8.868, magnitude: 0.76, name: 'Altair' },
-    { id: 'aldebaran', ra: 4.599, dec: 16.509, magnitude: 0.85, name: 'Aldebaran' },
-    { id: 'antares', ra: 16.490, dec: -26.432, magnitude: 0.96, name: 'Antares' },
-    { id: 'spica', ra: 13.420, dec: -11.161, magnitude: 0.97, name: 'Spica' },
-    { id: 'pollux', ra: 7.755, dec: 28.026, magnitude: 1.14, name: 'Pollux' },
-    { id: 'fomalhaut', ra: 22.961, dec: -29.622, magnitude: 1.16, name: 'Fomalhaut' },
-    { id: 'deneb', ra: 20.690, dec: 45.280, magnitude: 1.25, name: 'Deneb' },
-    { id: 'regulus', ra: 10.140, dec: 11.967, magnitude: 1.35, name: 'Regulus' },
-    { id: 'castor', ra: 7.577, dec: 31.888, magnitude: 1.57, name: 'Castor' },
-    { id: 'polaris', ra: 2.530, dec: 89.264, magnitude: 1.98, name: 'Polaris' },
-    { id: 'dubhe', ra: 11.062, dec: 61.751, magnitude: 1.79, name: 'Dubhe' },
-    { id: 'merak', ra: 11.031, dec: 56.382, magnitude: 2.37, name: 'Merak' },
-    { id: 'phecda', ra: 11.897, dec: 53.695, magnitude: 2.44, name: 'Phecda' },
-    { id: 'megrez', ra: 12.257, dec: 57.032, magnitude: 3.31, name: 'Megrez' },
-    { id: 'alioth', ra: 12.900, dec: 55.960, magnitude: 1.77, name: 'Alioth' },
-    { id: 'mizar', ra: 13.399, dec: 54.926, magnitude: 2.27, name: 'Mizar' },
-    { id: 'alkaid', ra: 13.792, dec: 49.313, magnitude: 1.86, name: 'Alkaid' },
-    { id: 'bellatrix', ra: 5.419, dec: 6.350, magnitude: 1.64, name: 'Bellatrix' },
-    { id: 'mintaka', ra: 5.533, dec: -0.299, magnitude: 2.23, name: 'Mintaka' },
-    { id: 'alnilam', ra: 5.603, dec: -1.202, magnitude: 1.69, name: 'Alnilam' },
-    { id: 'alnitak', ra: 5.679, dec: -1.943, magnitude: 1.77, name: 'Alnitak' },
-    { id: 'saiph', ra: 5.796, dec: -9.670, magnitude: 2.06, name: 'Saiph' },
-    { id: 'schedar', ra: 0.675, dec: 56.537, magnitude: 2.23, name: 'Schedar' },
-    { id: 'caph', ra: 0.153, dec: 59.150, magnitude: 2.27, name: 'Caph' },
-    { id: 'navi', ra: 0.945, dec: 60.717, magnitude: 2.47, name: 'Navi' },
-    { id: 'ruchbah', ra: 1.430, dec: 60.235, magnitude: 2.68, name: 'Ruchbah' },
-    { id: 'segin', ra: 1.907, dec: 63.670, magnitude: 3.37, name: 'Segin' },
-  ];
-
-  return [...stars, ...namedStars];
+interface ConstellationLineData {
+  id: string;
+  lines: [number, number, number, number][]; // [ra1_deg, dec1, ra2_deg, dec2]
 }
 
-const allStars = generateRealisticStars();
+/** Parse stars.6.json GeoJSON into StarData[] */
+function parseStarsGeoJSON(geojson: any): StarData[] {
+  return geojson.features.map((f: any) => {
+    const [raDeg, dec] = f.geometry.coordinates;
+    const id = Number(f.id);
+    return {
+      id: String(id),
+      ra: raDeg / 15.0, // degrees → hours
+      dec,
+      magnitude: f.properties.mag ?? 6.0,
+      name: STAR_NAMES[id],
+      bv: f.properties.bv ? parseFloat(f.properties.bv) : undefined,
+    } as StarData;
+  });
+}
+
+/** Parse constellations.lines.json into drawable line segments */
+function parseConstellationLinesGeoJSON(geojson: any): ConstellationLineData[] {
+  return geojson.features.map((f: any) => {
+    const lines: [number, number, number, number][] = [];
+    const multiLine = f.geometry.coordinates as number[][][];
+    for (const line of multiLine) {
+      for (let i = 0; i < line.length - 1; i++) {
+        // Coordinates are [RA_degrees, Dec_degrees]
+        // Convert RA from degrees to hours for our engine
+        lines.push([
+          line[i][0] / 15,   line[i][1],
+          line[i + 1][0] / 15, line[i + 1][1],
+        ]);
+      }
+    }
+    return { id: f.id, lines };
+  });
+}
+
+// Global catalog cache
+let cachedStars: StarData[] | null = null;
+let cachedConstellationLines: ConstellationLineData[] | null = null;
+let loadingPromise: Promise<void> | null = null;
+
+async function loadCatalogData(): Promise<void> {
+  if (cachedStars && cachedConstellationLines) return;
+  if (loadingPromise) return loadingPromise;
+
+  loadingPromise = (async () => {
+    const [starsRes, constRes] = await Promise.all([
+      fetch('/data/stars.6.json'),
+      fetch('/data/constellations.lines.json'),
+    ]);
+    const starsJson = await starsRes.json();
+    const constJson = await constRes.json();
+    cachedStars = parseStarsGeoJSON(starsJson);
+    cachedConstellationLines = parseConstellationLinesGeoJSON(constJson);
+  })();
+  return loadingPromise;
+}
 
 
 
@@ -119,12 +109,19 @@ export default function PosterPreview({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const theme = getTheme(themeId);
   const frame = getDefaultFrame();
+  const [catalogLoaded, setCatalogLoaded] = useState(!!cachedStars);
+
+  // Load star catalog data on mount
+  useEffect(() => {
+    loadCatalogData().then(() => setCatalogLoaded(true));
+  }, []);
 
   const dateTime = useMemo(() => {
     return new Date(Date.UTC(date.year, date.month - 1, date.day, time.hours, time.minutes));
   }, [date, time]);
 
   useEffect(() => {
+    if (!catalogLoaded || !cachedStars) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -169,16 +166,16 @@ export default function PosterPreview({
 
     // ── Stars ──
     const lst = getLocalSiderealTime(dateTime, selectedCity.lon);
-    drawStars(ctx, center, radius, lst, selectedCity.lat, theme, size, layers.constellationNames);
+    drawStars(ctx, center, radius, lst, selectedCity.lat, theme, size, layers.constellationNames, cachedStars!);
 
     // ── Constellation lines ──
     if (layers.constellationLines) {
-      drawConstellations(ctx, center, radius, lst, selectedCity.lat, theme, size);
+      drawConstellations(ctx, center, radius, lst, selectedCity.lat, theme, size, cachedConstellationLines!);
     }
 
     ctx.restore();
 
-  }, [themeId, selectedCity, dateTime, layers, theme, locale, frame]);
+  }, [themeId, selectedCity, dateTime, layers, theme, locale, frame, catalogLoaded]);
 
   return (
     <div className="poster-frame">
@@ -252,6 +249,7 @@ function drawStars(
   theme: { stars: string },
   size: number,
   showNames: boolean = false,
+  allStars: StarData[],
 ) {
   ctx.fillStyle = theme.stars;
 
@@ -349,12 +347,13 @@ function drawConstellations(
   lst: number, lat: number,
   theme: { constellationLines: string },
   size: number,
+  constellationLines: ConstellationLineData[],
 ) {
   ctx.strokeStyle = theme.constellationLines;
   ctx.lineWidth = Math.max(1, 0.8 * (size / 500));
   ctx.globalAlpha = 0.5;
 
-  for (const constellation of constellationData) {
+  for (const constellation of constellationLines) {
     for (const line of constellation.lines) {
       const [ra1, dec1, ra2, dec2] = line;
 

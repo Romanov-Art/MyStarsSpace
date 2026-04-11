@@ -4,6 +4,7 @@ import { cities, getCityName } from './data/cities.js';
 import { getDefaultConfig } from './config/celestial-config.js';
 import { getTheme, themes } from './config/themes.js';
 import { posterSizes } from './config/celestial-config.js';
+import { getDefaultFrame } from './config/frames.js';
 import type { City, StarMapConfig, PosterSize } from './types/index.js';
 
 import ControlPanel from './components/ControlPanel.js';
@@ -66,59 +67,67 @@ export default function App() {
     setLayers(prev => ({ ...prev, [layer]: !prev[layer] }));
   }, []);
 
-  const handleExport = useCallback(() => {
-    // Find the canvas inside poster and export
-    const canvas = document.querySelector('.poster__starmap-canvas canvas') as HTMLCanvasElement;
-    const posterEl = document.querySelector('.poster-frame') as HTMLElement;
-    if (!posterEl) return;
+  const handleExport = useCallback(async () => {
+    // Find the star map canvas directly (it IS the .poster__starmap-canvas element)
+    const starCanvas = document.querySelector('.poster__starmap-canvas') as HTMLCanvasElement;
+    if (!starCanvas) return;
 
-    // Use html2canvas approach: create offscreen canvas with poster content
-    // For now, simple canvas export
-    const exportCanvas = document.createElement('canvas');
-    exportCanvas.width = 2000;
-    exportCanvas.height = Math.round(2000 * (selectedSize.height / selectedSize.width));
-    const ctx = exportCanvas.getContext('2d')!;
     const theme = getTheme(themeId);
+    const W = 2000;
+    const H = Math.round(W * (selectedSize.height / selectedSize.width));
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = W;
+    exportCanvas.height = H;
+    const ctx = exportCanvas.getContext('2d')!;
 
-    // Background
+    // 1) Background
     ctx.fillStyle = theme.background;
-    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    ctx.fillRect(0, 0, W, H);
 
-    // Draw star map circle
-    if (canvas) {
-      const mapSize = exportCanvas.width * 0.85;
-      const mapX = (exportCanvas.width - mapSize) / 2;
-      const mapY = exportCanvas.width * 0.08;
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(mapX + mapSize / 2, mapY + mapSize / 2, mapSize / 2, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(canvas, mapX, mapY, mapSize, mapSize);
-      ctx.restore();
-    }
+    // 2) Star map area: square centered in the upper portion
+    const mapSize = W * 0.90;
+    const mapX = (W - mapSize) / 2;
+    const mapY = W * 0.04;
 
-    // Phrase text
+    // 3) Load and draw SVG frame as background
+    const frameSvg = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = `/${getDefaultFrame().filename}`;
+    });
+    ctx.drawImage(frameSvg, mapX, mapY, mapSize, mapSize);
+
+    // 4) Draw star canvas on top (already includes background fill + clipping)
+    ctx.drawImage(starCanvas, mapX, mapY, mapSize, mapSize);
+
+    // 5) Phrase text
+    const fontScale = W / 500; // relative to 500px reference
+    const phraseFontPx = posterFontSize * fontScale * 0.28;
     ctx.fillStyle = theme.text;
-    ctx.font = `400 ${exportCanvas.width * 0.04}px "${posterFont}", Georgia, serif`;
+    ctx.font = `400 ${Math.round(phraseFontPx)}px "${posterFont}", Georgia, serif`;
     ctx.textAlign = 'center';
-    const phraseY = exportCanvas.height * 0.75;
-    ctx.fillText(phrase, exportCanvas.width / 2, phraseY);
+    ctx.textBaseline = 'top';
+    const phraseY = mapY + mapSize + H * 0.03;
+    ctx.fillText(phrase, W / 2, phraseY);
 
-    // Subtitle lines
-    ctx.font = `500 ${exportCanvas.width * 0.02}px "Inter", sans-serif`;
-    ctx.globalAlpha = 0.8;
-    const baseY = exportCanvas.height * 0.85;
-    ctx.fillText(subtitles.line1, exportCanvas.width / 2, baseY);
-    ctx.font = `400 ${exportCanvas.width * 0.018}px "Inter", sans-serif`;
-    ctx.fillText(subtitles.line2, exportCanvas.width / 2, baseY + exportCanvas.width * 0.03);
-    ctx.fillText(subtitles.line3, exportCanvas.width / 2, baseY + exportCanvas.width * 0.055);
+    // 6) Subtitle lines
+    const subtitleGap = H * 0.025;
+    const subtitleBaseY = H * 0.82;
+    ctx.font = `500 ${Math.round(W * 0.022)}px "Inter", sans-serif`;
+    ctx.globalAlpha = 0.85;
+    ctx.fillText(subtitles.line1, W / 2, subtitleBaseY);
+    ctx.font = `400 ${Math.round(W * 0.018)}px "Inter", sans-serif`;
+    ctx.fillText(subtitles.line2, W / 2, subtitleBaseY + subtitleGap);
+    ctx.fillText(subtitles.line3, W / 2, subtitleBaseY + subtitleGap * 2);
+    ctx.globalAlpha = 1;
 
-    // Download
+    // 7) Download
     const link = document.createElement('a');
     link.download = `starmap-${selectedCity.name}-${date.year}-${date.month}-${date.day}.png`;
     link.href = exportCanvas.toDataURL('image/png');
     link.click();
-  }, [phrase, subtitles, themeId, selectedSize, selectedCity, date]);
+  }, [phrase, subtitles, themeId, selectedSize, selectedCity, date, posterFont, posterFontSize]);
 
   return (
     <>
