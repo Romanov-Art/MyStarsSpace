@@ -330,11 +330,11 @@ function drawMilkyWay(
 
   // Opacity per brightness level — reduced by 20%
   const opacityMap: Record<string, number> = {
-    ol1: 0.05,
-    ol2: 0.08,
-    ol3: 0.13,
-    ol4: 0.18,
-    ol5: 0.24,
+    ol1: 0.04,
+    ol2: 0.06,
+    ol3: 0.10,
+    ol4: 0.14,
+    ol5: 0.19,
   };
 
   const fillColor = '200,220,255'; // blue-white glow
