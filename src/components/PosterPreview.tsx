@@ -328,19 +328,19 @@ function drawMilkyWay(
   offCtx.arc(center, center, radius, 0, Math.PI * 2);
   offCtx.clip();
 
-  // Opacity per brightness level — higher values for better blur visibility
+  // Opacity per brightness level — reduced by 20%
   const opacityMap: Record<string, number> = {
-    ol1: 0.06,
-    ol2: 0.10,
-    ol3: 0.16,
-    ol4: 0.22,
-    ol5: 0.30,
+    ol1: 0.05,
+    ol2: 0.08,
+    ol3: 0.13,
+    ol4: 0.18,
+    ol5: 0.24,
   };
 
   const fillColor = '200,220,255'; // blue-white glow
 
   for (const layer of mwData) {
-    const alpha = opacityMap[layer.id] ?? 0.05;
+    const alpha = opacityMap[layer.id] ?? 0.04;
     offCtx.fillStyle = `rgba(${fillColor},${alpha})`;
 
     for (const polygon of layer.polygons) {
@@ -371,17 +371,17 @@ function drawMilkyWay(
     }
   }
 
-  // Apply Gaussian blur for smooth gradients
-  const blurAmount = Math.max(8, size / 80);
+  // Apply moderate blur for smooth gradients (less aggressive)
+  const blurAmount = Math.max(4, size / 200);
   ctx.save();
   ctx.filter = `blur(${blurAmount}px)`;
   ctx.drawImage(offCanvas, 0, 0);
   ctx.restore();
 
-  // Draw a second pass with less blur for the brighter core details
+  // Second pass with minimal blur for core structure
   ctx.save();
-  ctx.filter = `blur(${blurAmount * 0.4}px)`;
-  ctx.globalAlpha = 0.5;
+  ctx.filter = `blur(${blurAmount * 0.3}px)`;
+  ctx.globalAlpha = 0.4;
   ctx.drawImage(offCanvas, 0, 0);
   ctx.globalAlpha = 1;
   ctx.restore();
