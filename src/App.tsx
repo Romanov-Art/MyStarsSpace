@@ -173,8 +173,9 @@ export default function App() {
 
     // ── Text area (matches CSS: .poster__text padding: 5%, gap: 8%) ──
     const textAreaTop = W;
-    const textPadding = W * 0.05;
-    const textGap = W * 0.08; // matches CSS gap: 8%
+    const textPadding = W * 0.05; // CSS padding % is relative to width
+    const textAreaHeight = H - W;
+    const textGap = textAreaHeight * 0.08; // CSS gap % in flex-column is relative to container height
 
     // Scale fonts relative to preview (~500px wide canvas)
     const scale = W / 500;
