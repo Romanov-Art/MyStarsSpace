@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { t, setLocale, getLocale, type Locale, LOCALE_NAMES, AVAILABLE_LOCALES } from './i18n/index.js';
-import { cities, getCityName } from './data/cities.js';
+import { cities, getCityName, sanitizeInput } from './data/cities.js';
 import { getDefaultConfig } from './config/celestial-config.js';
 import { getTheme, themes } from './config/themes.js';
 import { posterSizes } from './config/celestial-config.js';
@@ -194,8 +194,8 @@ export default function App() {
             onCityChange={setSelectedCity}
             onDateChange={setDate}
             onTimeChange={setTime}
-            onPhraseChange={setPhrase}
-            onSubtitlesChange={setSubtitles}
+            onPhraseChange={v => setPhrase(sanitizeInput(v))}
+            onSubtitlesChange={s => setSubtitles({ line1: sanitizeInput(s.line1), line2: sanitizeInput(s.line2), line3: sanitizeInput(s.line3) })}
             onPhraseFontChange={setPhraseFont}
             onPhraseFontSizeChange={setPhraseFontSize}
             onSubtitleFontChange={setSubtitleFont}

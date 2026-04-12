@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { t, type Locale } from '../i18n/index.js';
-import { cities, findCity, getCityName } from '../data/cities.js';
+import { cities, findCity, getCityName, parseCoordinates, sanitizeInput } from '../data/cities.js';
 import type { City } from '../types/index.js';
 import FontSelector from './FontSelector.js';
 
@@ -65,15 +65,34 @@ export default function ControlPanel({
   const [showCityResults, setShowCityResults] = useState(false);
   const [fontPanelFor, setFontPanelFor] = useState<'phrase' | 'subtitle' | null>(null);
 
+  // Check if input looks like coordinates
+  const parsedCoords = useMemo(() => {
+    if (!cityQuery.trim()) return null;
+    return parseCoordinates(cityQuery);
+  }, [cityQuery]);
+
   const cityResults = useMemo(() => {
-    if (!cityQuery.trim()) return [];
+    if (!cityQuery.trim() || parsedCoords) return [];
     return findCity(cityQuery, locale).slice(0, 8);
-  }, [cityQuery, locale]);
+  }, [cityQuery, locale, parsedCoords]);
 
   const handleCitySelect = (city: City) => {
     onCityChange(city);
     setCityQuery('');
     setShowCityResults(false);
+  };
+
+  const handleCityInputKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && parsedCoords) {
+      const customCity: City = {
+        name: '',
+        country: '',
+        lat: parsedCoords.lat,
+        lon: parsedCoords.lon,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      };
+      handleCitySelect(customCity);
+    }
   };
 
   const handleCategoryClick = (categoryKey: string) => {
@@ -158,12 +177,18 @@ export default function ControlPanel({
         <div className="city-search" style={{ marginBottom: 12 }}>
           <input
             className="input-field"
-            placeholder={`${locale === 'ru' ? 'Начните тут' : 'Start here'}: ${getCityName(selectedCity, locale)}`}
+            placeholder={`${locale === 'ru' ? 'Город или координаты' : 'City or coordinates'}: ${getCityName(selectedCity, locale)}`}
             value={cityQuery}
             onChange={e => { setCityQuery(e.target.value); setShowCityResults(true); }}
             onFocus={() => setShowCityResults(true)}
             onBlur={() => setTimeout(() => setShowCityResults(false), 200)}
+            onKeyDown={handleCityInputKeyDown}
           />
+          {parsedCoords && (
+            <div className="city-search__coord-hint">
+              📍 {locale === 'ru' ? 'Координаты найдены — нажмите Enter' : 'Coordinates detected — press Enter'}
+            </div>
+          )}
           {showCityResults && cityResults.length > 0 && (
             <div className="city-search__results">
               {cityResults.map(city => (

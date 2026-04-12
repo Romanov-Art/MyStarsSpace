@@ -90,7 +90,75 @@ export function findCity(query: string, locale?: string): City[] {
 
 /**
  * Get city name in the specified locale, falling back to English.
+ * If no name is available (custom coordinates), returns DMS format.
  */
 export function getCityName(city: City, locale: string): string {
-  return city.localizedNames?.[locale] || city.name;
+  const name = city.localizedNames?.[locale] || city.name;
+  if (name) return name;
+  return formatDMS(city.lat, city.lon);
+}
+
+/**
+ * Format coordinates as DMS (Degrees, Minutes, Seconds).
+ * Example: 12°14'17.2"N 109°11'32.1"E
+ */
+export function formatDMS(lat: number, lon: number): string {
+  const toDMS = (value: number, posChar: string, negChar: string) => {
+    const dir = value >= 0 ? posChar : negChar;
+    const abs = Math.abs(value);
+    const deg = Math.floor(abs);
+    const minFloat = (abs - deg) * 60;
+    const min = Math.floor(minFloat);
+    const sec = ((minFloat - min) * 60).toFixed(1);
+    return `${deg}°${String(min).padStart(2, '0')}'${sec}"${dir}`;
+  };
+  return `${toDMS(lat, 'N', 'S')} ${toDMS(lon, 'E', 'W')}`;
+}
+
+/**
+ * Try to parse coordinate input. Supports:
+ * - Decimal: "12.241380, 109.193171"
+ * - DMS: "12°14'17.2"N 109°11'32.1"E"
+ * Returns { lat, lon } or null if not coordinates.
+ */
+export function parseCoordinates(input: string): { lat: number; lon: number } | null {
+  const s = sanitizeInput(input).trim();
+
+  // Try decimal format: "lat, lon" or "lat lon"
+  const decimalMatch = s.match(/^(-?\d+\.?\d*)\s*[,;\s]\s*(-?\d+\.?\d*)$/);
+  if (decimalMatch) {
+    const lat = parseFloat(decimalMatch[1]);
+    const lon = parseFloat(decimalMatch[2]);
+    if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+      return { lat, lon };
+    }
+  }
+
+  // Try DMS format: 12°14'17.2"N 109°11'32.1"E
+  const dmsPattern = /(\d+)[°]\s*(\d+)[''′]\s*(\d+\.?\d*)[""″]?\s*([NSns])\s+(\d+)[°]\s*(\d+)[''′]\s*(\d+\.?\d*)[""″]?\s*([EWew])/;
+  const dmsMatch = s.match(dmsPattern);
+  if (dmsMatch) {
+    let lat = parseInt(dmsMatch[1]) + parseInt(dmsMatch[2]) / 60 + parseFloat(dmsMatch[3]) / 3600;
+    let lon = parseInt(dmsMatch[5]) + parseInt(dmsMatch[6]) / 60 + parseFloat(dmsMatch[7]) / 3600;
+    if (dmsMatch[4].toUpperCase() === 'S') lat = -lat;
+    if (dmsMatch[8].toUpperCase() === 'W') lon = -lon;
+    if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+      return { lat, lon };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Sanitize user input: strip HTML/script tags, control characters.
+ * Prevents XSS injection in text fields.
+ */
+export function sanitizeInput(input: string): string {
+  return input
+    .replace(/<[^>]*>/g, '')          // strip HTML tags
+    .replace(/[^\P{C}\n\r\t]/gu, '')  // strip control chars except newline/tab
+    .replace(/javascript:/gi, '')      // strip JS protocol
+    .replace(/on\w+\s*=/gi, '')        // strip event handlers
+    .trim();
 }
