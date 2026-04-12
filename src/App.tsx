@@ -11,31 +11,62 @@ import ControlPanel from './components/ControlPanel.js';
 import PosterPreview from './components/PosterPreview.js';
 import LanguageSelector from './components/LanguageSelector.js';
 
+const LS_KEY = 'starmap-settings';
+
+function loadSettings(): Record<string, any> {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function saveSettings(s: Record<string, any>) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch {}
+}
+
 export default function App() {
-  const [locale, _setLocale] = useState<Locale>(getLocale());
-  const [themeId, setThemeId] = useState('black');
-  const [selectedCity, setSelectedCity] = useState<City>(cities[0]); // Moscow
-  const [date, setDate] = useState({ day: 26, month: 3, year: 2026 });
-  const [time, setTime] = useState({ hours: 0, minutes: 0 });
-  const [layers, setLayers] = useState({
+  const saved = React.useMemo(() => loadSettings(), []);
+
+  const [locale, _setLocale] = useState<Locale>(() => saved.locale || getLocale());
+  const [themeId, setThemeId] = useState(() => saved.themeId || 'black');
+  const [selectedCity, setSelectedCity] = useState<City>(() => saved.selectedCity || cities[0]);
+  const [date, setDate] = useState(() => saved.date || { day: 26, month: 3, year: 2026 });
+  const [time, setTime] = useState(() => saved.time || { hours: 0, minutes: 0 });
+  const [layers, setLayers] = useState(() => saved.layers || {
     constellationLines: true,
     constellationNames: true,
     milkyWay: true,
   });
-  const [phrase, setPhrase] = useState(() => t('poster.under_this_sky', getLocale()));
-  const [subtitles, setSubtitles] = useState({
+  const [phrase, setPhrase] = useState(() => saved.phrase || t('poster.under_this_sky', getLocale()));
+  const [subtitles, setSubtitles] = useState(() => saved.subtitles || {
     line1: t('category.birthday', getLocale()),
     line2: '',
     line3: '',
   });
-  const [selectedSize, setSelectedSize] = useState<PosterSize>(posterSizes[1]); // 30x40
-  const [phraseFont, setPhraseFont] = useState('Cormorant Garamond');
-  const [phraseFontSize, setPhraseFontSize] = useState(16);
-  const [subtitleFont, setSubtitleFont] = useState('Cormorant Garamond');
-  const [subtitleFontSize, setSubtitleFontSize] = useState(16);
+  const [selectedSize, setSelectedSize] = useState<PosterSize>(() => {
+    if (saved.selectedSize) {
+      return posterSizes.find(s => s.width === saved.selectedSize.width && s.height === saved.selectedSize.height) || posterSizes[1];
+    }
+    return posterSizes[1];
+  });
+  const [phraseFont, setPhraseFont] = useState(() => saved.phraseFont || 'Cormorant Garamond');
+  const [phraseFontSize, setPhraseFontSize] = useState(() => saved.phraseFontSize || 16);
+  const [subtitleFont, setSubtitleFont] = useState(() => saved.subtitleFont || 'Cormorant Garamond');
+  const [subtitleFontSize, setSubtitleFontSize] = useState(() => saved.subtitleFontSize || 16);
   const [isExporting, setIsExporting] = useState(false);
-  const [starColors, setStarColors] = useState(true);
-  const [gridStyle, setGridStyle] = useState<'hide' | 'flat' | 'spherical'>('flat');
+  const [starColors, setStarColors] = useState(() => saved.starColors ?? true);
+  const [gridStyle, setGridStyle] = useState<'hide' | 'flat' | 'spherical'>(() => saved.gridStyle || 'flat');
+
+  // Persist settings to localStorage on every change
+  React.useEffect(() => {
+    saveSettings({
+      locale, themeId, selectedCity, date, time, layers, phrase, subtitles,
+      selectedSize, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize,
+      starColors, gridStyle,
+    });
+  }, [locale, themeId, selectedCity, date, time, layers, phrase, subtitles,
+      selectedSize, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize,
+      starColors, gridStyle]);
 
   // Initialize subtitles with city and date
   React.useEffect(() => {
