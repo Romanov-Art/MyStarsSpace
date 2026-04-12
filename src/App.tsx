@@ -158,16 +158,15 @@ export default function App() {
     // 4) Draw star canvas on top
     ctx.drawImage(starCanvas, mapX, mapY, mapSize, mapSize);
 
-    // ── Text area (matches CSS: .poster__text padding: 5% 5% 5%, flex space-between) ──
-    // Text area is from y=W (bottom of square star map) to y=H
+    // ── Text area (matches CSS: .poster__text padding: 5%, gap: 8%) ──
     const textAreaTop = W;
-    const textPadding = W * 0.05; // CSS padding % is relative to width
-    const textAreaHeight = H - W;
+    const textPadding = W * 0.05;
+    const textGap = W * 0.08; // matches CSS gap: 8%
 
     // Scale fonts relative to preview (~500px wide canvas)
     const scale = W / 500;
 
-    // 5) Phrase text — positioned at top of text area + padding (matches flex space-between)
+    // 5) Phrase text — at top of text area
     const phrasePx = Math.round(phraseFontSize * scale);
     const phraseLineHeight = phrasePx * 1.3;
     ctx.fillStyle = theme.text;
@@ -177,19 +176,22 @@ export default function App() {
     const phraseY = textAreaTop + textPadding;
     const phraseLines = phrase.split('\n');
     phraseLines.forEach((line: string, i: number) => {
-      ctx.fillText(line, W / 2, phraseY + i * phraseLineHeight);
+      const y = phraseY + i * phraseLineHeight;
+      if (y < H - textPadding) ctx.fillText(line, W / 2, y);
     });
+    const phraseBottom = phraseY + phraseLines.length * phraseLineHeight;
 
-    // 6) Subtitle lines — positioned at bottom of text area (matches flex space-between)
+    // 6) Subtitle lines — right after phrase with gap
     const subtitlePx = Math.round(subtitleFontSize * scale * 0.7);
     const subtitleLineHeight = subtitlePx * 1.6;
-    const totalSubtitleHeight = subtitleLineHeight * 3;
-    const subtitleStartY = H - textPadding - totalSubtitleHeight;
+    const subtitleStartY = phraseBottom + textGap;
     ctx.font = `400 ${subtitlePx}px "${subtitleFont}", "Inter", sans-serif`;
     ctx.globalAlpha = 0.8;
-    ctx.fillText(subtitles.line1, W / 2, subtitleStartY);
-    ctx.fillText(subtitles.line2, W / 2, subtitleStartY + subtitleLineHeight);
-    ctx.fillText(subtitles.line3, W / 2, subtitleStartY + subtitleLineHeight * 2);
+    const subLines = [subtitles.line1, subtitles.line2, subtitles.line3];
+    subLines.forEach((line: string, i: number) => {
+      const y = subtitleStartY + i * subtitleLineHeight;
+      if (y < H - textPadding) ctx.fillText(line, W / 2, y);
+    });
     ctx.globalAlpha = 1;
 
     // 7) Download via Blob (better for large files)
