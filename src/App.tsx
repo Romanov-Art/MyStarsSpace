@@ -185,8 +185,8 @@ export default function App() {
     const phraseBottom = phraseY + phraseLines.length * phraseLineHeight;
 
     // 6) Subtitle lines — right after phrase with gap
-    const subtitlePx = Math.round(subtitleFontSize * scale * 0.7);
-    const subtitleLineHeight = subtitlePx * 1.6;
+    const subtitlePx = Math.round(subtitleFontSize * scale);
+    const subtitleLineHeight = subtitlePx * 1.5;
     const subtitleStartY = phraseBottom + textGap;
     ctx.font = `400 ${subtitlePx}px "${subtitleFont}", "Inter", sans-serif`;
     ctx.globalAlpha = 0.8;
