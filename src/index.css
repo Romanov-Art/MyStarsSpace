@@ -222,7 +222,7 @@ html, body {
 .theme-circle--black { background: #000000; }
 .theme-circle--white { background: #ffffff; border: 3px solid #ddd; }
 .theme-circle--white.theme-circle--active { border-color: var(--color-accent); }
-.theme-circle--navy { background: #101217; }
+.theme-circle--navy { background: #363a44; }
 .theme-circle--beige { background: #dbccb6; }
 
 .theme-circle__check {
@@ -478,7 +478,7 @@ html, body {
 
 .poster-canvas--black { background: #000; border-color: #000; color: #fff; }
 .poster-canvas--white { background: #fff; border-color: #bbb; color: #000; }
-.poster-canvas--navy { background: #101217; border-color: #101217; color: #fff; }
+.poster-canvas--navy { background: #363a44; border-color: #363a44; color: #fff; }
 .poster-canvas--beige { background: #dbccb6; border-color: #c4b49c; color: #2c2418; }
 
 .poster__starmap-container {

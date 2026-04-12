@@ -26,7 +26,7 @@ export const themes: Record<string, Theme> = {
   navy: {
     id: 'navy',
     name: 'Deep Navy',
-    background: '#101217',
+    background: '#363a44',
     stars: '#ffffff',
     grid: '#4a5068',
     constellationLines: '#8a9ab5',
