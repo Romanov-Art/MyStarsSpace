@@ -200,16 +200,19 @@ export default function App() {
     const subtitleLineHeight = subtitlePx * 1.5;
     let subtitleY = phraseBottom + textGap;
 
+    // Set letter-spacing to match CSS (1px at preview scale)
+    ctx.letterSpacing = `${Math.round(1 * scale)}px`;
+
     // Line 1 — bold (name/company)
     if (subtitles.line1) {
-      ctx.font = `500 ${subtitlePx}px "${subtitleFont}", "Inter", sans-serif`;
+      ctx.font = `500 ${subtitlePx}px "${subtitleFont}", serif`;
       ctx.globalAlpha = 1;
       if (subtitleY < H - textPadding) ctx.fillText(subtitles.line1, W / 2, subtitleY);
       subtitleY += subtitleLineHeight + subtitlePx * 0.3;
     }
 
     // Lines 2-4 — regular
-    ctx.font = `400 ${subtitlePx}px "${subtitleFont}", "Inter", sans-serif`;
+    ctx.font = `400 ${subtitlePx}px "${subtitleFont}", serif`;
     ctx.globalAlpha = 0.8;
     const remainingLines = [subtitles.line2, subtitles.line3, subtitles.line4].filter(Boolean) as string[];
     remainingLines.forEach((line: string, i: number) => {
@@ -217,6 +220,7 @@ export default function App() {
       if (y < H - textPadding) ctx.fillText(line, W / 2, y);
     });
     ctx.globalAlpha = 1;
+    ctx.letterSpacing = '0px';
 
     // 7) Download via Blob (better for large files)
     exportCanvas.toBlob((blob) => {
