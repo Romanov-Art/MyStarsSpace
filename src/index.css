@@ -199,6 +199,7 @@ html, body {
   display: flex;
   gap: 20px;
   justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .layer-toggle {
@@ -387,6 +388,7 @@ html, body {
   border: 8px solid;
   position: relative;
   overflow: hidden;
+  transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
 }
 
 .poster-canvas--black { background: #000; border-color: #000; color: #fff; }
