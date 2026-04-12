@@ -30,8 +30,10 @@ export default function App() {
   });
   const [selectedSize, setSelectedSize] = useState<PosterSize>(posterSizes[1]); // 30x40
   const [showTime, setShowTime] = useState(true);
-  const [posterFont, setPosterFont] = useState('Cormorant Garamond');
-  const [posterFontSize, setPosterFontSize] = useState(16);
+  const [phraseFont, setPhraseFont] = useState('Cormorant Garamond');
+  const [phraseFontSize, setPhraseFontSize] = useState(16);
+  const [subtitleFont, setSubtitleFont] = useState('Cormorant Garamond');
+  const [subtitleFontSize, setSubtitleFontSize] = useState(16);
   const [isExporting, setIsExporting] = useState(false);
   const [starColors, setStarColors] = useState(true);
   const [gridStyle, setGridStyle] = useState<'hide' | 'flat' | 'spherical'>('flat');
@@ -128,9 +130,9 @@ export default function App() {
 
     // 5) Phrase text
     const fontScale = W / 500; // relative to 500px reference
-    const phraseFontPx = posterFontSize * fontScale * 0.28;
+    const phraseFontPx = phraseFontSize * fontScale * 0.28;
     ctx.fillStyle = theme.text;
-    ctx.font = `400 ${Math.round(phraseFontPx)}px "${posterFont}", Georgia, serif`;
+    ctx.font = `400 ${Math.round(phraseFontPx)}px "${phraseFont}", Georgia, serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     const phraseY = mapY + mapSize + H * 0.03;
@@ -139,10 +141,10 @@ export default function App() {
     // 6) Subtitle lines
     const subtitleGap = H * 0.025;
     const subtitleBaseY = H * 0.82;
-    ctx.font = `500 ${Math.round(W * 0.022)}px "Inter", sans-serif`;
+    ctx.font = `500 ${Math.round(W * 0.022)}px "${subtitleFont}", "Inter", sans-serif`;
     ctx.globalAlpha = 0.85;
     ctx.fillText(subtitles.line1, W / 2, subtitleBaseY);
-    ctx.font = `400 ${Math.round(W * 0.018)}px "Inter", sans-serif`;
+    ctx.font = `400 ${Math.round(W * 0.018)}px "${subtitleFont}", "Inter", sans-serif`;
     ctx.fillText(subtitles.line2, W / 2, subtitleBaseY + subtitleGap);
     ctx.fillText(subtitles.line3, W / 2, subtitleBaseY + subtitleGap * 2);
     ctx.globalAlpha = 1;
@@ -155,7 +157,7 @@ export default function App() {
     } finally {
       setIsExporting(false);
     }
-  }, [phrase, subtitles, themeId, selectedSize, selectedCity, date, posterFont, posterFontSize, isExporting]);
+  }, [phrase, subtitles, themeId, selectedSize, selectedCity, date, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, isExporting]);
 
   return (
     <>
@@ -185,8 +187,10 @@ export default function App() {
             phrase={phrase}
             subtitles={subtitles}
             showTime={showTime}
-            posterFont={posterFont}
-            posterFontSize={posterFontSize}
+            phraseFont={phraseFont}
+            phraseFontSize={phraseFontSize}
+            subtitleFont={subtitleFont}
+            subtitleFontSize={subtitleFontSize}
             starColors={starColors}
             gridStyle={gridStyle}
             onThemeChange={handleThemeChange}
@@ -197,10 +201,12 @@ export default function App() {
             onPhraseChange={setPhrase}
             onSubtitlesChange={setSubtitles}
             onShowTimeChange={setShowTime}
-            onFontChange={setPosterFont}
+            onPhraseFontChange={setPhraseFont}
+            onPhraseFontSizeChange={setPhraseFontSize}
+            onSubtitleFontChange={setSubtitleFont}
+            onSubtitleFontSizeChange={setSubtitleFontSize}
             onStarColorsChange={setStarColors}
             onGridStyleChange={setGridStyle}
-            onFontSizeChange={setPosterFontSize}
           />
         </div>
 
@@ -216,8 +222,10 @@ export default function App() {
             phrase={phrase}
             subtitles={subtitles}
             showTime={showTime}
-            posterFont={posterFont}
-            posterFontSize={posterFontSize}
+            phraseFont={phraseFont}
+            phraseFontSize={phraseFontSize}
+            subtitleFont={subtitleFont}
+            subtitleFontSize={subtitleFontSize}
             starColors={starColors}
             gridStyle={gridStyle}
           />

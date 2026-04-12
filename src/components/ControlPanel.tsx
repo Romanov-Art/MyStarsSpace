@@ -14,8 +14,10 @@ interface ControlPanelProps {
   phrase: string;
   subtitles: { line1: string; line2: string; line3: string };
   showTime: boolean;
-  posterFont: string;
-  posterFontSize: number;
+  phraseFont: string;
+  phraseFontSize: number;
+  subtitleFont: string;
+  subtitleFontSize: number;
   starColors: boolean;
   gridStyle: 'hide' | 'flat' | 'spherical';
   onThemeChange: (id: string) => void;
@@ -26,8 +28,10 @@ interface ControlPanelProps {
   onPhraseChange: (phrase: string) => void;
   onSubtitlesChange: (subs: { line1: string; line2: string; line3: string }) => void;
   onShowTimeChange: (show: boolean) => void;
-  onFontChange: (font: string) => void;
-  onFontSizeChange: (size: number) => void;
+  onPhraseFontChange: (font: string) => void;
+  onPhraseFontSizeChange: (size: number) => void;
+  onSubtitleFontChange: (font: string) => void;
+  onSubtitleFontSizeChange: (size: number) => void;
   onStarColorsChange: (colored: boolean) => void;
   onGridStyleChange: (style: 'hide' | 'flat' | 'spherical') => void;
 }
@@ -54,10 +58,10 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
 
 export default function ControlPanel({
   locale, themeId, layers, selectedCity, date, time, phrase,
-  subtitles, showTime, posterFont, posterFontSize, starColors, gridStyle,
+  subtitles, showTime, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, starColors, gridStyle,
   onThemeChange, onToggleLayer, onCityChange,
   onDateChange, onTimeChange, onPhraseChange, onSubtitlesChange, onShowTimeChange,
-  onFontChange, onFontSizeChange, onStarColorsChange, onGridStyleChange,
+  onPhraseFontChange, onPhraseFontSizeChange, onSubtitleFontChange, onSubtitleFontSizeChange, onStarColorsChange, onGridStyleChange,
 }: ControlPanelProps) {
   const [cityQuery, setCityQuery] = useState('');
   const [showCityResults, setShowCityResults] = useState(false);
@@ -213,10 +217,10 @@ export default function ControlPanel({
         </div>
         {fontPanelFor === 'phrase' && (
           <FontSelector
-            selectedFont={posterFont}
-            selectedFontSize={posterFontSize}
-            onChange={onFontChange}
-            onFontSizeChange={onFontSizeChange}
+            selectedFont={phraseFont}
+            selectedFontSize={phraseFontSize}
+            onChange={onPhraseFontChange}
+            onFontSizeChange={onPhraseFontSizeChange}
             locale={locale}
           />
         )}
@@ -253,10 +257,10 @@ export default function ControlPanel({
         </div>
         {fontPanelFor === 'subtitle' && (
           <FontSelector
-            selectedFont={posterFont}
-            selectedFontSize={posterFontSize}
-            onChange={onFontChange}
-            onFontSizeChange={onFontSizeChange}
+            selectedFont={subtitleFont}
+            selectedFontSize={subtitleFontSize}
+            onChange={onSubtitleFontChange}
+            onFontSizeChange={onSubtitleFontSizeChange}
             locale={locale}
           />
         )}

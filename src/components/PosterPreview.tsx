@@ -16,8 +16,10 @@ interface PosterPreviewProps {
   phrase: string;
   subtitles: { line1: string; line2: string; line3: string };
   showTime: boolean;
-  posterFont: string;
-  posterFontSize: number;
+  phraseFont: string;
+  phraseFontSize: number;
+  subtitleFont: string;
+  subtitleFontSize: number;
   starColors: boolean;
   gridStyle: 'hide' | 'flat' | 'spherical';
 }
@@ -129,7 +131,7 @@ async function loadCatalogData(): Promise<void> {
 // COMPONENT
 // ──────────────────────────────────────────────────────────────────
 export default function PosterPreview({
-  themeId, locale, selectedCity, date, time, layers, phrase, subtitles, showTime, posterFont, posterFontSize, starColors, gridStyle,
+  themeId, locale, selectedCity, date, time, layers, phrase, subtitles, showTime, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, starColors, gridStyle,
 }: PosterPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -245,9 +247,9 @@ export default function PosterPreview({
           <canvas ref={canvasRef} className="poster__starmap-canvas" />
         </div>
 
-        <div className="poster__text" style={{ fontFamily: `"${posterFont}", serif` }}>
-          <div className="poster__phrase" style={{ fontSize: `${posterFontSize}px` }}>{phrase}</div>
-          <div>
+        <div className="poster__text">
+          <div className="poster__phrase" style={{ fontFamily: `"${phraseFont}", serif`, fontSize: `${phraseFontSize}px` }}>{phrase}</div>
+          <div style={{ fontFamily: `"${subtitleFont}", serif` }}>
             <div className="poster__subtitle-line poster__subtitle-line--main">{subtitles.line1}</div>
             <div className="poster__subtitle-line">{subtitles.line2}</div>
             <div className="poster__subtitle-line">{subtitles.line3}</div>
