@@ -470,6 +470,7 @@ html, body {
   position: relative;
   overflow: hidden;
   transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+  box-sizing: border-box;
 }
 
 .poster-canvas--black { background: #000; border-color: #000; color: #fff; }
@@ -481,6 +482,7 @@ html, body {
   aspect-ratio: 1;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .poster__frame-bg {
@@ -531,8 +533,10 @@ html, body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding-bottom: 5%;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .poster__phrase {

@@ -189,11 +189,11 @@ export default function PosterPreview({
     // ── Transparent background — SVG frame is behind via CSS ──
     ctx.clearRect(0, 0, size, size);
 
-    // ── Fill star circle with theme background ──
+    // ── Fill star circle — always dark background for star visibility ──
     ctx.save();
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, Math.PI * 2);
-    ctx.fillStyle = theme.background;
+    ctx.fillStyle = '#0a0a14';
     ctx.fill();
 
     // ── Clip to star map circle ──
@@ -318,18 +318,18 @@ function drawMilkyWay(
   size: number,
   mwData: MilkyWayData[],
 ) {
-  const isDark = theme.background !== '#ffffff';
+  // Star circle is always dark, so always use dark-theme Milky Way rendering
 
   // Opacity per brightness level (ol1 = dimmest outer, ol5 = brightest core)
   const opacityMap: Record<string, number> = {
-    ol1: isDark ? 0.04 : 0.03,
-    ol2: isDark ? 0.06 : 0.04,
-    ol3: isDark ? 0.10 : 0.06,
-    ol4: isDark ? 0.14 : 0.08,
-    ol5: isDark ? 0.20 : 0.10,
+    ol1: 0.04,
+    ol2: 0.06,
+    ol3: 0.10,
+    ol4: 0.14,
+    ol5: 0.20,
   };
 
-  const fillColor = isDark ? '200,220,255' : '60,60,80'; // blue-white glow or subtle gray
+  const fillColor = '200,220,255'; // blue-white glow
 
   for (const layer of mwData) {
     const alpha = opacityMap[layer.id] ?? 0.05;
@@ -375,7 +375,7 @@ function drawGrid(
   theme: { grid: string },
   size: number,
 ) {
-  ctx.strokeStyle = theme.grid;
+  ctx.strokeStyle = '#6c757d';
 
   // Altitude circles every 10°
   ctx.lineWidth = Math.max(1, 0.8 * (size / 500));
@@ -410,7 +410,7 @@ function drawSphericalGrid(
   theme: { grid: string },
   size: number,
 ) {
-  ctx.strokeStyle = theme.grid;
+  ctx.strokeStyle = '#6c757d';
   const STEP = 2; // sample interval in degrees for smooth curves
 
   // Declination circles every 15° from -75° to 75°
@@ -467,7 +467,7 @@ function drawStars(
   allStars: StarData[],
   useColors: boolean = true,
 ) {
-  const isDarkTheme = theme.background !== '#ffffff';
+  // Star circle is always dark — stars always render in light-on-dark mode
 
   for (const star of allStars) {
     if (star.magnitude > 6.5) continue;
@@ -512,12 +512,10 @@ function drawStars(
     let starColor: string;
     if (useColors) {
       const [r, g, b] = bvToRGB(star.bv ?? 0.6);
-      starColor = isDarkTheme
-        ? `rgb(${r},${g},${b})`
-        : `rgb(${Math.round(r * 0.3)},${Math.round(g * 0.3)},${Math.round(b * 0.3)})`;
+      starColor = `rgb(${r},${g},${b})`;
 
-      // Glow for bright stars (magnitude < 1.5 on dark themes)
-      if (isDarkTheme && star.magnitude < 1.5) {
+      // Glow for bright stars (magnitude < 1.5)
+      if (star.magnitude < 1.5) {
         const glowRadius = starSize * 3;
         const glow = ctx.createRadialGradient(x, y, starSize * 0.5, x, y, glowRadius);
         glow.addColorStop(0, `rgba(${r},${g},${b},${alpha * 0.35})`);
@@ -529,11 +527,11 @@ function drawStars(
         ctx.fill();
       }
     } else {
-      // Monochrome mode
-      starColor = theme.stars;
+      // Monochrome mode — always white on dark circle
+      starColor = '#ffffff';
 
       // Simple white glow for bright stars in monochrome
-      if (isDarkTheme && star.magnitude < 1.5) {
+      if (star.magnitude < 1.5) {
         const glowRadius = starSize * 3;
         const glow = ctx.createRadialGradient(x, y, starSize * 0.5, x, y, glowRadius);
         glow.addColorStop(0, `rgba(255,255,255,${alpha * 0.25})`);
@@ -579,7 +577,7 @@ function drawStars(
     candidates.sort((a, b) => a.mag - b.mag);
 
     ctx.font = `${Math.max(10, 10 * scale)}px sans-serif`;
-    ctx.fillStyle = theme.stars;
+    ctx.fillStyle = '#ffffff';
 
     for (const c of candidates) {
       if (placed.length >= MAX_LABELS) break;
@@ -604,7 +602,7 @@ function drawConstellations(
   size: number,
   constellationLines: ConstellationLineData[],
 ) {
-  ctx.strokeStyle = theme.constellationLines;
+  ctx.strokeStyle = '#f8f9fa';
   ctx.lineWidth = Math.max(1, 0.8 * (size / 500));
   ctx.globalAlpha = 0.35;
 

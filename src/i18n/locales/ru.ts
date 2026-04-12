@@ -18,7 +18,7 @@ const ru: Record<string, string> = {
   'ui.layers': 'Слои',
   'ui.meridians': 'Меридианы',
   'ui.constellations': 'Созвездия',
-  'ui.constellation_names': 'Названия созвездий',
+  'ui.constellation_names': 'Названия',
   'ui.milky_way': 'Млечный Путь',
   'ui.export_png': 'Скачать PNG',
   'ui.phrase': 'Фраза',

@@ -18,7 +18,7 @@ const en: Record<string, string> = {
   'ui.layers': 'Layers',
   'ui.meridians': 'Meridians',
   'ui.constellations': 'Constellations',
-  'ui.constellation_names': 'Constellation Names',
+  'ui.constellation_names': 'Names',
   'ui.milky_way': 'Milky Way',
   'ui.export_png': 'Download PNG',
   'ui.phrase': 'Phrase',
