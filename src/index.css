@@ -549,7 +549,7 @@ html, body {
 }
 
 .poster__subtitle-line {
-  font-size: 10px;
+  font-size: inherit;
   font-weight: 400;
   opacity: 0.8;
   margin-bottom: 2px;
@@ -557,7 +557,6 @@ html, body {
 }
 
 .poster__subtitle-line--main {
-  font-size: 12px;
   font-weight: 500;
   opacity: 1;
   margin-bottom: 4px;
@@ -963,11 +962,7 @@ html, body {
   }
 
   .poster__subtitle-line {
-    font-size: 9px;
-  }
-
-  .poster__subtitle-line--main {
-    font-size: 10px;
+    font-size: inherit;
   }
 
   /* Size selector */
