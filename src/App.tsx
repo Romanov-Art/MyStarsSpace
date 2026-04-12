@@ -39,7 +39,7 @@ export default function App() {
   });
   const [phrase, setPhrase] = useState(() => saved.phrase || t('poster.under_this_sky', getLocale()));
   const [subtitles, setSubtitles] = useState(() => saved.subtitles || {
-    line1: t('category.birthday', getLocale()),
+    line1: saved.subtitles?.line1 ?? '',
     line2: '',
     line3: '',
     line4: '',
@@ -98,9 +98,8 @@ export default function App() {
     _setLocale(newLocale);
     // Update phrase to new locale
     setPhrase(t('poster.under_this_sky', newLocale));
-    setSubtitles(prev => ({
+    setSubtitles((prev: typeof subtitles) => ({
       ...prev,
-      line1: t('category.birthday', newLocale),
     }));
   }, []);
 
@@ -197,12 +196,22 @@ export default function App() {
     // 6) Subtitle lines — right after phrase with gap
     const subtitlePx = Math.round(subtitleFontSize * scale);
     const subtitleLineHeight = subtitlePx * 1.5;
-    const subtitleStartY = phraseBottom + textGap;
+    let subtitleY = phraseBottom + textGap;
+
+    // Line 1 — bold (name/company)
+    if (subtitles.line1) {
+      ctx.font = `500 ${subtitlePx}px "${subtitleFont}", "Inter", sans-serif`;
+      ctx.globalAlpha = 1;
+      if (subtitleY < H - textPadding) ctx.fillText(subtitles.line1, W / 2, subtitleY);
+      subtitleY += subtitleLineHeight + subtitlePx * 0.3;
+    }
+
+    // Lines 2-4 — regular
     ctx.font = `400 ${subtitlePx}px "${subtitleFont}", "Inter", sans-serif`;
     ctx.globalAlpha = 0.8;
-    const subLines = [subtitles.line1, subtitles.line2, subtitles.line3, subtitles.line4].filter(Boolean) as string[];
-    subLines.forEach((line: string, i: number) => {
-      const y = subtitleStartY + i * subtitleLineHeight;
+    const remainingLines = [subtitles.line2, subtitles.line3, subtitles.line4].filter(Boolean) as string[];
+    remainingLines.forEach((line: string, i: number) => {
+      const y = subtitleY + i * subtitleLineHeight;
       if (y < H - textPadding) ctx.fillText(line, W / 2, y);
     });
     ctx.globalAlpha = 1;

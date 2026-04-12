@@ -302,6 +302,7 @@ export default function ControlPanel({
           <input
             className="subtitle-input"
             value={subtitles.line1}
+            placeholder={locale === 'ru' ? 'Имя / Компания' : 'Name / Company'}
             onChange={e => onSubtitlesChange({ ...subtitles, line1: e.target.value })}
           />
           <input
