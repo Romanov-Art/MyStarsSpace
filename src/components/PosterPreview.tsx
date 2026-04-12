@@ -337,9 +337,13 @@ function drawMilkyWay(
 
       for (const [raH, dec] of polygon) {
         const hz = equatorialToHorizontal(raH, dec, lat, lst);
-        if (hz.altitude < -10) continue;
 
-        const proj = stereographicProjection(hz.altitude, hz.azimuth, radius);
+        // Clamp altitude to avoid extreme stereographic distortion,
+        // but NEVER skip points — skipping breaks polygon continuity
+        // and creates the "cut off" artifact.
+        // The ctx.clip() circle handles the visible boundary.
+        const clampedAlt = Math.max(hz.altitude, -30);
+        const proj = stereographicProjection(clampedAlt, hz.azimuth, radius);
         const x = center + proj.x;
         const y = center + proj.y;
 
