@@ -40,6 +40,7 @@ const ru: Record<string, string> = {
   'category.memorial': 'Памятная дата',
   'category.baby': 'Рождение ребёнка',
   'category.custom': 'Свой текст',
+  'category.business': 'Бизнес',
 
   // Birthday phrases
   'phrase.birthday.1': 'Звёздное небо в день, когда ты появился на свет',
@@ -55,6 +56,11 @@ const ru: Record<string, string> = {
   'phrase.relationship.1': 'Ночь, когда мы встретились',
   'phrase.relationship.2': 'Наш первый поцелуй под звёздами',
   'phrase.relationship.3': 'Звёзды, что видели нашу любовь',
+
+  // Business phrases
+  'phrase.business.1': 'Начало великого пути к звёздам',
+  'phrase.business.2': 'Ночь, когда мечта стала реальностью',
+  'phrase.business.3': 'Записано на звёздах с первого дня',
 
   // Months
   'month.1': 'Январь', 'month.2': 'Февраль', 'month.3': 'Март',

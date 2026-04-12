@@ -15,7 +15,6 @@ interface PosterPreviewProps {
   layers: { constellationLines: boolean; constellationNames: boolean; milkyWay: boolean };
   phrase: string;
   subtitles: { line1: string; line2: string; line3: string };
-  showTime: boolean;
   phraseFont: string;
   phraseFontSize: number;
   subtitleFont: string;
@@ -131,7 +130,7 @@ async function loadCatalogData(): Promise<void> {
 // COMPONENT
 // ──────────────────────────────────────────────────────────────────
 export default function PosterPreview({
-  themeId, locale, selectedCity, date, time, layers, phrase, subtitles, showTime, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, starColors, gridStyle,
+  themeId, locale, selectedCity, date, time, layers, phrase, subtitles, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, starColors, gridStyle,
 }: PosterPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);

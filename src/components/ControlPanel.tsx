@@ -13,7 +13,6 @@ interface ControlPanelProps {
   time: { hours: number; minutes: number };
   phrase: string;
   subtitles: { line1: string; line2: string; line3: string };
-  showTime: boolean;
   phraseFont: string;
   phraseFontSize: number;
   subtitleFont: string;
@@ -27,7 +26,6 @@ interface ControlPanelProps {
   onTimeChange: (time: { hours: number; minutes: number }) => void;
   onPhraseChange: (phrase: string) => void;
   onSubtitlesChange: (subs: { line1: string; line2: string; line3: string }) => void;
-  onShowTimeChange: (show: boolean) => void;
   onPhraseFontChange: (font: string) => void;
   onPhraseFontSizeChange: (size: number) => void;
   onSubtitleFontChange: (font: string) => void;
@@ -38,7 +36,7 @@ interface ControlPanelProps {
 
 const phraseCategories = [
   'category.birthday', 'category.relationship', 'category.wedding',
-  'category.memorial', 'category.baby', 'category.custom',
+  'category.memorial', 'category.baby', 'category.business',
 ];
 
 const phrasesMap: Record<string, string[]> = {
@@ -47,7 +45,7 @@ const phrasesMap: Record<string, string[]> = {
   'category.relationship': ['phrase.relationship.1', 'phrase.relationship.2', 'phrase.relationship.3'],
   'category.memorial': ['poster.moment_in_time'],
   'category.baby': ['poster.stars_of_your_birth'],
-  'category.custom': [],
+  'category.business': ['phrase.business.1', 'phrase.business.2', 'phrase.business.3'],
 };
 
 const days = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -58,9 +56,9 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
 
 export default function ControlPanel({
   locale, themeId, layers, selectedCity, date, time, phrase,
-  subtitles, showTime, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, starColors, gridStyle,
+  subtitles, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, starColors, gridStyle,
   onThemeChange, onToggleLayer, onCityChange,
-  onDateChange, onTimeChange, onPhraseChange, onSubtitlesChange, onShowTimeChange,
+  onDateChange, onTimeChange, onPhraseChange, onSubtitlesChange,
   onPhraseFontChange, onPhraseFontSizeChange, onSubtitleFontChange, onSubtitleFontSizeChange, onStarColorsChange, onGridStyleChange,
 }: ControlPanelProps) {
   const [cityQuery, setCityQuery] = useState('');
@@ -281,10 +279,8 @@ export default function ControlPanel({
             onChange={e => onSubtitlesChange({ ...subtitles, line3: e.target.value })}
           />
         </div>
-        <label className="checkbox-row" style={{ marginTop: 8 }}>
-          <input type="checkbox" checked={!showTime} onChange={e => onShowTimeChange(!e.target.checked)} />
-          {locale === 'ru' ? 'Не показывать время на постере' : 'Hide time on poster'}
-        </label>
+
+
       </div>
     </div>
   );

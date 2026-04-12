@@ -29,7 +29,6 @@ export default function App() {
     line3: '',
   });
   const [selectedSize, setSelectedSize] = useState<PosterSize>(posterSizes[1]); // 30x40
-  const [showTime, setShowTime] = useState(true);
   const [phraseFont, setPhraseFont] = useState('Cormorant Garamond');
   const [phraseFontSize, setPhraseFontSize] = useState(16);
   const [subtitleFont, setSubtitleFont] = useState('Cormorant Garamond');
@@ -42,15 +41,13 @@ export default function App() {
   React.useEffect(() => {
     const cityName = getCityName(selectedCity, locale);
     const monthName = t(`month.${date.month}`, locale);
-    const dateStr = showTime
-      ? `${date.day} ${monthName} ${date.year} ${t('ui.time', locale).toLowerCase()} ${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`
-      : `${date.day} ${monthName} ${date.year}`;
+    const dateStr = `${date.day} ${monthName} ${date.year} ${t('ui.time', locale).toLowerCase()} ${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`;
     setSubtitles(prev => ({
       ...prev,
       line2: cityName,
       line3: dateStr,
     }));
-  }, [selectedCity, date, time, locale, showTime]);
+  }, [selectedCity, date, time, locale]);
 
   const handleLocaleChange = useCallback((newLocale: Locale) => {
     setLocale(newLocale);
@@ -186,7 +183,6 @@ export default function App() {
             time={time}
             phrase={phrase}
             subtitles={subtitles}
-            showTime={showTime}
             phraseFont={phraseFont}
             phraseFontSize={phraseFontSize}
             subtitleFont={subtitleFont}
@@ -200,7 +196,6 @@ export default function App() {
             onTimeChange={setTime}
             onPhraseChange={setPhrase}
             onSubtitlesChange={setSubtitles}
-            onShowTimeChange={setShowTime}
             onPhraseFontChange={setPhraseFont}
             onPhraseFontSizeChange={setPhraseFontSize}
             onSubtitleFontChange={setSubtitleFont}
@@ -221,7 +216,6 @@ export default function App() {
             layers={layers}
             phrase={phrase}
             subtitles={subtitles}
-            showTime={showTime}
             phraseFont={phraseFont}
             phraseFontSize={phraseFontSize}
             subtitleFont={subtitleFont}

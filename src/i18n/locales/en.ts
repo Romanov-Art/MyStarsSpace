@@ -40,6 +40,7 @@ const en: Record<string, string> = {
   'category.memorial': 'Memorial',
   'category.baby': 'Baby Born',
   'category.custom': 'Custom Text',
+  'category.business': 'Business',
 
   // Birthday phrases
   'phrase.birthday.1': 'The sky on the day you were born',
@@ -55,6 +56,11 @@ const en: Record<string, string> = {
   'phrase.relationship.1': 'The night we met',
   'phrase.relationship.2': 'Our first kiss under the stars',
   'phrase.relationship.3': 'The stars that witnessed our love',
+
+  // Business phrases
+  'phrase.business.1': 'The beginning of the great journey to the stars',
+  'phrase.business.2': 'The night the vision became reality',
+  'phrase.business.3': 'Written in the stars from the very first day',
 
   // Months
   'month.1': 'January', 'month.2': 'February', 'month.3': 'March',
