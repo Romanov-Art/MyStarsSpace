@@ -57,6 +57,12 @@ function createFrameConfig(filename: string, label: string): FrameConfig {
 // Note: we override with exact SVG geometry for pixel-perfect alignment
 export const FRAMES: FrameConfig[] = [
   {
+    ...createFrameConfig('Frame2-300-215.svg', 'Modern'),
+    // Exact values from SVG: viewBox 708.67×708.67, inner circle r=303.31
+    circleRatio: (303.31 * 2) / 708.67,         // 0.8558
+    starRadiusFraction: 303.31 / 708.67,         // 0.4279
+  },
+  {
     ...createFrameConfig('Frame1-300-215.svg', 'Classic'),
     // Exact values from SVG: viewBox 850.39×850.39, inner circle r=302.67
     circleRatio: (302.67 * 2) / 850.39,         // 0.7119
