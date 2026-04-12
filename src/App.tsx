@@ -123,12 +123,12 @@ export default function App() {
     ctx.fillStyle = theme.background;
     ctx.fillRect(0, 0, W, H);
 
-    // 2) Star map area: square centered in the upper portion
-    const mapSize = W * 0.90;
-    const mapX = (W - mapSize) / 2;
-    const mapY = W * 0.04;
+    // 2) Star map area: full width square at top (matches CSS: width:100%, aspect-ratio:1)
+    const mapSize = W;
+    const mapX = 0;
+    const mapY = 0;
 
-    // 3) Load and draw SVG frame as background
+    // 3) Load and draw SVG frame
     const frameSvg = await new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
       img.onload = () => resolve(img);
@@ -138,11 +138,11 @@ export default function App() {
 
     if (themeId === 'white' || themeId === 'beige') {
       const tmpCanvas = document.createElement('canvas');
-      tmpCanvas.width = Math.round(mapSize);
-      tmpCanvas.height = Math.round(mapSize);
+      tmpCanvas.width = mapSize;
+      tmpCanvas.height = mapSize;
       const tmpCtx = tmpCanvas.getContext('2d')!;
-      tmpCtx.drawImage(frameSvg, 0, 0, tmpCanvas.width, tmpCanvas.height);
-      const imgData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
+      tmpCtx.drawImage(frameSvg, 0, 0, mapSize, mapSize);
+      const imgData = tmpCtx.getImageData(0, 0, mapSize, mapSize);
       const d = imgData.data;
       for (let i = 0; i < d.length; i += 4) {
         d[i] = 255 - d[i];
@@ -158,26 +158,34 @@ export default function App() {
     // 4) Draw star canvas on top
     ctx.drawImage(starCanvas, mapX, mapY, mapSize, mapSize);
 
-    // 5) Phrase text
-    // Scale font sizes relative to canvas width (preview is ~500px, scale to export W)
+    // ── Text area (matches CSS: .poster__text padding: 5% 5% 5%, flex space-between) ──
+    // Text area is from y=W (bottom of square star map) to y=H
+    const textAreaTop = W;
+    const textPadding = W * 0.05; // CSS padding % is relative to width
+    const textAreaHeight = H - W;
+
+    // Scale fonts relative to preview (~500px wide canvas)
     const scale = W / 500;
+
+    // 5) Phrase text — positioned at top of text area + padding (matches flex space-between)
     const phrasePx = Math.round(phraseFontSize * scale);
     ctx.fillStyle = theme.text;
     ctx.font = `400 ${phrasePx}px "${phraseFont}", Georgia, serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    const phraseY = mapY + mapSize + H * 0.03;
+    const phraseY = textAreaTop + textPadding;
     ctx.fillText(phrase, W / 2, phraseY);
 
-    // 6) Subtitle lines — all same size
+    // 6) Subtitle lines — positioned at bottom of text area (matches flex space-between)
     const subtitlePx = Math.round(subtitleFontSize * scale * 0.7);
-    const subtitleGap = H * 0.025;
-    const subtitleBaseY = H * 0.82;
+    const subtitleLineHeight = subtitlePx * 1.6;
+    const totalSubtitleHeight = subtitleLineHeight * 3;
+    const subtitleStartY = H - textPadding - totalSubtitleHeight;
     ctx.font = `400 ${subtitlePx}px "${subtitleFont}", "Inter", sans-serif`;
     ctx.globalAlpha = 0.8;
-    ctx.fillText(subtitles.line1, W / 2, subtitleBaseY);
-    ctx.fillText(subtitles.line2, W / 2, subtitleBaseY + subtitleGap);
-    ctx.fillText(subtitles.line3, W / 2, subtitleBaseY + subtitleGap * 2);
+    ctx.fillText(subtitles.line1, W / 2, subtitleStartY);
+    ctx.fillText(subtitles.line2, W / 2, subtitleStartY + subtitleLineHeight);
+    ctx.fillText(subtitles.line3, W / 2, subtitleStartY + subtitleLineHeight * 2);
     ctx.globalAlpha = 1;
 
     // 7) Download via Blob (better for large files)
