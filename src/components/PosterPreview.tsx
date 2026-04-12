@@ -248,7 +248,7 @@ export default function PosterPreview({
 
         <div className="poster__text">
           <div className="poster__phrase" style={{ fontFamily: `"${phraseFont}", serif`, fontSize: `${phraseFontSize}px` }}>{phrase}</div>
-          <div style={{ fontFamily: `"${subtitleFont}", serif` }}>
+          <div style={{ fontFamily: `"${subtitleFont}", serif`, fontSize: `${subtitleFontSize}px` }}>
             <div className="poster__subtitle-line poster__subtitle-line--main">{subtitles.line1}</div>
             <div className="poster__subtitle-line">{subtitles.line2}</div>
             <div className="poster__subtitle-line">{subtitles.line3}</div>

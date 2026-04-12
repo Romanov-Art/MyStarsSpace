@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { t, type Locale } from '../i18n/index.js';
-import { cities, findCity, getCityName, parseCoordinates, sanitizeInput } from '../data/cities.js';
+import { cities, findCityAsync, getCityName, getCityLabel, isoToFlag, parseCoordinates, sanitizeInput } from '../data/cities.js';
 import type { City } from '../types/index.js';
 import FontSelector from './FontSelector.js';
 
@@ -71,9 +71,18 @@ export default function ControlPanel({
     return parseCoordinates(cityQuery);
   }, [cityQuery]);
 
-  const cityResults = useMemo(() => {
-    if (!cityQuery.trim() || parsedCoords) return [];
-    return findCity(cityQuery, locale).slice(0, 8);
+  const [cityResults, setCityResults] = useState<City[]>([]);
+
+  useEffect(() => {
+    if (!cityQuery.trim() || parsedCoords) {
+      setCityResults([]);
+      return;
+    }
+    let cancelled = false;
+    findCityAsync(cityQuery, locale).then(results => {
+      if (!cancelled) setCityResults(results);
+    });
+    return () => { cancelled = true; };
   }, [cityQuery, locale, parsedCoords]);
 
   const handleCitySelect = (city: City) => {
@@ -192,9 +201,8 @@ export default function ControlPanel({
           {showCityResults && cityResults.length > 0 && (
             <div className="city-search__results">
               {cityResults.map(city => (
-                <div key={city.name + city.country} className="city-option" onMouseDown={() => handleCitySelect(city)}>
-                  <span className="city-option__name">{getCityName(city, locale)}</span>
-                  <span className="city-option__country">{city.country}</span>
+                <div key={city.name + city.country + city.lat} className="city-option" onMouseDown={() => handleCitySelect(city)}>
+                  <span className="city-option__name">{getCityLabel(city, locale)}</span>
                 </div>
               ))}
             </div>
