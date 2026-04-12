@@ -169,12 +169,16 @@ export default function App() {
 
     // 5) Phrase text — positioned at top of text area + padding (matches flex space-between)
     const phrasePx = Math.round(phraseFontSize * scale);
+    const phraseLineHeight = phrasePx * 1.3;
     ctx.fillStyle = theme.text;
     ctx.font = `400 ${phrasePx}px "${phraseFont}", Georgia, serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     const phraseY = textAreaTop + textPadding;
-    ctx.fillText(phrase, W / 2, phraseY);
+    const phraseLines = phrase.split('\n');
+    phraseLines.forEach((line: string, i: number) => {
+      ctx.fillText(line, W / 2, phraseY + i * phraseLineHeight);
+    });
 
     // 6) Subtitle lines — positioned at bottom of text area (matches flex space-between)
     const subtitlePx = Math.round(subtitleFontSize * scale * 0.7);
