@@ -30,10 +30,18 @@ export const FONT_SIZE_PRESETS = [
 
 export const SUBTITLE_SIZE_PRESETS = [
   { label: 'S', value: 8 },
-  { label: 'M', value: 11 },
-  { label: 'L', value: 14 },
-  { label: 'XL', value: 17 },
-  { label: 'XXL', value: 21 },
+  { label: 'M', value: 10 },
+  { label: 'L', value: 12 },
+  { label: 'XL', value: 16 },
+  { label: 'XXL', value: 20 },
+];
+
+export const BODY_SIZE_PRESETS = [
+  { label: 'S', value: 5 },
+  { label: 'M', value: 8 },
+  { label: 'L', value: 10 },
+  { label: 'XL', value: 12 },
+  { label: 'XXL', value: 16 },
 ];
 
 /** Build Google Fonts CSS URL for all fonts */
