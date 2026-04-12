@@ -173,8 +173,7 @@ export function sanitizeInput(input: string): string {
     .replace(/<[^>]*>/g, '')
     .replace(/[^\P{C}\n\r\t]/gu, '')
     .replace(/javascript:/gi, '')
-    .replace(/on\w+\s*=/gi, '')
-    .trim();
+    .replace(/on\w+\s*=/gi, '');
 }
 
 // ── Country name → ISO lookup (for curated cities) ──────────────
