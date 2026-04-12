@@ -594,6 +594,13 @@ function drawStars(
     }
     candidates.sort((a, b) => a.mag - b.mag);
 
+    // Always label Polaris first if visible
+    const polarisIdx = candidates.findIndex(c => c.name === 'Polaris');
+    if (polarisIdx > 0) {
+      const [polaris] = candidates.splice(polarisIdx, 1);
+      candidates.unshift(polaris);
+    }
+
     ctx.font = `${Math.max(10, 10 * scale)}px sans-serif`;
     ctx.fillStyle = '#ffffff';
 
@@ -602,7 +609,7 @@ function drawStars(
       const tooClose = placed.some(p =>
         Math.sqrt((c.x - p.x) ** 2 + (c.y - p.y) ** 2) < MIN_GAP
       );
-      if (tooClose) continue;
+      if (tooClose && c.name !== 'Polaris') continue; // Never skip Polaris
       ctx.globalAlpha = 0.9;
       ctx.fillText(c.name, c.x + 5, c.y - 5);
       placed.push({ x: c.x, y: c.y });
