@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { t, type Locale } from '../i18n/index.js';
 import { cities, findCityAsync, getCityName, getCityLabel, isoToFlag, parseCoordinates, sanitizeInput } from '../data/cities.js';
 import type { City } from '../types/index.js';
-import FontSelector from './FontSelector.js';
+import FontSelector, { SUBTITLE_SIZE_PRESETS } from './FontSelector.js';
 
 interface ControlPanelProps {
   locale: Locale;
@@ -295,6 +295,7 @@ export default function ControlPanel({
             onChange={onSubtitleFontChange}
             onFontSizeChange={onSubtitleFontSizeChange}
             locale={locale}
+            sizePresets={SUBTITLE_SIZE_PRESETS}
           />
         )}
         <div className="subtitle-inputs">

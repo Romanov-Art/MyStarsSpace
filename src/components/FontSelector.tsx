@@ -28,6 +28,14 @@ export const FONT_SIZE_PRESETS = [
   { label: 'XXL', value: 30 },
 ];
 
+export const SUBTITLE_SIZE_PRESETS = [
+  { label: 'S', value: 8 },
+  { label: 'M', value: 11 },
+  { label: 'L', value: 14 },
+  { label: 'XL', value: 17 },
+  { label: 'XXL', value: 21 },
+];
+
 /** Build Google Fonts CSS URL for all fonts */
 function buildGoogleFontsUrl(): string {
   const families = POSTER_FONTS.map(f => {
@@ -54,6 +62,7 @@ interface FontSelectorProps {
   onChange: (fontName: string) => void;
   onFontSizeChange: (size: number) => void;
   locale: string;
+  sizePresets?: { label: string; value: number }[];
 }
 
 const PREVIEW_TEXT: Record<string, string> = {
@@ -71,10 +80,11 @@ const PREVIEW_TEXT: Record<string, string> = {
   tr: 'Bu gökyüzünün altında',
 };
 
-export default function FontSelector({ selectedFont, selectedFontSize, onChange, onFontSizeChange, locale }: FontSelectorProps) {
+export default function FontSelector({ selectedFont, selectedFontSize, onChange, onFontSizeChange, locale, sizePresets }: FontSelectorProps) {
   useEffect(() => { loadAllFonts(); }, []);
 
   const preview = PREVIEW_TEXT[locale] || PREVIEW_TEXT.en;
+  const presets = sizePresets || FONT_SIZE_PRESETS;
 
   return (
     <div className="panel-section" style={{ marginBottom: 16 }}>
@@ -88,7 +98,7 @@ export default function FontSelector({ selectedFont, selectedFontSize, onChange,
           {locale === 'ru' ? 'Размер' : 'Size'}
         </span>
         <div className="font-size-selector__buttons">
-          {FONT_SIZE_PRESETS.map(preset => (
+          {presets.map(preset => (
             <button
               key={preset.value}
               className={`font-size-btn ${selectedFontSize === preset.value ? 'font-size-btn--active' : ''}`}
