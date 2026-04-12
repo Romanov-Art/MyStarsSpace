@@ -180,7 +180,7 @@ export default function App() {
     // Scale fonts relative to preview (~500px wide canvas)
     const scale = W / 500;
 
-    // 5) Phrase text — at top of text area
+    // 5) Phrase text — at top of text area (with word-wrap like CSS)
     const phrasePx = Math.round(phraseFontSize * scale);
     const phraseLineHeight = phrasePx * 1.3;
     ctx.fillStyle = theme.text;
@@ -188,12 +188,31 @@ export default function App() {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     const phraseY = textAreaTop + textPadding;
-    const phraseLines = phrase.split('\n');
-    phraseLines.forEach((line: string, i: number) => {
+    const maxTextWidth = W - textPadding * 2;
+
+    // Word-wrap: split each \n line into visual lines that fit maxTextWidth
+    const wrappedLines: string[] = [];
+    phrase.split('\n').forEach((paragraph: string) => {
+      if (!paragraph) { wrappedLines.push(''); return; }
+      const words = paragraph.split(' ');
+      let currentLine = words[0] || '';
+      for (let i = 1; i < words.length; i++) {
+        const test = currentLine + ' ' + words[i];
+        if (ctx.measureText(test).width <= maxTextWidth) {
+          currentLine = test;
+        } else {
+          wrappedLines.push(currentLine);
+          currentLine = words[i];
+        }
+      }
+      wrappedLines.push(currentLine);
+    });
+
+    wrappedLines.forEach((line: string, i: number) => {
       const y = phraseY + i * phraseLineHeight;
       if (y < H - textPadding) ctx.fillText(line, W / 2, y);
     });
-    const phraseBottom = phraseY + phraseLines.length * phraseLineHeight;
+    const phraseBottom = phraseY + wrappedLines.length * phraseLineHeight;
 
     // 6) Subtitle lines — right after phrase with gap
     const subtitlePx = Math.round(subtitleFontSize * scale);
