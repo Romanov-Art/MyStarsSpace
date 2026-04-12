@@ -18,6 +18,8 @@ interface PosterPreviewProps {
   showTime: boolean;
   posterFont: string;
   posterFontSize: number;
+  starColors: boolean;
+  gridStyle: 'flat' | 'spherical';
 }
 
 // ──────────────────────────────────────────────────────────────────
@@ -127,7 +129,7 @@ async function loadCatalogData(): Promise<void> {
 // COMPONENT
 // ──────────────────────────────────────────────────────────────────
 export default function PosterPreview({
-  themeId, locale, selectedCity, date, time, layers, phrase, subtitles, showTime, posterFont, posterFontSize,
+  themeId, locale, selectedCity, date, time, layers, phrase, subtitles, showTime, posterFont, posterFontSize, starColors, gridStyle,
 }: PosterPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -207,11 +209,15 @@ export default function PosterPreview({
 
     // ── Grid (graticule) ──
     if (layers.grid) {
-      drawGrid(ctx, center, radius, theme, size);
+      if (gridStyle === 'spherical') {
+        drawSphericalGrid(ctx, center, radius, lst, selectedCity.lat, theme, size);
+      } else {
+        drawGrid(ctx, center, radius, theme, size);
+      }
     }
 
     // ── Stars ──
-    drawStars(ctx, center, radius, lst, selectedCity.lat, theme, size, layers.constellationNames, cachedStars!);
+    drawStars(ctx, center, radius, lst, selectedCity.lat, theme, size, layers.constellationNames, cachedStars!, starColors);
 
     // ── Constellation lines ──
     if (layers.constellationLines) {
@@ -220,7 +226,7 @@ export default function PosterPreview({
 
     ctx.restore();
 
-  }, [themeId, selectedCity, dateTime, layers, theme, locale, frame, catalogLoaded, containerSize]);
+  }, [themeId, selectedCity, dateTime, layers, theme, locale, frame, catalogLoaded, containerSize, starColors, gridStyle]);
 
   return (
     <div className="poster-frame">
@@ -395,6 +401,62 @@ function drawGrid(
   ctx.globalAlpha = 1;
 }
 
+/** Spherical grid: draws RA/Dec arcs in equatorial coordinates through the stereographic projection.
+ *  This creates curved lines that look like a 3D globe, unlike the flat azimuth/altitude grid. */
+function drawSphericalGrid(
+  ctx: CanvasRenderingContext2D,
+  center: number, radius: number,
+  lst: number, lat: number,
+  theme: { grid: string },
+  size: number,
+) {
+  ctx.strokeStyle = theme.grid;
+  const STEP = 2; // sample interval in degrees for smooth curves
+
+  // Declination circles every 15° from -75° to 75°
+  ctx.lineWidth = Math.max(1, 0.8 * (size / 500));
+  ctx.globalAlpha = 0.35;
+  for (let dec = -75; dec <= 75; dec += 15) {
+    ctx.beginPath();
+    let started = false;
+    for (let ra = 0; ra <= 360; ra += STEP) {
+      const raH = ra / 15; // degrees to hours
+      const hz = equatorialToHorizontal(raH, dec, lat, lst);
+      if (hz.altitude < -5) { started = false; continue; }
+      const proj = stereographicProjection(hz.altitude, hz.azimuth, radius);
+      const x = center + proj.x;
+      const y = center + proj.y;
+      const dist = Math.sqrt((x - center) ** 2 + (y - center) ** 2);
+      if (dist > radius * 1.05) { started = false; continue; }
+      if (!started) { ctx.moveTo(x, y); started = true; }
+      else { ctx.lineTo(x, y); }
+    }
+    ctx.stroke();
+  }
+
+  // Right Ascension lines every 1 hour (15°)
+  ctx.lineWidth = Math.max(1, 0.6 * (size / 500));
+  ctx.globalAlpha = 0.25;
+  for (let raH = 0; raH < 24; raH += 1) {
+    ctx.beginPath();
+    let started = false;
+    for (let dec = -90; dec <= 90; dec += STEP) {
+      const hz = equatorialToHorizontal(raH, dec, lat, lst);
+      if (hz.altitude < -5) { started = false; continue; }
+      const proj = stereographicProjection(hz.altitude, hz.azimuth, radius);
+      const x = center + proj.x;
+      const y = center + proj.y;
+      const dist = Math.sqrt((x - center) ** 2 + (y - center) ** 2);
+      if (dist > radius * 1.05) { started = false; continue; }
+      if (!started) { ctx.moveTo(x, y); started = true; }
+      else { ctx.lineTo(x, y); }
+    }
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 1;
+}
+
 function drawStars(
   ctx: CanvasRenderingContext2D,
   center: number, radius: number,
@@ -403,6 +465,7 @@ function drawStars(
   size: number,
   showNames: boolean = false,
   allStars: StarData[],
+  useColors: boolean = true,
 ) {
   const isDarkTheme = theme.background !== '#ffffff';
 
@@ -445,23 +508,42 @@ function drawStars(
                   star.magnitude < 5 ? 0.6 :
                   0.4;
 
-    // Star color from B-V index
-    const [r, g, b] = bvToRGB(star.bv ?? 0.6);
-    const starColor = isDarkTheme
-      ? `rgb(${r},${g},${b})`
-      : `rgb(${Math.round(r * 0.3)},${Math.round(g * 0.3)},${Math.round(b * 0.3)})`;
+    // Star color from B-V index or monochrome
+    let starColor: string;
+    if (useColors) {
+      const [r, g, b] = bvToRGB(star.bv ?? 0.6);
+      starColor = isDarkTheme
+        ? `rgb(${r},${g},${b})`
+        : `rgb(${Math.round(r * 0.3)},${Math.round(g * 0.3)},${Math.round(b * 0.3)})`;
 
-    // Glow for bright stars (magnitude < 1.5 on dark themes)
-    if (isDarkTheme && star.magnitude < 1.5) {
-      const glowRadius = starSize * 3;
-      const glow = ctx.createRadialGradient(x, y, starSize * 0.5, x, y, glowRadius);
-      glow.addColorStop(0, `rgba(${r},${g},${b},${alpha * 0.35})`);
-      glow.addColorStop(1, `rgba(${r},${g},${b},0)`);
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = glow;
-      ctx.beginPath();
-      ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
-      ctx.fill();
+      // Glow for bright stars (magnitude < 1.5 on dark themes)
+      if (isDarkTheme && star.magnitude < 1.5) {
+        const glowRadius = starSize * 3;
+        const glow = ctx.createRadialGradient(x, y, starSize * 0.5, x, y, glowRadius);
+        glow.addColorStop(0, `rgba(${r},${g},${b},${alpha * 0.35})`);
+        glow.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else {
+      // Monochrome mode
+      starColor = theme.stars;
+
+      // Simple white glow for bright stars in monochrome
+      if (isDarkTheme && star.magnitude < 1.5) {
+        const glowRadius = starSize * 3;
+        const glow = ctx.createRadialGradient(x, y, starSize * 0.5, x, y, glowRadius);
+        glow.addColorStop(0, `rgba(255,255,255,${alpha * 0.25})`);
+        glow.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
     ctx.globalAlpha = alpha;
@@ -524,7 +606,7 @@ function drawConstellations(
 ) {
   ctx.strokeStyle = theme.constellationLines;
   ctx.lineWidth = Math.max(1, 0.8 * (size / 500));
-  ctx.globalAlpha = 0.5;
+  ctx.globalAlpha = 0.35;
 
   for (const constellation of constellationLines) {
     for (const line of constellation.lines) {

@@ -34,6 +34,8 @@ export default function App() {
   const [posterFont, setPosterFont] = useState('Cormorant Garamond');
   const [posterFontSize, setPosterFontSize] = useState(16);
   const [isExporting, setIsExporting] = useState(false);
+  const [starColors, setStarColors] = useState(true);
+  const [gridStyle, setGridStyle] = useState<'flat' | 'spherical'>('flat');
 
   // Initialize subtitles with city and date
   React.useEffect(() => {
@@ -186,6 +188,8 @@ export default function App() {
             showTime={showTime}
             posterFont={posterFont}
             posterFontSize={posterFontSize}
+            starColors={starColors}
+            gridStyle={gridStyle}
             onThemeChange={handleThemeChange}
             onToggleLayer={handleToggleLayer}
             onCityChange={setSelectedCity}
@@ -195,6 +199,8 @@ export default function App() {
             onSubtitlesChange={setSubtitles}
             onShowTimeChange={setShowTime}
             onFontChange={setPosterFont}
+            onStarColorsChange={setStarColors}
+            onGridStyleChange={setGridStyle}
             onFontSizeChange={setPosterFontSize}
           />
         </div>
@@ -213,6 +219,8 @@ export default function App() {
             showTime={showTime}
             posterFont={posterFont}
             posterFontSize={posterFontSize}
+            starColors={starColors}
+            gridStyle={gridStyle}
           />
 
           {/* Size Selector */}

@@ -16,6 +16,8 @@ interface ControlPanelProps {
   showTime: boolean;
   posterFont: string;
   posterFontSize: number;
+  starColors: boolean;
+  gridStyle: 'flat' | 'spherical';
   onThemeChange: (id: string) => void;
   onToggleLayer: (layer: 'grid' | 'constellationLines' | 'constellationNames' | 'milkyWay') => void;
   onCityChange: (city: City) => void;
@@ -26,6 +28,8 @@ interface ControlPanelProps {
   onShowTimeChange: (show: boolean) => void;
   onFontChange: (font: string) => void;
   onFontSizeChange: (size: number) => void;
+  onStarColorsChange: (colored: boolean) => void;
+  onGridStyleChange: (style: 'flat' | 'spherical') => void;
 }
 
 const phraseCategories = [
@@ -50,14 +54,14 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
 
 export default function ControlPanel({
   locale, themeId, layers, selectedCity, date, time, phrase,
-  subtitles, showTime, posterFont, posterFontSize,
+  subtitles, showTime, posterFont, posterFontSize, starColors, gridStyle,
   onThemeChange, onToggleLayer, onCityChange,
   onDateChange, onTimeChange, onPhraseChange, onSubtitlesChange, onShowTimeChange,
-  onFontChange, onFontSizeChange,
+  onFontChange, onFontSizeChange, onStarColorsChange, onGridStyleChange,
 }: ControlPanelProps) {
   const [cityQuery, setCityQuery] = useState('');
   const [showCityResults, setShowCityResults] = useState(false);
-  const [showFontPanel, setShowFontPanel] = useState(false);
+  const [fontPanelFor, setFontPanelFor] = useState<'phrase' | 'subtitle' | null>(null);
 
   const cityResults = useMemo(() => {
     if (!cityQuery.trim()) return [];
@@ -122,6 +126,44 @@ export default function ControlPanel({
             <span className="layer-toggle__status">{layers.milkyWay ? hideLabel : showLabel}</span>
           </div>
         </div>
+
+        {/* Grid style toggle */}
+        <div className="layer-settings">
+          <span className="layer-settings__label">{locale === 'ru' ? 'Стиль сетки' : 'Grid style'}</span>
+          <div className="layer-settings__options">
+            <button
+              className={`layer-settings__btn ${gridStyle === 'flat' ? 'layer-settings__btn--active' : ''}`}
+              onClick={() => onGridStyleChange('flat')}
+            >
+              {locale === 'ru' ? 'Плоская' : 'Flat'}
+            </button>
+            <button
+              className={`layer-settings__btn ${gridStyle === 'spherical' ? 'layer-settings__btn--active' : ''}`}
+              onClick={() => onGridStyleChange('spherical')}
+            >
+              {locale === 'ru' ? 'Сферическая' : 'Spherical'}
+            </button>
+          </div>
+        </div>
+
+        {/* Star colors toggle */}
+        <div className="layer-settings">
+          <span className="layer-settings__label">{locale === 'ru' ? 'Цвет звёзд' : 'Star colors'}</span>
+          <div className="layer-settings__options">
+            <button
+              className={`layer-settings__btn ${starColors ? 'layer-settings__btn--active' : ''}`}
+              onClick={() => onStarColorsChange(true)}
+            >
+              {locale === 'ru' ? 'Цветные' : 'Color'}
+            </button>
+            <button
+              className={`layer-settings__btn ${!starColors ? 'layer-settings__btn--active' : ''}`}
+              onClick={() => onStarColorsChange(false)}
+            >
+              {locale === 'ru' ? 'Ч/Б' : 'B&W'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* City + Date + Time */}
@@ -180,13 +222,22 @@ export default function ControlPanel({
         <div className="panel-section__title">
           <span>{locale === 'ru' ? 'Добавьте фразу' : 'Add a phrase'}</span>
           <button
-            className={`text-settings-btn ${showFontPanel ? 'text-settings-btn--active' : ''}`}
-            onClick={() => setShowFontPanel(prev => !prev)}
+            className={`text-settings-btn ${fontPanelFor === 'phrase' ? 'text-settings-btn--active' : ''}`}
+            onClick={() => setFontPanelFor(prev => prev === 'phrase' ? null : 'phrase')}
             title={locale === 'ru' ? 'Настройки текста' : 'Text settings'}
           >
             <span className="material-symbols-outlined">text_fields</span>
           </button>
         </div>
+        {fontPanelFor === 'phrase' && (
+          <FontSelector
+            selectedFont={posterFont}
+            selectedFontSize={posterFontSize}
+            onChange={onFontChange}
+            onFontSizeChange={onFontSizeChange}
+            locale={locale}
+          />
+        )}
         <textarea
           className="textarea-field"
           value={phrase}
@@ -211,13 +262,22 @@ export default function ControlPanel({
         <div className="panel-section__title">
           <span>{locale === 'ru' ? 'Текст можно отредактировать' : 'Editable text'}</span>
           <button
-            className={`text-settings-btn ${showFontPanel ? 'text-settings-btn--active' : ''}`}
-            onClick={() => setShowFontPanel(prev => !prev)}
+            className={`text-settings-btn ${fontPanelFor === 'subtitle' ? 'text-settings-btn--active' : ''}`}
+            onClick={() => setFontPanelFor(prev => prev === 'subtitle' ? null : 'subtitle')}
             title={locale === 'ru' ? 'Настройки текста' : 'Text settings'}
           >
             <span className="material-symbols-outlined">text_fields</span>
           </button>
         </div>
+        {fontPanelFor === 'subtitle' && (
+          <FontSelector
+            selectedFont={posterFont}
+            selectedFontSize={posterFontSize}
+            onChange={onFontChange}
+            onFontSizeChange={onFontSizeChange}
+            locale={locale}
+          />
+        )}
         <div className="subtitle-inputs">
           <input
             className="subtitle-input"
@@ -240,17 +300,6 @@ export default function ControlPanel({
           {locale === 'ru' ? 'Не показывать время на постере' : 'Hide time on poster'}
         </label>
       </div>
-
-      {/* Font Panel — collapsible */}
-      {showFontPanel && (
-        <FontSelector
-          selectedFont={posterFont}
-          selectedFontSize={posterFontSize}
-          onChange={onFontChange}
-          onFontSizeChange={onFontSizeChange}
-          locale={locale}
-        />
-      )}
     </div>
   );
 }
