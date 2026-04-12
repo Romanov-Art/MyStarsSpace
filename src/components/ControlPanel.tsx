@@ -119,6 +119,7 @@ export default function ControlPanel({
     <div className="control-panel">
       {/* Theme selector */}
       <div className="panel-section">
+        <div className="panel-section__title">{locale === 'ru' ? 'Выберите цвет' : 'Choose Color'}</div>
         <div className="theme-selector">
           {['black', 'white', 'navy', 'beige'].map(id => (
             <div
@@ -134,6 +135,7 @@ export default function ControlPanel({
 
       {/* Layer toggles */}
       <div className="panel-section">
+        <div className="panel-section__title">{locale === 'ru' ? 'Выберите стиль' : 'Choose Style'}</div>
         <div className="layer-toggles">
           {/* Stars: Colors / B&W */}
           <div
