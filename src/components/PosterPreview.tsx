@@ -192,7 +192,7 @@ export default function PosterPreview({
     ctx.save();
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, Math.PI * 2);
-    ctx.fillStyle = '#0a0a14';
+    ctx.fillStyle = '#000000';
     ctx.fill();
 
     // ── Clip to star map circle ──
