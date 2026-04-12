@@ -69,19 +69,29 @@ export default function App() {
       selectedSize, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize,
       starColors, gridStyle]);
 
-  // Initialize subtitles with city, date, and coordinates
-  React.useEffect(() => {
-    const cityName = getCityName(selectedCity, locale);
-    const monthName = t(`month.${date.month}`, locale);
-    const dateStr = `${date.day} ${monthName} ${date.year} ${t('ui.time', locale).toLowerCase()} ${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`;
-    const coords = formatCoordsDMS(selectedCity.lat, selectedCity.lon);
-    setSubtitles((prev: typeof subtitles) => ({
-      ...prev,
-      line2: cityName,
-      line3: dateStr,
-      line4: coords,
-    }));
-  }, [selectedCity, date, time, locale]);
+  // Helper to build date string
+  const buildDateStr = (d: typeof date, t2: typeof time, loc: Locale) => {
+    const monthName = t(`month.${d.month}`, loc);
+    return `${d.day} ${monthName} ${d.year} ${t('ui.time', loc).toLowerCase()} ${String(t2.hours).padStart(2, '0')}:${String(t2.minutes).padStart(2, '0')}`;
+  };
+
+  // Auto-fill subtitles only when user changes city/date/time (not on every render)
+  const handleCityChange = useCallback((city: City) => {
+    setSelectedCity(city);
+    const cityName = getCityName(city, locale);
+    const coords = formatCoordsDMS(city.lat, city.lon);
+    setSubtitles((prev: typeof subtitles) => ({ ...prev, line2: cityName, line4: coords }));
+  }, [locale]);
+
+  const handleDateChange = useCallback((d: typeof date) => {
+    setDate(d);
+    setSubtitles((prev: typeof subtitles) => ({ ...prev, line3: buildDateStr(d, time, locale) }));
+  }, [time, locale]);
+
+  const handleTimeChange = useCallback((t2: typeof time) => {
+    setTime(t2);
+    setSubtitles((prev: typeof subtitles) => ({ ...prev, line3: buildDateStr(date, t2, locale) }));
+  }, [date, locale]);
 
   const handleLocaleChange = useCallback((newLocale: Locale) => {
     setLocale(newLocale);
@@ -247,11 +257,11 @@ export default function App() {
             gridStyle={gridStyle}
             onThemeChange={handleThemeChange}
             onToggleLayer={handleToggleLayer}
-            onCityChange={setSelectedCity}
-            onDateChange={setDate}
-            onTimeChange={setTime}
+            onCityChange={handleCityChange}
+            onDateChange={handleDateChange}
+            onTimeChange={handleTimeChange}
             onPhraseChange={v => setPhrase(sanitizeInput(v))}
-            onSubtitlesChange={s => setSubtitles({ line1: sanitizeInput(s.line1), line2: sanitizeInput(s.line2), line3: sanitizeInput(s.line3) })}
+            onSubtitlesChange={s => setSubtitles({ line1: sanitizeInput(s.line1), line2: sanitizeInput(s.line2), line3: sanitizeInput(s.line3), line4: sanitizeInput(s.line4 || '') })}
             onPhraseFontChange={setPhraseFont}
             onPhraseFontSizeChange={setPhraseFontSize}
             onSubtitleFontChange={setSubtitleFont}
