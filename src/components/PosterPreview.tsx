@@ -188,11 +188,11 @@ export default function PosterPreview({
     // ── Transparent background — SVG frame is behind via CSS ──
     ctx.clearRect(0, 0, size, size);
 
-    // ── Fill star circle with theme background ──
+    // ── Fill star circle — always black for star visibility ──
     ctx.save();
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, Math.PI * 2);
-    ctx.fillStyle = theme.background;
+    ctx.fillStyle = '#000000';
     ctx.fill();
 
     // ── Clip to star map circle ──
@@ -240,7 +240,7 @@ export default function PosterPreview({
               backgroundSize: '100% 100%',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              filter: (themeId === 'white' || themeId === 'beige') ? 'invert(1)' : 'none',
+              filter: themeId === 'white' ? 'invert(1)' : themeId === 'beige' ? 'invert(1) sepia(0.3) saturate(0.5) brightness(0.4)' : 'none',
             }}
           />
           <canvas ref={canvasRef} className="poster__starmap-canvas" />
