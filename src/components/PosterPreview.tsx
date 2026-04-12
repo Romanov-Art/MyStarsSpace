@@ -317,55 +317,74 @@ function drawMilkyWay(
   size: number,
   mwData: MilkyWayData[],
 ) {
-  // Star circle is always dark, so always use dark-theme Milky Way rendering
+  // Render Milky Way on offscreen canvas, then blur for smooth gradients
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width = size;
+  offCanvas.height = size;
+  const offCtx = offCanvas.getContext('2d')!;
 
-  // Opacity per brightness level (ol1 = dimmest outer, ol5 = brightest core)
+  // Clip to circle on offscreen canvas too
+  offCtx.beginPath();
+  offCtx.arc(center, center, radius, 0, Math.PI * 2);
+  offCtx.clip();
+
+  // Opacity per brightness level — higher values for better blur visibility
   const opacityMap: Record<string, number> = {
-    ol1: 0.04,
-    ol2: 0.06,
-    ol3: 0.10,
-    ol4: 0.14,
-    ol5: 0.20,
+    ol1: 0.06,
+    ol2: 0.10,
+    ol3: 0.16,
+    ol4: 0.22,
+    ol5: 0.30,
   };
 
   const fillColor = '200,220,255'; // blue-white glow
 
   for (const layer of mwData) {
     const alpha = opacityMap[layer.id] ?? 0.05;
-    ctx.fillStyle = `rgba(${fillColor},${alpha})`;
+    offCtx.fillStyle = `rgba(${fillColor},${alpha})`;
 
     for (const polygon of layer.polygons) {
       if (polygon.length < 3) continue;
 
-      ctx.beginPath();
+      offCtx.beginPath();
       let started = false;
 
       for (const [raH, dec] of polygon) {
         const hz = equatorialToHorizontal(raH, dec, lat, lst);
-
-        // Clamp altitude to avoid extreme stereographic distortion,
-        // but NEVER skip points — skipping breaks polygon continuity
-        // and creates the "cut off" artifact.
-        // The ctx.clip() circle handles the visible boundary.
         const clampedAlt = Math.max(hz.altitude, -30);
         const proj = stereographicProjection(clampedAlt, hz.azimuth, radius);
         const x = center + proj.x;
         const y = center + proj.y;
 
         if (!started) {
-          ctx.moveTo(x, y);
+          offCtx.moveTo(x, y);
           started = true;
         } else {
-          ctx.lineTo(x, y);
+          offCtx.lineTo(x, y);
         }
       }
 
       if (started) {
-        ctx.closePath();
-        ctx.fill();
+        offCtx.closePath();
+        offCtx.fill();
       }
     }
   }
+
+  // Apply Gaussian blur for smooth gradients
+  const blurAmount = Math.max(8, size / 80);
+  ctx.save();
+  ctx.filter = `blur(${blurAmount}px)`;
+  ctx.drawImage(offCanvas, 0, 0);
+  ctx.restore();
+
+  // Draw a second pass with less blur for the brighter core details
+  ctx.save();
+  ctx.filter = `blur(${blurAmount * 0.4}px)`;
+  ctx.globalAlpha = 0.5;
+  ctx.drawImage(offCanvas, 0, 0);
+  ctx.globalAlpha = 1;
+  ctx.restore();
 }
 
 function drawGrid(
