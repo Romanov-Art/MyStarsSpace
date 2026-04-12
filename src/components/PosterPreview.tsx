@@ -171,8 +171,8 @@ export default function PosterPreview({
     // Canvas fills the square frame container
     const cssSize = containerSize;
     const dpr = window.devicePixelRatio || 1;
-    // Draw in PHYSICAL pixels for crisp Retina rendering
-    const size = Math.round(cssSize * dpr);
+    // Render at high resolution: at least 1500px for crisp preview
+    const size = Math.max(1500, Math.round(cssSize * dpr));
     canvas.width = size;
     canvas.height = size;
     canvas.style.width = `${cssSize}px`;
