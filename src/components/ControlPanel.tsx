@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { t, type Locale } from '../i18n/index.js';
 import { cities, findCity, getCityName } from '../data/cities.js';
 import type { City } from '../types/index.js';
+import FontSelector from './FontSelector.js';
 
 interface ControlPanelProps {
   locale: Locale;
@@ -13,6 +14,8 @@ interface ControlPanelProps {
   phrase: string;
   subtitles: { line1: string; line2: string; line3: string };
   showTime: boolean;
+  posterFont: string;
+  posterFontSize: number;
   onThemeChange: (id: string) => void;
   onToggleLayer: (layer: 'grid' | 'constellationLines' | 'constellationNames' | 'milkyWay') => void;
   onCityChange: (city: City) => void;
@@ -21,6 +24,8 @@ interface ControlPanelProps {
   onPhraseChange: (phrase: string) => void;
   onSubtitlesChange: (subs: { line1: string; line2: string; line3: string }) => void;
   onShowTimeChange: (show: boolean) => void;
+  onFontChange: (font: string) => void;
+  onFontSizeChange: (size: number) => void;
 }
 
 const phraseCategories = [
@@ -45,11 +50,14 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
 
 export default function ControlPanel({
   locale, themeId, layers, selectedCity, date, time, phrase,
-  subtitles, showTime, onThemeChange, onToggleLayer, onCityChange,
+  subtitles, showTime, posterFont, posterFontSize,
+  onThemeChange, onToggleLayer, onCityChange,
   onDateChange, onTimeChange, onPhraseChange, onSubtitlesChange, onShowTimeChange,
+  onFontChange, onFontSizeChange,
 }: ControlPanelProps) {
   const [cityQuery, setCityQuery] = useState('');
   const [showCityResults, setShowCityResults] = useState(false);
+  const [showFontPanel, setShowFontPanel] = useState(false);
 
   const cityResults = useMemo(() => {
     if (!cityQuery.trim()) return [];
@@ -169,7 +177,16 @@ export default function ControlPanel({
 
       {/* Phrase */}
       <div className="panel-section">
-        <div className="panel-section__title">{locale === 'ru' ? 'Добавьте фразу' : 'Add a phrase'}</div>
+        <div className="panel-section__title">
+          <span>{locale === 'ru' ? 'Добавьте фразу' : 'Add a phrase'}</span>
+          <button
+            className={`text-settings-btn ${showFontPanel ? 'text-settings-btn--active' : ''}`}
+            onClick={() => setShowFontPanel(prev => !prev)}
+            title={locale === 'ru' ? 'Настройки текста' : 'Text settings'}
+          >
+            <span className="material-symbols-outlined">text_fields</span>
+          </button>
+        </div>
         <textarea
           className="textarea-field"
           value={phrase}
@@ -191,7 +208,16 @@ export default function ControlPanel({
 
       {/* Subtitles */}
       <div className="panel-section">
-        <div className="panel-section__title">{locale === 'ru' ? 'Текст можно отредактировать' : 'Editable text'}</div>
+        <div className="panel-section__title">
+          <span>{locale === 'ru' ? 'Текст можно отредактировать' : 'Editable text'}</span>
+          <button
+            className={`text-settings-btn ${showFontPanel ? 'text-settings-btn--active' : ''}`}
+            onClick={() => setShowFontPanel(prev => !prev)}
+            title={locale === 'ru' ? 'Настройки текста' : 'Text settings'}
+          >
+            <span className="material-symbols-outlined">text_fields</span>
+          </button>
+        </div>
         <div className="subtitle-inputs">
           <input
             className="subtitle-input"
@@ -214,6 +240,17 @@ export default function ControlPanel({
           {locale === 'ru' ? 'Не показывать время на постере' : 'Hide time on poster'}
         </label>
       </div>
+
+      {/* Font Panel — collapsible */}
+      {showFontPanel && (
+        <FontSelector
+          selectedFont={posterFont}
+          selectedFontSize={posterFontSize}
+          onChange={onFontChange}
+          onFontSizeChange={onFontSizeChange}
+          locale={locale}
+        />
+      )}
     </div>
   );
 }

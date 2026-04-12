@@ -154,6 +154,41 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── Text Settings Button (Tt icon) ─── */
+.text-settings-btn {
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.text-settings-btn:hover {
+  background: var(--color-input-bg);
+  color: var(--color-text);
+}
+
+.text-settings-btn--active {
+  background: #fff3f3;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.text-settings-btn .material-symbols-outlined {
+  font-size: 24px;
 }
 
 /* ── Theme Selector ─── */

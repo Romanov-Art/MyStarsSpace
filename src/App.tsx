@@ -10,7 +10,6 @@ import type { City, StarMapConfig, PosterSize } from './types/index.js';
 import ControlPanel from './components/ControlPanel.js';
 import PosterPreview from './components/PosterPreview.js';
 import LanguageSelector from './components/LanguageSelector.js';
-import FontSelector from './components/FontSelector.js';
 
 export default function App() {
   const [locale, _setLocale] = useState<Locale>(getLocale());
@@ -185,6 +184,8 @@ export default function App() {
             phrase={phrase}
             subtitles={subtitles}
             showTime={showTime}
+            posterFont={posterFont}
+            posterFontSize={posterFontSize}
             onThemeChange={handleThemeChange}
             onToggleLayer={handleToggleLayer}
             onCityChange={setSelectedCity}
@@ -193,15 +194,8 @@ export default function App() {
             onPhraseChange={setPhrase}
             onSubtitlesChange={setSubtitles}
             onShowTimeChange={setShowTime}
-          />
-
-          {/* Font Selector */}
-          <FontSelector
-            selectedFont={posterFont}
-            selectedFontSize={posterFontSize}
-            onChange={setPosterFont}
+            onFontChange={setPosterFont}
             onFontSizeChange={setPosterFontSize}
-            locale={locale}
           />
         </div>
 
