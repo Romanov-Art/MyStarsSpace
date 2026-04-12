@@ -72,13 +72,17 @@ export default function App() {
     if (isExporting) return;
     setIsExporting(true);
     try {
-    // Find the star map canvas directly (it IS the .poster__starmap-canvas element)
+    // Find the star map canvas directly
     const starCanvas = document.querySelector('.poster__starmap-canvas') as HTMLCanvasElement;
     if (!starCanvas) { setIsExporting(false); return; }
 
     const theme = getTheme(themeId);
-    const W = 2000;
-    const H = Math.round(W * (selectedSize.height / selectedSize.width));
+
+    // 300 DPI: cm → pixels (1 inch = 2.54 cm)
+    const DPI = 300;
+    const W = Math.round((selectedSize.width / 2.54) * DPI);
+    const H = Math.round((selectedSize.height / 2.54) * DPI);
+
     const exportCanvas = document.createElement('canvas');
     exportCanvas.width = W;
     exportCanvas.height = H;
@@ -102,7 +106,6 @@ export default function App() {
     });
 
     if (themeId === 'white') {
-      // Invert frame colors for white theme (matches CSS filter: invert(1))
       const tmpCanvas = document.createElement('canvas');
       tmpCanvas.width = Math.round(mapSize);
       tmpCanvas.height = Math.round(mapSize);
@@ -111,10 +114,9 @@ export default function App() {
       const imgData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
       const d = imgData.data;
       for (let i = 0; i < d.length; i += 4) {
-        d[i] = 255 - d[i];       // R
-        d[i + 1] = 255 - d[i + 1]; // G
-        d[i + 2] = 255 - d[i + 2]; // B
-        // Alpha stays the same
+        d[i] = 255 - d[i];
+        d[i + 1] = 255 - d[i + 1];
+        d[i + 2] = 255 - d[i + 2];
       }
       tmpCtx.putImageData(imgData, 0, 0);
       ctx.drawImage(tmpCanvas, mapX, mapY, mapSize, mapSize);
@@ -122,11 +124,11 @@ export default function App() {
       ctx.drawImage(frameSvg, mapX, mapY, mapSize, mapSize);
     }
 
-    // 4) Draw star canvas on top (already includes background fill + clipping)
+    // 4) Draw star canvas on top
     ctx.drawImage(starCanvas, mapX, mapY, mapSize, mapSize);
 
     // 5) Phrase text
-    const fontScale = W / 500; // relative to 500px reference
+    const fontScale = W / 500;
     const phraseFontPx = phraseFontSize * fontScale * 0.28;
     ctx.fillStyle = theme.text;
     ctx.font = `400 ${Math.round(phraseFontPx)}px "${phraseFont}", Georgia, serif`;
@@ -135,22 +137,28 @@ export default function App() {
     const phraseY = mapY + mapSize + H * 0.03;
     ctx.fillText(phrase, W / 2, phraseY);
 
-    // 6) Subtitle lines
+    // 6) Subtitle lines (uses subtitleFontSize)
+    const subtitleFontPx = subtitleFontSize * fontScale * 0.28;
     const subtitleGap = H * 0.025;
     const subtitleBaseY = H * 0.82;
-    ctx.font = `500 ${Math.round(W * 0.022)}px "${subtitleFont}", "Inter", sans-serif`;
+    ctx.font = `500 ${Math.round(subtitleFontPx)}px "${subtitleFont}", "Inter", sans-serif`;
     ctx.globalAlpha = 0.85;
     ctx.fillText(subtitles.line1, W / 2, subtitleBaseY);
-    ctx.font = `400 ${Math.round(W * 0.018)}px "${subtitleFont}", "Inter", sans-serif`;
+    ctx.font = `400 ${Math.round(subtitleFontPx * 0.85)}px "${subtitleFont}", "Inter", sans-serif`;
     ctx.fillText(subtitles.line2, W / 2, subtitleBaseY + subtitleGap);
     ctx.fillText(subtitles.line3, W / 2, subtitleBaseY + subtitleGap * 2);
     ctx.globalAlpha = 1;
 
-    // 7) Download
-    const link = document.createElement('a');
-    link.download = `starmap-${selectedCity.name}-${date.year}-${date.month}-${date.day}.png`;
-    link.href = exportCanvas.toDataURL('image/png');
-    link.click();
+    // 7) Download via Blob (better for large files)
+    exportCanvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = `starmap-${selectedCity.name || 'custom'}-${selectedSize.width}x${selectedSize.height}cm-300dpi.png`;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+    }, 'image/png');
     } finally {
       setIsExporting(false);
     }
