@@ -61,7 +61,7 @@ export default function ControlPanel({
   onDateChange, onTimeChange, onPhraseChange, onSubtitlesChange,
   onPhraseFontChange, onPhraseFontSizeChange, onSubtitleFontChange, onSubtitleFontSizeChange, onStarColorsChange, onGridStyleChange,
 }: ControlPanelProps) {
-  const [cityQuery, setCityQuery] = useState('');
+  const [cityQuery, setCityQuery] = useState(getCityLabel(selectedCity, locale));
   const [showCityResults, setShowCityResults] = useState(false);
   const [fontPanelFor, setFontPanelFor] = useState<'phrase' | 'subtitle' | null>(null);
 
@@ -87,7 +87,7 @@ export default function ControlPanel({
 
   const handleCitySelect = (city: City) => {
     onCityChange(city);
-    setCityQuery('');
+    setCityQuery(getCityLabel(city, locale));
     setShowCityResults(false);
   };
 
@@ -186,11 +186,11 @@ export default function ControlPanel({
         <div className="city-search" style={{ marginBottom: 12 }}>
           <input
             className="input-field"
-            placeholder={`${locale === 'ru' ? 'Город или координаты' : 'City or coordinates'}: ${getCityName(selectedCity, locale)}`}
+            placeholder={locale === 'ru' ? '🔍 Город или координаты' : '🔍 City or coordinates'}
             value={cityQuery}
             onChange={e => { setCityQuery(e.target.value); setShowCityResults(true); }}
-            onFocus={() => setShowCityResults(true)}
-            onBlur={() => setTimeout(() => setShowCityResults(false), 200)}
+            onFocus={() => { if (cityQuery && !showCityResults) setCityQuery(''); setShowCityResults(true); }}
+            onBlur={() => setTimeout(() => { setShowCityResults(false); if (!cityQuery.trim()) setCityQuery(getCityLabel(selectedCity, locale)); }, 200)}
             onKeyDown={handleCityInputKeyDown}
           />
           {parsedCoords && (
