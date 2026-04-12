@@ -77,7 +77,7 @@ export default function FontSelector({ selectedFont, selectedFontSize, onChange,
   const preview = PREVIEW_TEXT[locale] || PREVIEW_TEXT.en;
 
   return (
-    <div className="panel-section">
+    <div className="panel-section" style={{ marginBottom: 16 }}>
       <div className="panel-section__title">
         {locale === 'ru' ? 'Шрифт' : 'Font'}
       </div>

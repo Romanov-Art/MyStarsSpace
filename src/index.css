@@ -782,7 +782,6 @@ html, body {
   max-height: 320px;
   overflow-y: auto;
   padding-right: 4px;
-  margin-bottom: 16px;
 }
 
 .font-selector__list::-webkit-scrollbar {
