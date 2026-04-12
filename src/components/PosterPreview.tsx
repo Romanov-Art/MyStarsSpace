@@ -12,7 +12,7 @@ interface PosterPreviewProps {
   selectedCity: City;
   date: { day: number; month: number; year: number };
   time: { hours: number; minutes: number };
-  layers: { grid: boolean; constellationLines: boolean; constellationNames: boolean };
+  layers: { grid: boolean; constellationLines: boolean; constellationNames: boolean; milkyWay: boolean };
   phrase: string;
   subtitles: { line1: string; line2: string; line3: string };
   showTime: boolean;
@@ -76,24 +76,47 @@ function parseConstellationLinesGeoJSON(geojson: any): ConstellationLineData[] {
   });
 }
 
+// Milky Way polygon data
+interface MilkyWayData {
+  id: string; // ol1..ol5 (brightness level)
+  polygons: number[][][]; // array of polygons, each polygon is array of [ra_hours, dec]
+}
+
+function parseMilkyWayGeoJSON(geojson: any): MilkyWayData[] {
+  return geojson.features.map((f: any) => {
+    const polygons: number[][][] = [];
+    const coords = f.geometry.coordinates as number[][][][];
+    for (const multipoly of coords) {
+      for (const ring of multipoly) {
+        polygons.push(ring.map(([raDeg, dec]: number[]) => [raDeg / 15, dec]));
+      }
+    }
+    return { id: f.id, polygons };
+  });
+}
+
 // Global catalog cache
 let cachedStars: StarData[] | null = null;
 let cachedConstellationLines: ConstellationLineData[] | null = null;
+let cachedMilkyWay: MilkyWayData[] | null = null;
 let loadingPromise: Promise<void> | null = null;
 
 async function loadCatalogData(): Promise<void> {
-  if (cachedStars && cachedConstellationLines) return;
+  if (cachedStars && cachedConstellationLines && cachedMilkyWay) return;
   if (loadingPromise) return loadingPromise;
 
   loadingPromise = (async () => {
-    const [starsRes, constRes] = await Promise.all([
+    const [starsRes, constRes, mwRes] = await Promise.all([
       fetch('/data/stars.6.json'),
       fetch('/data/constellations.lines.json'),
+      fetch('/data/mw.json'),
     ]);
     const starsJson = await starsRes.json();
     const constJson = await constRes.json();
+    const mwJson = await mwRes.json();
     cachedStars = parseStarsGeoJSON(starsJson);
     cachedConstellationLines = parseConstellationLinesGeoJSON(constJson);
+    cachedMilkyWay = parseMilkyWayGeoJSON(mwJson);
   })();
   return loadingPromise;
 }
@@ -174,13 +197,20 @@ export default function PosterPreview({
     ctx.arc(center, center, radius, 0, Math.PI * 2);
     ctx.clip();
 
+    // ── Compute LST for all coordinate transforms ──
+    const lst = getLocalSiderealTime(dateTime, selectedCity.lon);
+
+    // ── Milky Way ──
+    if (layers.milkyWay && cachedMilkyWay) {
+      drawMilkyWay(ctx, center, radius, lst, selectedCity.lat, theme, size, cachedMilkyWay);
+    }
+
     // ── Grid (graticule) ──
     if (layers.grid) {
       drawGrid(ctx, center, radius, theme, size);
     }
 
     // ── Stars ──
-    const lst = getLocalSiderealTime(dateTime, selectedCity.lon);
     drawStars(ctx, center, radius, lst, selectedCity.lat, theme, size, layers.constellationNames, cachedStars!);
 
     // ── Constellation lines ──
@@ -272,6 +302,63 @@ function bvToRGB(bv: number): [number, number, number] {
     Math.round(Math.max(0, Math.min(1, b)) * 255),
   ];
 }
+
+/** Draw the Milky Way as translucent filled polygons */
+function drawMilkyWay(
+  ctx: CanvasRenderingContext2D,
+  center: number, radius: number,
+  lst: number, lat: number,
+  theme: { background: string },
+  size: number,
+  mwData: MilkyWayData[],
+) {
+  const isDark = theme.background !== '#ffffff';
+
+  // Opacity per brightness level (ol1 = dimmest outer, ol5 = brightest core)
+  const opacityMap: Record<string, number> = {
+    ol1: isDark ? 0.04 : 0.03,
+    ol2: isDark ? 0.06 : 0.04,
+    ol3: isDark ? 0.10 : 0.06,
+    ol4: isDark ? 0.14 : 0.08,
+    ol5: isDark ? 0.20 : 0.10,
+  };
+
+  const fillColor = isDark ? '200,220,255' : '60,60,80'; // blue-white glow or subtle gray
+
+  for (const layer of mwData) {
+    const alpha = opacityMap[layer.id] ?? 0.05;
+    ctx.fillStyle = `rgba(${fillColor},${alpha})`;
+
+    for (const polygon of layer.polygons) {
+      if (polygon.length < 3) continue;
+
+      ctx.beginPath();
+      let started = false;
+
+      for (const [raH, dec] of polygon) {
+        const hz = equatorialToHorizontal(raH, dec, lat, lst);
+        if (hz.altitude < -10) continue;
+
+        const proj = stereographicProjection(hz.altitude, hz.azimuth, radius);
+        const x = center + proj.x;
+        const y = center + proj.y;
+
+        if (!started) {
+          ctx.moveTo(x, y);
+          started = true;
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+
+      if (started) {
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+  }
+}
+
 function drawGrid(
   ctx: CanvasRenderingContext2D,
   center: number, radius: number,

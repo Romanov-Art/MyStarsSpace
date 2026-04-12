@@ -22,6 +22,7 @@ export default function App() {
     grid: true,
     constellationLines: true,
     constellationNames: true,
+    milkyWay: true,
   });
   const [phrase, setPhrase] = useState(() => t('poster.under_this_sky', getLocale()));
   const [subtitles, setSubtitles] = useState({

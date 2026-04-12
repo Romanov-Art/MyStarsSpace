@@ -6,7 +6,7 @@ import type { City } from '../types/index.js';
 interface ControlPanelProps {
   locale: Locale;
   themeId: string;
-  layers: { grid: boolean; constellationLines: boolean; constellationNames: boolean };
+  layers: { grid: boolean; constellationLines: boolean; constellationNames: boolean; milkyWay: boolean };
   selectedCity: City;
   date: { day: number; month: number; year: number };
   time: { hours: number; minutes: number };
@@ -14,7 +14,7 @@ interface ControlPanelProps {
   subtitles: { line1: string; line2: string; line3: string };
   showTime: boolean;
   onThemeChange: (id: string) => void;
-  onToggleLayer: (layer: 'grid' | 'constellationLines' | 'constellationNames') => void;
+  onToggleLayer: (layer: 'grid' | 'constellationLines' | 'constellationNames' | 'milkyWay') => void;
   onCityChange: (city: City) => void;
   onDateChange: (date: { day: number; month: number; year: number }) => void;
   onTimeChange: (time: { hours: number; minutes: number }) => void;
@@ -107,6 +107,11 @@ export default function ControlPanel({
             <div className="layer-toggle__icon">Aa</div>
             <span className="layer-toggle__label">{t('ui.constellation_names', locale)}</span>
             <span className="layer-toggle__status">{layers.constellationNames ? hideLabel : showLabel}</span>
+          </div>
+          <div className={`layer-toggle ${layers.milkyWay ? 'layer-toggle--active' : ''}`} onClick={() => onToggleLayer('milkyWay')}>
+            <div className="layer-toggle__icon">🌌</div>
+            <span className="layer-toggle__label">{locale === 'ru' ? 'Млечный путь' : 'Milky Way'}</span>
+            <span className="layer-toggle__status">{layers.milkyWay ? hideLabel : showLabel}</span>
           </div>
         </div>
       </div>
