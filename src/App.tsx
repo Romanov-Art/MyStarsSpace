@@ -79,8 +79,9 @@ export default function App() {
   const handleCityChange = useCallback((city: City) => {
     setSelectedCity(city);
     const cityName = getCityName(city, locale);
+    const cityWithCountry = city.country ? `${cityName}, ${city.country}` : cityName;
     const coords = formatCoordsDMS(city.lat, city.lon);
-    setSubtitles((prev: typeof subtitles) => ({ ...prev, line2: cityName, line4: coords }));
+    setSubtitles((prev: typeof subtitles) => ({ ...prev, line2: cityWithCountry, line4: coords }));
   }, [locale]);
 
   const handleDateChange = useCallback((d: typeof date) => {
