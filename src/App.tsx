@@ -137,14 +137,13 @@ export default function App() {
     const phraseY = mapY + mapSize + H * 0.03;
     ctx.fillText(phrase, W / 2, phraseY);
 
-    // 6) Subtitle lines (uses subtitleFontSize)
+    // 6) Subtitle lines (uses subtitleFontSize) — all same size
     const subtitleFontPx = subtitleFontSize * fontScale * 0.28;
     const subtitleGap = H * 0.025;
     const subtitleBaseY = H * 0.82;
-    ctx.font = `500 ${Math.round(subtitleFontPx)}px "${subtitleFont}", "Inter", sans-serif`;
-    ctx.globalAlpha = 0.85;
+    ctx.font = `400 ${Math.round(subtitleFontPx)}px "${subtitleFont}", "Inter", sans-serif`;
+    ctx.globalAlpha = 0.8;
     ctx.fillText(subtitles.line1, W / 2, subtitleBaseY);
-    ctx.font = `400 ${Math.round(subtitleFontPx * 0.85)}px "${subtitleFont}", "Inter", sans-serif`;
     ctx.fillText(subtitles.line2, W / 2, subtitleBaseY + subtitleGap);
     ctx.fillText(subtitles.line3, W / 2, subtitleBaseY + subtitleGap * 2);
     ctx.globalAlpha = 1;

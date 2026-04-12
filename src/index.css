@@ -21,13 +21,18 @@
   --radius-lg: 16px;
   --radius-pill: 100px;
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-html, body {
+html,
+body {
   font-family: var(--font-ui);
   background: var(--color-bg);
   color: var(--color-text);
@@ -110,7 +115,10 @@ html, body {
   .editor-layout {
     grid-template-columns: 300px 1fr;
   }
-  .editor-layout__info { display: none; }
+
+  .editor-layout__info {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
@@ -120,7 +128,10 @@ html, body {
     gap: 16px;
     min-height: auto;
   }
-  .editor-layout__info { display: none; }
+
+  .editor-layout__info {
+    display: none;
+  }
 }
 
 /* ─── Control Panel (Left) ─────────────────────────────────────── */
@@ -219,18 +230,36 @@ html, body {
   border-color: var(--color-accent);
 }
 
-.theme-circle--black { background: #000000; }
-.theme-circle--white { background: #ffffff; border: 3px solid #ddd; }
-.theme-circle--white.theme-circle--active { border-color: var(--color-accent); }
-.theme-circle--navy { background: #363a44; }
-.theme-circle--beige { background: #dbccb6; }
+.theme-circle--black {
+  background: #000000;
+}
+
+.theme-circle--white {
+  background: #ffffff;
+  border: 3px solid #ddd;
+}
+
+.theme-circle--white.theme-circle--active {
+  border-color: var(--color-accent);
+}
+
+.theme-circle--navy {
+  background: #363a44;
+}
+
+.theme-circle--beige {
+  background: #dbccb6;
+}
 
 .theme-circle__check {
   color: white;
   font-size: 16px;
 }
+
 .theme-circle--white .theme-circle__check,
-.theme-circle--beige .theme-circle__check { color: #333; }
+.theme-circle--beige .theme-circle__check {
+  color: #333;
+}
 
 /* ── Layer Toggles ─── */
 .layer-toggles {
@@ -456,7 +485,7 @@ html, body {
   max-width: 500px;
   aspect-ratio: 3/4;
   position: relative;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -476,10 +505,29 @@ html, body {
   box-sizing: border-box;
 }
 
-.poster-canvas--black { background: #000; border-color: #000; color: #fff; }
-.poster-canvas--white { background: #fff; border-color: #bbb; color: #000; }
-.poster-canvas--navy { background: #363a44; border-color: #363a44; color: #fff; }
-.poster-canvas--beige { background: #dbccb6; border-color: #c4b49c; color: #2c2418; }
+.poster-canvas--black {
+  background: #000;
+  border-color: #000;
+  color: #fff;
+}
+
+.poster-canvas--white {
+  background: #fff;
+  border-color: #bbb;
+  color: #000;
+}
+
+.poster-canvas--navy {
+  background: #363a44;
+  border-color: #363a44;
+  color: #fff;
+}
+
+.poster-canvas--beige {
+  background: #dbccb6;
+  border-color: #c4b49c;
+  color: #2c2418;
+}
 
 .poster__starmap-container {
   width: 100%;
@@ -511,7 +559,10 @@ html, body {
 /* Cardinal directions */
 .poster__cardinals {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   pointer-events: none;
 }
 
@@ -524,16 +575,35 @@ html, body {
   opacity: 0.7;
 }
 
-.poster__cardinal--n { top: 4px; left: 50%; transform: translateX(-50%); }
-.poster__cardinal--s { bottom: 4px; left: 50%; transform: translateX(-50%); }
-.poster__cardinal--e { right: 4px; top: 50%; transform: translateY(-50%); }
-.poster__cardinal--w { left: 4px; top: 50%; transform: translateY(-50%); }
+.poster__cardinal--n {
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.poster__cardinal--s {
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.poster__cardinal--e {
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.poster__cardinal--w {
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
 
 /* Poster text */
 .poster__text {
   text-align: center;
   width: 100%;
-  padding: 10% 5% 5%;
+  padding: 5% 5% 5%;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -560,8 +630,6 @@ html, body {
 }
 
 .poster__subtitle-line--main {
-  font-weight: 500;
-  opacity: 1;
   margin-bottom: 4px;
 }
 
