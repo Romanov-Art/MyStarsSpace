@@ -107,14 +107,16 @@ export function getCityName(city: City, locale: string): string {
 }
 
 /**
- * Get display label with flag: "🇷🇺 Москва" or "🇺🇸 New York"
+ * Get display label for search dropdown: "🇷🇺 Moscow" (always English name).
+ * For non-English locale, appends localized name: "🇷🇺 Moscow · Москва"
  */
 export function getCityLabel(city: City, locale: string): string {
-  const name = getCityName(city, locale);
-  // Country field is either full name or ISO code
   const iso = city.country.length === 2 ? city.country : countryToISO(city.country);
   const flag = iso ? isoToFlag(iso) : '';
-  return flag ? `${flag} ${name}` : name;
+  const eng = city.name || formatDMS(city.lat, city.lon);
+  const locName = locale !== 'en' && city.localizedNames?.[locale];
+  const label = locName ? `${eng} · ${locName}` : eng;
+  return flag ? `${flag} ${label}` : label;
 }
 
 /**
