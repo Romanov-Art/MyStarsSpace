@@ -120,7 +120,7 @@ export default function ControlPanel({
       {/* Theme selector */}
       <div className="panel-section">
         <div className="theme-selector">
-          {['black', 'white', 'navy'].map(id => (
+          {['black', 'white', 'navy', 'beige'].map(id => (
             <div
               key={id}
               className={`theme-circle theme-circle--${id} ${themeId === id ? 'theme-circle--active' : ''}`}

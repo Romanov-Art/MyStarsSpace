@@ -26,11 +26,20 @@ export const themes: Record<string, Theme> = {
   navy: {
     id: 'navy',
     name: 'Deep Navy',
-    background: '#2A2F41',
+    background: '#101217',
     stars: '#ffffff',
     grid: '#4a5068',
     constellationLines: '#8a9ab5',
     text: '#ffffff',
+  },
+  beige: {
+    id: 'beige',
+    name: 'Warm Beige',
+    background: '#dbccb6',
+    stars: '#1a1a1a',
+    grid: '#a89880',
+    constellationLines: '#4a3f33',
+    text: '#2c2418',
   },
 };
 

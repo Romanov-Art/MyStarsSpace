@@ -222,12 +222,15 @@ html, body {
 .theme-circle--black { background: #000000; }
 .theme-circle--white { background: #ffffff; border: 3px solid #ddd; }
 .theme-circle--white.theme-circle--active { border-color: var(--color-accent); }
-.theme-circle--navy { background: #2A2F41; }
+.theme-circle--navy { background: #101217; }
+.theme-circle--beige { background: #dbccb6; }
 
 .theme-circle__check {
   color: white;
   font-size: 16px;
 }
+.theme-circle--white .theme-circle__check,
+.theme-circle--beige .theme-circle__check { color: #333; }
 
 /* ── Layer Toggles ─── */
 .layer-toggles {
