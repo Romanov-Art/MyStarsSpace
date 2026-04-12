@@ -12,14 +12,14 @@ interface PosterPreviewProps {
   selectedCity: City;
   date: { day: number; month: number; year: number };
   time: { hours: number; minutes: number };
-  layers: { grid: boolean; constellationLines: boolean; constellationNames: boolean; milkyWay: boolean };
+  layers: { constellationLines: boolean; constellationNames: boolean; milkyWay: boolean };
   phrase: string;
   subtitles: { line1: string; line2: string; line3: string };
   showTime: boolean;
   posterFont: string;
   posterFontSize: number;
   starColors: boolean;
-  gridStyle: 'flat' | 'spherical';
+  gridStyle: 'hide' | 'flat' | 'spherical';
 }
 
 // ──────────────────────────────────────────────────────────────────
@@ -208,12 +208,10 @@ export default function PosterPreview({
     }
 
     // ── Grid (graticule) ──
-    if (layers.grid) {
-      if (gridStyle === 'spherical') {
-        drawSphericalGrid(ctx, center, radius, lst, selectedCity.lat, theme, size);
-      } else {
-        drawGrid(ctx, center, radius, theme, size);
-      }
+    if (gridStyle === 'spherical') {
+      drawSphericalGrid(ctx, center, radius, lst, selectedCity.lat, theme, size);
+    } else if (gridStyle === 'flat') {
+      drawGrid(ctx, center, radius, theme, size);
     }
 
     // ── Stars ──

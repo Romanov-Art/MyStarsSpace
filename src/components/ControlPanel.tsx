@@ -7,7 +7,7 @@ import FontSelector from './FontSelector.js';
 interface ControlPanelProps {
   locale: Locale;
   themeId: string;
-  layers: { grid: boolean; constellationLines: boolean; constellationNames: boolean; milkyWay: boolean };
+  layers: { constellationLines: boolean; constellationNames: boolean; milkyWay: boolean };
   selectedCity: City;
   date: { day: number; month: number; year: number };
   time: { hours: number; minutes: number };
@@ -17,9 +17,9 @@ interface ControlPanelProps {
   posterFont: string;
   posterFontSize: number;
   starColors: boolean;
-  gridStyle: 'flat' | 'spherical';
+  gridStyle: 'hide' | 'flat' | 'spherical';
   onThemeChange: (id: string) => void;
-  onToggleLayer: (layer: 'grid' | 'constellationLines' | 'constellationNames' | 'milkyWay') => void;
+  onToggleLayer: (layer: 'constellationLines' | 'constellationNames' | 'milkyWay') => void;
   onCityChange: (city: City) => void;
   onDateChange: (date: { day: number; month: number; year: number }) => void;
   onTimeChange: (time: { hours: number; minutes: number }) => void;
@@ -29,7 +29,7 @@ interface ControlPanelProps {
   onFontChange: (font: string) => void;
   onFontSizeChange: (size: number) => void;
   onStarColorsChange: (colored: boolean) => void;
-  onGridStyleChange: (style: 'flat' | 'spherical') => void;
+  onGridStyleChange: (style: 'hide' | 'flat' | 'spherical') => void;
 }
 
 const phraseCategories = [
@@ -105,13 +105,33 @@ export default function ControlPanel({
       {/* Layer toggles */}
       <div className="panel-section">
         <div className="layer-toggles">
-          <div className={`layer-toggle ${layers.grid ? 'layer-toggle--active' : ''}`} onClick={() => onToggleLayer('grid')}>
+          {/* Stars: Colors / B&W */}
+          <div
+            className={`layer-toggle layer-toggle--active`}
+            onClick={() => onStarColorsChange(!starColors)}
+          >
+            <div className="layer-toggle__icon">✨</div>
+            <span className="layer-toggle__label">{locale === 'ru' ? 'Звёзды' : 'Stars'}</span>
+            <span className="layer-toggle__status">{starColors ? (locale === 'ru' ? 'Цветные' : 'Colors') : (locale === 'ru' ? 'Ч/Б' : 'B&W')}</span>
+          </div>
+          {/* Meridians: Hide / Flat / 3D */}
+          <div
+            className={`layer-toggle ${gridStyle !== 'hide' ? 'layer-toggle--active' : ''}`}
+            onClick={() => {
+              const cycle: ('hide' | 'flat' | 'spherical')[] = ['hide', 'flat', 'spherical'];
+              const idx = cycle.indexOf(gridStyle);
+              onGridStyleChange(cycle[(idx + 1) % cycle.length]);
+            }}
+          >
             <div className="layer-toggle__icon">🌐</div>
             <span className="layer-toggle__label">{t('ui.meridians', locale)}</span>
-            <span className="layer-toggle__status">{layers.grid ? hideLabel : showLabel}</span>
+            <span className="layer-toggle__status">
+              {gridStyle === 'hide' ? (locale === 'ru' ? 'Скрыть' : 'Hide')
+                : gridStyle === 'flat' ? 'Flat' : '3D'}
+            </span>
           </div>
           <div className={`layer-toggle ${layers.constellationLines ? 'layer-toggle--active' : ''}`} onClick={() => onToggleLayer('constellationLines')}>
-            <div className="layer-toggle__icon">✨</div>
+            <div className="layer-toggle__icon">╋</div>
             <span className="layer-toggle__label">{t('ui.constellations', locale)}</span>
             <span className="layer-toggle__status">{layers.constellationLines ? hideLabel : showLabel}</span>
           </div>
@@ -124,44 +144,6 @@ export default function ControlPanel({
             <div className="layer-toggle__icon">🌌</div>
             <span className="layer-toggle__label">{locale === 'ru' ? 'Млечный путь' : 'Milky Way'}</span>
             <span className="layer-toggle__status">{layers.milkyWay ? hideLabel : showLabel}</span>
-          </div>
-        </div>
-
-        {/* Grid style toggle */}
-        <div className="layer-settings">
-          <span className="layer-settings__label">{locale === 'ru' ? 'Стиль сетки' : 'Grid style'}</span>
-          <div className="layer-settings__options">
-            <button
-              className={`layer-settings__btn ${gridStyle === 'flat' ? 'layer-settings__btn--active' : ''}`}
-              onClick={() => onGridStyleChange('flat')}
-            >
-              {locale === 'ru' ? 'Плоская' : 'Flat'}
-            </button>
-            <button
-              className={`layer-settings__btn ${gridStyle === 'spherical' ? 'layer-settings__btn--active' : ''}`}
-              onClick={() => onGridStyleChange('spherical')}
-            >
-              {locale === 'ru' ? 'Сферическая' : 'Spherical'}
-            </button>
-          </div>
-        </div>
-
-        {/* Star colors toggle */}
-        <div className="layer-settings">
-          <span className="layer-settings__label">{locale === 'ru' ? 'Цвет звёзд' : 'Star colors'}</span>
-          <div className="layer-settings__options">
-            <button
-              className={`layer-settings__btn ${starColors ? 'layer-settings__btn--active' : ''}`}
-              onClick={() => onStarColorsChange(true)}
-            >
-              {locale === 'ru' ? 'Цветные' : 'Color'}
-            </button>
-            <button
-              className={`layer-settings__btn ${!starColors ? 'layer-settings__btn--active' : ''}`}
-              onClick={() => onStarColorsChange(false)}
-            >
-              {locale === 'ru' ? 'Ч/Б' : 'B&W'}
-            </button>
           </div>
         </div>
       </div>

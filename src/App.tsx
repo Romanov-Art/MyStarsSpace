@@ -18,7 +18,6 @@ export default function App() {
   const [date, setDate] = useState({ day: 26, month: 3, year: 2026 });
   const [time, setTime] = useState({ hours: 0, minutes: 0 });
   const [layers, setLayers] = useState({
-    grid: true,
     constellationLines: true,
     constellationNames: true,
     milkyWay: true,
@@ -35,7 +34,7 @@ export default function App() {
   const [posterFontSize, setPosterFontSize] = useState(16);
   const [isExporting, setIsExporting] = useState(false);
   const [starColors, setStarColors] = useState(true);
-  const [gridStyle, setGridStyle] = useState<'flat' | 'spherical'>('flat');
+  const [gridStyle, setGridStyle] = useState<'hide' | 'flat' | 'spherical'>('flat');
 
   // Initialize subtitles with city and date
   React.useEffect(() => {
