@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { t, setLocale, getLocale, type Locale, LOCALE_NAMES, AVAILABLE_LOCALES } from './i18n/index.js';
-import { cities, getCityName, sanitizeInput } from './data/cities.js';
+import { cities, getCityName, sanitizeInput, formatCoordsDMS } from './data/cities.js';
 import { getDefaultConfig } from './config/celestial-config.js';
 import { getTheme, themes } from './config/themes.js';
 import { posterSizes } from './config/celestial-config.js';
@@ -42,6 +42,7 @@ export default function App() {
     line1: t('category.birthday', getLocale()),
     line2: '',
     line3: '',
+    line4: '',
   });
   const [selectedSize, setSelectedSize] = useState<PosterSize>(() => {
     if (saved.selectedSize) {
@@ -68,15 +69,17 @@ export default function App() {
       selectedSize, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize,
       starColors, gridStyle]);
 
-  // Initialize subtitles with city and date
+  // Initialize subtitles with city, date, and coordinates
   React.useEffect(() => {
     const cityName = getCityName(selectedCity, locale);
     const monthName = t(`month.${date.month}`, locale);
     const dateStr = `${date.day} ${monthName} ${date.year} ${t('ui.time', locale).toLowerCase()} ${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`;
-    setSubtitles(prev => ({
+    const coords = formatCoordsDMS(selectedCity.lat, selectedCity.lon);
+    setSubtitles((prev: typeof subtitles) => ({
       ...prev,
       line2: cityName,
       line3: dateStr,
+      line4: coords,
     }));
   }, [selectedCity, date, time, locale]);
 
@@ -187,7 +190,7 @@ export default function App() {
     const subtitleStartY = phraseBottom + textGap;
     ctx.font = `400 ${subtitlePx}px "${subtitleFont}", "Inter", sans-serif`;
     ctx.globalAlpha = 0.8;
-    const subLines = [subtitles.line1, subtitles.line2, subtitles.line3];
+    const subLines = [subtitles.line1, subtitles.line2, subtitles.line3, subtitles.line4].filter(Boolean) as string[];
     subLines.forEach((line: string, i: number) => {
       const y = subtitleStartY + i * subtitleLineHeight;
       if (y < H - textPadding) ctx.fillText(line, W / 2, y);

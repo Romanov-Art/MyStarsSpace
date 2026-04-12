@@ -12,7 +12,7 @@ interface ControlPanelProps {
   date: { day: number; month: number; year: number };
   time: { hours: number; minutes: number };
   phrase: string;
-  subtitles: { line1: string; line2: string; line3: string };
+  subtitles: { line1: string; line2: string; line3: string; line4?: string };
   phraseFont: string;
   phraseFontSize: number;
   subtitleFont: string;
@@ -25,7 +25,7 @@ interface ControlPanelProps {
   onDateChange: (date: { day: number; month: number; year: number }) => void;
   onTimeChange: (time: { hours: number; minutes: number }) => void;
   onPhraseChange: (phrase: string) => void;
-  onSubtitlesChange: (subs: { line1: string; line2: string; line3: string }) => void;
+  onSubtitlesChange: (subs: { line1: string; line2: string; line3: string; line4?: string }) => void;
   onPhraseFontChange: (font: string) => void;
   onPhraseFontSizeChange: (size: number) => void;
   onSubtitleFontChange: (font: string) => void;
@@ -313,6 +313,11 @@ export default function ControlPanel({
             className="subtitle-input"
             value={subtitles.line3}
             onChange={e => onSubtitlesChange({ ...subtitles, line3: e.target.value })}
+          />
+          <input
+            className="subtitle-input"
+            value={subtitles.line4 || ''}
+            onChange={e => onSubtitlesChange({ ...subtitles, line4: e.target.value })}
           />
         </div>
 

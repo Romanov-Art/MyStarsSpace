@@ -176,6 +176,21 @@ export function sanitizeInput(input: string): string {
     .replace(/on\w+\s*=/gi, '');
 }
 
+/** Format lat/lon as DMS: 55°45'08.0"N 37°37'04.0"E */
+export function formatCoordsDMS(lat: number, lon: number): string {
+  const toDMS = (val: number) => {
+    const abs = Math.abs(val);
+    const d = Math.floor(abs);
+    const mFull = (abs - d) * 60;
+    const m = Math.floor(mFull);
+    const s = ((mFull - m) * 60).toFixed(1);
+    return `${d}°${String(m).padStart(2, '0')}'${s.padStart(4, '0')}"`;
+  };
+  const ns = lat >= 0 ? 'N' : 'S';
+  const ew = lon >= 0 ? 'E' : 'W';
+  return `${toDMS(lat)}${ns} ${toDMS(lon)}${ew}`;
+}
+
 // ── Country name → ISO lookup (for curated cities) ──────────────
 const COUNTRY_ISO: Record<string, string> = {
   'Russia': 'RU', 'United Kingdom': 'GB', 'France': 'FR', 'Germany': 'DE',

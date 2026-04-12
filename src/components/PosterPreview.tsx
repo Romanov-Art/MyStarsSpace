@@ -14,7 +14,7 @@ interface PosterPreviewProps {
   time: { hours: number; minutes: number };
   layers: { constellationLines: boolean; constellationNames: boolean; milkyWay: boolean };
   phrase: string;
-  subtitles: { line1: string; line2: string; line3: string };
+  subtitles: { line1: string; line2: string; line3: string; line4?: string };
   phraseFont: string;
   phraseFontSize: number;
   subtitleFont: string;
@@ -252,6 +252,7 @@ export default function PosterPreview({
             <div className="poster__subtitle-line poster__subtitle-line--main">{subtitles.line1}</div>
             <div className="poster__subtitle-line">{subtitles.line2}</div>
             <div className="poster__subtitle-line">{subtitles.line3}</div>
+            {subtitles.line4 && <div className="poster__subtitle-line">{subtitles.line4}</div>}
           </div>
         </div>
       </div>
