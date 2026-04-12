@@ -105,7 +105,7 @@ export default function App() {
       img.src = `/${getDefaultFrame().filename}`;
     });
 
-    if (themeId === 'white') {
+    if (themeId === 'white' || themeId === 'beige') {
       const tmpCanvas = document.createElement('canvas');
       tmpCanvas.width = Math.round(mapSize);
       tmpCanvas.height = Math.round(mapSize);
