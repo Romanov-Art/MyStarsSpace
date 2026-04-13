@@ -301,14 +301,6 @@ export default function App() {
     ctx.globalAlpha = 1;
     ctx.letterSpacing = '0px';
 
-    // 7) Border on top of everything (from theme)
-    if (theme.borderWidth > 0) {
-      const borderPx = Math.round(W * theme.borderWidth / 100);
-      ctx.strokeStyle = theme.borderColor;
-      ctx.lineWidth = borderPx;
-      ctx.strokeRect(borderPx / 2, borderPx / 2, W - borderPx, H - borderPx);
-    }
-
     // 7) Download via Blob (better for large files)
     exportCanvas.toBlob((blob) => {
       if (!blob) return;
