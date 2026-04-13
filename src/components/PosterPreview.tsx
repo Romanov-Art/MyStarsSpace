@@ -289,15 +289,14 @@ export default function PosterPreview({
     // ── PREVIEW watermark (inside circle clip, not exported) ──
     const wmScale = size / 500;
     const wmFontSize = Math.round(14 * wmScale);
-    ctx.font = `${wmFontSize}px 'Dots', sans-serif`;
+    ctx.font = `bold ${wmFontSize}px 'Dotrice', sans-serif`;
     ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.globalAlpha = 0.5;
-    // 3-4 random positions inside inner 55% of circle
-    const wmCount = 3 + Math.floor(Math.random() * 2);
+    // 3 random positions inside inner 55% of circle
     const safeR = radius * 0.55;
-    for (let i = 0; i < wmCount; i++) {
+    for (let i = 0; i < 3; i++) {
       const angle = Math.random() * Math.PI * 2;
       const dist = Math.random() * safeR;
       const wx = center + Math.cos(angle) * dist;
