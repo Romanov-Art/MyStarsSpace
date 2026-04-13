@@ -223,22 +223,23 @@ export default function App() {
 
     // ── Text area (below star map, inside poster padding) ──
     const textAreaTop = mapY + mapSize;
-    const textAreaHeight = H - textAreaTop - posterPadding;
-    // Gap between phrase and subtitles — proportional to text area height
-    const textGap = textAreaHeight * 0.12;
+    const textAreaBottom = H - posterPadding;
+    const textAreaHeight = textAreaBottom - textAreaTop;
+    // CSS: .poster__text { padding: 5%; gap: 8%; } → resolves against width
+    const textPad = innerW * 0.05;
+    const textGap = innerW * 0.08;
 
     // Scale fonts relative to preview (~500px wide canvas)
     const scale = W / 500;
 
-    // 5) Phrase text — at top of text area (with word-wrap like CSS)
+    // 5) Phrase text — measure first, then center vertically
     const phrasePx = Math.round(phraseFontSize * scale);
     const phraseLineHeight = phrasePx * 1.3;
     ctx.fillStyle = theme.text;
     ctx.font = `400 ${phrasePx}px "${phraseFont}", Georgia, serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    const phraseY = textAreaTop + textAreaHeight * 0.06;
-    const maxTextWidth = innerW;
+    const maxTextWidth = innerW - textPad * 2;
 
     // Word-wrap: split each \n line into visual lines that fit maxTextWidth
     const wrappedLines: string[] = [];
@@ -258,15 +259,24 @@ export default function App() {
       wrappedLines.push(currentLine);
     });
 
-    wrappedLines.forEach((line: string, i: number) => {
-      const y = phraseY + i * phraseLineHeight;
-      if (y < H - posterPadding) ctx.fillText(line, W / 2, y);
-    });
-    const phraseBottom = phraseY + wrappedLines.length * phraseLineHeight;
-
-    // 6) Subtitle lines — right after phrase with gap
+    // Measure subtitle block height
     const subtitlePx = Math.round(subtitleFontSize * scale);
     const subtitleLineHeight = subtitlePx * 1.5;
+    const subtitleLinesArr = [subtitles.line1, subtitles.line2, subtitles.line3, subtitles.line4].filter(Boolean);
+    const subtitleBlockH = subtitleLinesArr.length * subtitleLineHeight + (subtitles.line1 ? subtitlePx * 0.3 : 0);
+    const phraseBlockH = wrappedLines.length * phraseLineHeight;
+    const totalContentH = phraseBlockH + textGap + subtitleBlockH;
+
+    // Center content vertically in text area
+    const contentStartY = textAreaTop + textPad + Math.max(0, (textAreaHeight - textPad * 2 - totalContentH) / 2);
+
+    wrappedLines.forEach((line: string, i: number) => {
+      const y = contentStartY + i * phraseLineHeight;
+      ctx.fillText(line, W / 2, y);
+    });
+    const phraseBottom = contentStartY + phraseBlockH;
+
+    // 6) Subtitle lines — right after phrase with gap
     let subtitleY = phraseBottom + textGap;
 
     // Set letter-spacing to match CSS (1px at preview scale)
