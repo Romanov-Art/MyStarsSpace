@@ -161,7 +161,7 @@ export default function App() {
       img.src = `/${getDefaultFrame().filename}`;
     });
 
-    if (themeId === 'white' || themeId === 'beige') {
+    if (theme.frameFilter !== 'none') {
       const tmpCanvas = document.createElement('canvas');
       tmpCanvas.width = mapSize;
       tmpCanvas.height = mapSize;
@@ -169,10 +169,22 @@ export default function App() {
       tmpCtx.drawImage(frameSvg, 0, 0, mapSize, mapSize);
       const imgData = tmpCtx.getImageData(0, 0, mapSize, mapSize);
       const d = imgData.data;
+
+      const needsInvert = theme.frameFilter.includes('invert');
+      const brightnessMatch = theme.frameFilter.match(/brightness\(([^)]+)\)/);
+      const brightness = brightnessMatch ? parseFloat(brightnessMatch[1]) : 1;
+
       for (let i = 0; i < d.length; i += 4) {
-        d[i] = 255 - d[i];
-        d[i + 1] = 255 - d[i + 1];
-        d[i + 2] = 255 - d[i + 2];
+        if (needsInvert) {
+          d[i] = 255 - d[i];
+          d[i + 1] = 255 - d[i + 1];
+          d[i + 2] = 255 - d[i + 2];
+        }
+        if (brightness !== 1) {
+          d[i] = Math.min(255, d[i] * brightness);
+          d[i + 1] = Math.min(255, d[i + 1] * brightness);
+          d[i + 2] = Math.min(255, d[i + 2] * brightness);
+        }
       }
       tmpCtx.putImageData(imgData, 0, 0);
       ctx.drawImage(tmpCanvas, mapX, mapY, mapSize, mapSize);

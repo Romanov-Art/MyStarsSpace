@@ -130,6 +130,8 @@ export interface Theme {
   borderColor: string;
   /** Border width as percentage of poster width */
   borderWidth: number;
+  /** CSS filter for the SVG frame (e.g. 'invert(1)' for light themes) */
+  frameFilter: string;
 }
 
 /** Star map rendering configuration */

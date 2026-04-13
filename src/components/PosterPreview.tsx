@@ -309,7 +309,7 @@ export default function PosterPreview({
               backgroundSize: '100% 100%',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              filter: themeId === 'white' ? 'invert(1)' : themeId === 'beige' ? 'invert(1) sepia(0.3) saturate(0.5) brightness(0.4)' : 'none',
+              filter: theme.frameFilter,
             }}
           />
           <canvas ref={canvasRef} className="poster__starmap-canvas" />
