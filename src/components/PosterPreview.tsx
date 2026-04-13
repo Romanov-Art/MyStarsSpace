@@ -324,6 +324,11 @@ export default function PosterPreview({
             {subtitles.line4 && <div className="poster__subtitle-line">{subtitles.line4}</div>}
           </div>
         </div>
+
+        {/* Preview watermark — not included in export */}
+        <div className="poster__watermark">
+          <img src="/preview-watermark.svg" alt="" draggable={false} />
+        </div>
       </div>
     </div>
   );

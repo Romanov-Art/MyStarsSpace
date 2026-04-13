@@ -58,17 +58,18 @@ export default function App() {
   const [isExporting, setIsExporting] = useState(false);
   const [starColors, setStarColors] = useState(() => saved.starColors ?? true);
   const [gridStyle, setGridStyle] = useState<'hide' | 'flat' | 'spherical'>(() => saved.gridStyle || 'flat');
+  const [frameStyle, setFrameStyle] = useState<'none' | 'line' | 'double' | 'border'>(() => saved.frameStyle || 'none');
 
   // Persist settings to localStorage on every change
   React.useEffect(() => {
     saveSettings({
       locale, themeId, selectedCity, date, time, layers, phrase, subtitles,
       selectedSize, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize,
-      starColors, gridStyle,
+      starColors, gridStyle, frameStyle,
     });
   }, [locale, themeId, selectedCity, date, time, layers, phrase, subtitles,
       selectedSize, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize,
-      starColors, gridStyle]);
+      starColors, gridStyle, frameStyle]);
 
   // Helper to build date string
   const buildDateStr = (d: typeof date, t2: typeof time, loc: Locale) => {
@@ -319,6 +320,7 @@ export default function App() {
             subtitleFontSize={subtitleFontSize}
             starColors={starColors}
             gridStyle={gridStyle}
+            frameStyle={frameStyle}
             onThemeChange={handleThemeChange}
             onToggleLayer={handleToggleLayer}
             onCityChange={handleCityChange}
@@ -332,6 +334,7 @@ export default function App() {
             onSubtitleFontSizeChange={setSubtitleFontSize}
             onStarColorsChange={setStarColors}
             onGridStyleChange={setGridStyle}
+            onFrameStyleChange={setFrameStyle}
           />
         </div>
 

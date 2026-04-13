@@ -19,6 +19,7 @@ interface ControlPanelProps {
   subtitleFontSize: number;
   starColors: boolean;
   gridStyle: 'hide' | 'flat' | 'spherical';
+  frameStyle: 'none' | 'line' | 'double' | 'border';
   onThemeChange: (id: string) => void;
   onToggleLayer: (layer: 'constellationLines' | 'constellationNames' | 'milkyWay') => void;
   onCityChange: (city: City) => void;
@@ -32,6 +33,7 @@ interface ControlPanelProps {
   onSubtitleFontSizeChange: (size: number) => void;
   onStarColorsChange: (colored: boolean) => void;
   onGridStyleChange: (style: 'hide' | 'flat' | 'spherical') => void;
+  onFrameStyleChange: (style: 'none' | 'line' | 'double' | 'border') => void;
 }
 
 const phraseCategories = [
@@ -56,10 +58,10 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
 
 export default function ControlPanel({
   locale, themeId, layers, selectedCity, date, time, phrase,
-  subtitles, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, starColors, gridStyle,
+  subtitles, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, starColors, gridStyle, frameStyle,
   onThemeChange, onToggleLayer, onCityChange,
   onDateChange, onTimeChange, onPhraseChange, onSubtitlesChange,
-  onPhraseFontChange, onPhraseFontSizeChange, onSubtitleFontChange, onSubtitleFontSizeChange, onStarColorsChange, onGridStyleChange,
+  onPhraseFontChange, onPhraseFontSizeChange, onSubtitleFontChange, onSubtitleFontSizeChange, onStarColorsChange, onGridStyleChange, onFrameStyleChange,
 }: ControlPanelProps) {
   const [cityQuery, setCityQuery] = useState(getCityLabel(selectedCity, locale));
   const [showCityResults, setShowCityResults] = useState(false);
@@ -176,6 +178,24 @@ export default function ControlPanel({
             <div className="layer-toggle__icon">🌌</div>
             <span className="layer-toggle__label">{locale === 'ru' ? 'Млечный путь' : 'Milky Way'}</span>
             <span className="layer-toggle__status">{layers.milkyWay ? hideLabel : showLabel}</span>
+          </div>
+          {/* Frame style: None → Line → Double → Border */}
+          <div
+            className={`layer-toggle ${frameStyle !== 'none' ? 'layer-toggle--active' : ''}`}
+            onClick={() => {
+              const cycle: ('none' | 'line' | 'double' | 'border')[] = ['none', 'line', 'double', 'border'];
+              const idx = cycle.indexOf(frameStyle);
+              onFrameStyleChange(cycle[(idx + 1) % cycle.length]);
+            }}
+          >
+            <div className="layer-toggle__icon">▣</div>
+            <span className="layer-toggle__label">{locale === 'ru' ? 'Рамка' : 'Frame'}</span>
+            <span className="layer-toggle__status">
+              {frameStyle === 'none' ? 'None'
+                : frameStyle === 'line' ? 'Line'
+                : frameStyle === 'double' ? 'Double'
+                : 'Border'}
+            </span>
           </div>
         </div>
       </div>

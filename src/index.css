@@ -205,15 +205,15 @@ body {
 /* ── Theme Selector ─── */
 .theme-selector {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   justify-content: flex-start;
 }
 
 .theme-circle {
-  width: 48px;
-  height: 48px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  border: 3px solid transparent;
+  border: 2px solid transparent;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
@@ -236,7 +236,7 @@ body {
 
 .theme-circle--white {
   background: #ffffff;
-  border: 3px solid #ddd;
+  border: 2px solid #ddd;
 }
 
 .theme-circle--white.theme-circle--active {
@@ -253,7 +253,7 @@ body {
 
 .theme-circle__check {
   color: white;
-  font-size: 16px;
+  font-size: 13px;
 }
 
 .theme-circle--white .theme-circle__check,
@@ -503,6 +503,28 @@ body {
   overflow: hidden;
   transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
   box-sizing: border-box;
+}
+
+/* Preview watermark overlay */
+.poster__watermark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.poster__watermark img {
+  width: 80%;
+  max-width: 400px;
+  opacity: 0.3;
+  transform: rotate(-30deg);
+  filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));
 }
 
 .poster-canvas--black {
