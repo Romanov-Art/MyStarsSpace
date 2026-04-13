@@ -288,23 +288,24 @@ export default function PosterPreview({
 
     // ── PREVIEW watermark (inside circle clip, not exported) ──
     const wmScale = size / 500;
-    const wmFontSize = Math.round(28 * wmScale);
+    const wmFontSize = Math.round(14 * wmScale);
     ctx.font = `${wmFontSize}px 'Dots', sans-serif`;
     ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.globalAlpha = 0.5;
-    // 4 positions spread across the circle
-    const wmPositions = [
-      { x: center - radius * 0.3, y: center - radius * 0.35, angle: -25 },
-      { x: center + radius * 0.3, y: center - radius * 0.1, angle: -25 },
-      { x: center - radius * 0.15, y: center + radius * 0.2, angle: -25 },
-      { x: center + radius * 0.25, y: center + radius * 0.5, angle: -25 },
-    ];
-    for (const wm of wmPositions) {
+    // 3-4 random positions inside inner 55% of circle
+    const wmCount = 3 + Math.floor(Math.random() * 2);
+    const safeR = radius * 0.55;
+    for (let i = 0; i < wmCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = Math.random() * safeR;
+      const wx = center + Math.cos(angle) * dist;
+      const wy = center + Math.sin(angle) * dist;
+      const rot = -20 - Math.random() * 15;
       ctx.save();
-      ctx.translate(wm.x, wm.y);
-      ctx.rotate(wm.angle * Math.PI / 180);
+      ctx.translate(wx, wy);
+      ctx.rotate(rot * Math.PI / 180);
       ctx.fillText('PREVIEW', 0, 0);
       ctx.restore();
     }
