@@ -223,10 +223,9 @@ export default function App() {
 
     // ── Text area (below star map, inside poster padding) ──
     const textAreaTop = mapY + mapSize;
-    const textPadding = posterPadding; // reuse poster padding for text margins
     const textAreaHeight = H - textAreaTop - posterPadding;
-    // CSS gap% in flex-column resolves against container WIDTH in Chrome
-    const textGap = innerW * 0.08;
+    // Gap between phrase and subtitles — proportional to text area height
+    const textGap = textAreaHeight * 0.12;
 
     // Scale fonts relative to preview (~500px wide canvas)
     const scale = W / 500;
@@ -238,7 +237,7 @@ export default function App() {
     ctx.font = `400 ${phrasePx}px "${phraseFont}", Georgia, serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    const phraseY = textAreaTop + textPadding;
+    const phraseY = textAreaTop + textAreaHeight * 0.06;
     const maxTextWidth = innerW;
 
     // Word-wrap: split each \n line into visual lines that fit maxTextWidth
@@ -261,7 +260,7 @@ export default function App() {
 
     wrappedLines.forEach((line: string, i: number) => {
       const y = phraseY + i * phraseLineHeight;
-      if (y < H - textPadding) ctx.fillText(line, W / 2, y);
+      if (y < H - posterPadding) ctx.fillText(line, W / 2, y);
     });
     const phraseBottom = phraseY + wrappedLines.length * phraseLineHeight;
 
@@ -277,7 +276,7 @@ export default function App() {
     if (subtitles.line1) {
       ctx.font = `500 ${subtitlePx}px "${subtitleFont}", serif`;
       ctx.globalAlpha = 1;
-      if (subtitleY < H - textPadding) ctx.fillText(subtitles.line1, W / 2, subtitleY);
+      if (subtitleY < H - posterPadding) ctx.fillText(subtitles.line1, W / 2, subtitleY);
       subtitleY += subtitleLineHeight + subtitlePx * 0.3;
     }
 
@@ -287,7 +286,7 @@ export default function App() {
     const remainingLines = [subtitles.line2, subtitles.line3, subtitles.line4].filter(Boolean) as string[];
     remainingLines.forEach((line: string, i: number) => {
       const y = subtitleY + i * subtitleLineHeight;
-      if (y < H - textPadding) ctx.fillText(line, W / 2, y);
+      if (y < H - posterPadding) ctx.fillText(line, W / 2, y);
     });
     ctx.globalAlpha = 1;
     ctx.letterSpacing = '0px';
