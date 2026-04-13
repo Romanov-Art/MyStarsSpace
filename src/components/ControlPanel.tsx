@@ -66,6 +66,17 @@ export default function ControlPanel({
   const [cityQuery, setCityQuery] = useState(getCityLabel(selectedCity, locale));
   const [showCityResults, setShowCityResults] = useState(false);
   const [fontPanelFor, setFontPanelFor] = useState<'phrase' | 'subtitle' | null>(null);
+  const [customColor, setCustomColor] = useState('#6a4c93');
+  const colorInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Check if a hex color is "light" (for contrast check/text color)
+  const isLightColor = (hex: string) => {
+    const c = hex.replace('#', '');
+    const r = parseInt(c.substring(0, 2), 16);
+    const g = parseInt(c.substring(2, 4), 16);
+    const b = parseInt(c.substring(4, 6), 16);
+    return (r * 0.299 + g * 0.587 + b * 0.114) > 150;
+  };
 
   // Check if input looks like coordinates
   const parsedCoords = useMemo(() => {
@@ -132,7 +143,37 @@ export default function ControlPanel({
               {themeId === id && <span className="theme-circle__check">✓</span>}
             </div>
           ))}
+          {/* Custom color picker */}
+          <div
+            className={`theme-circle theme-circle--custom ${themeId === 'custom' ? 'theme-circle--active' : ''}`}
+            style={themeId === 'custom' ? { background: customColor } : undefined}
+            onClick={() => colorInputRef.current?.click()}
+          >
+            {themeId === 'custom'
+              ? <span className="theme-circle__check" style={{ color: isLightColor(customColor) ? '#333' : '#fff' }}>✓</span>
+              : <span className="theme-circle__plus">+</span>
+            }
+          </div>
+          <input
+            ref={colorInputRef}
+            type="color"
+            value={customColor}
+            onChange={e => {
+              setCustomColor(e.target.value);
+              onThemeChange('custom:' + e.target.value);
+            }}
+            style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}
+          />
         </div>
+        {themeId === 'custom' && (
+          <div className="custom-color-warning">
+            <span className="custom-color-warning__icon">⚠️</span>
+            <span>{locale === 'ru'
+              ? 'Цвета при печати могут отличаться от отображения на мониторе!'
+              : 'Print colors may differ from what you see on screen!'
+            }</span>
+          </div>
+        )}
       </div>
 
       {/* Layer toggles */}

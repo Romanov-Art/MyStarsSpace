@@ -107,7 +107,31 @@ export default function App() {
   }, []);
 
   const handleThemeChange = useCallback((id: string) => {
-    setThemeId(id);
+    if (id.startsWith('custom:')) {
+      const hex = id.slice(7);
+      // Determine if background is light or dark
+      const c = hex.replace('#', '');
+      const r = parseInt(c.substring(0, 2), 16);
+      const g = parseInt(c.substring(2, 4), 16);
+      const b = parseInt(c.substring(4, 6), 16);
+      const isLight = (r * 0.299 + g * 0.587 + b * 0.114) > 150;
+      // Register custom theme dynamically
+      themes['custom'] = {
+        id: 'custom',
+        name: 'Custom',
+        background: hex,
+        stars: isLight ? '#000000' : '#ffffff',
+        grid: isLight ? '#999' : '#555',
+        constellationLines: isLight ? '#333' : '#ccc',
+        text: isLight ? '#000000' : '#ffffff',
+        borderColor: hex,
+        borderWidth: 0,
+        frameFilter: isLight ? 'invert(1)' : 'none',
+      };
+      setThemeId('custom');
+    } else {
+      setThemeId(id);
+    }
   }, []);
 
   const handleToggleLayer = useCallback((layer: keyof typeof layers) => {

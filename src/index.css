@@ -265,6 +265,37 @@ body {
   background: #fff2e0;
 }
 
+.theme-circle--custom {
+  background: #eee;
+  position: relative;
+}
+
+.theme-circle__plus {
+  font-size: 18px;
+  font-weight: 300;
+  color: #999;
+  line-height: 1;
+}
+
+/* Warning for custom color */
+.custom-color-warning {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: #fff3cd;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #856404;
+  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.custom-color-warning__icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
 .theme-circle__check {
   color: white;
   font-size: 13px;

@@ -340,6 +340,8 @@ export default function PosterPreview({
       <div
         className={`poster-canvas poster-canvas--${themeId}`}
         style={{
+          background: theme.background,
+          color: theme.text,
           borderColor: theme.borderColor,
           borderWidth: theme.borderWidth > 0 ? `${theme.borderWidth}%` : '0',
         }}
