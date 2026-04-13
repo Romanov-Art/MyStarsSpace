@@ -128,7 +128,9 @@ export default function App() {
         borderWidth: 0,
         frameFilter: isLight ? 'invert(1)' : 'none',
       };
-      setThemeId('custom');
+      // Force re-render: briefly set to empty then back to 'custom'
+      setThemeId('');
+      requestAnimationFrame(() => setThemeId('custom'));
     } else {
       setThemeId(id);
     }

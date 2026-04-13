@@ -279,8 +279,8 @@ body {
 
 /* Warning for custom color */
 .custom-color-warning {
-  margin-top: 8px;
-  padding: 6px 10px;
+  margin-top: 12px;
+  padding: 8px 12px;
   background: #fff3cd;
   border-radius: 6px;
   font-size: 11px;
@@ -289,6 +289,19 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 6px;
+  position: relative;
+}
+
+.custom-color-warning::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: 24px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #fff3cd;
 }
 
 .custom-color-warning__icon {
