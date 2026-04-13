@@ -311,7 +311,7 @@ export default function App() {
     } finally {
       setIsExporting(false);
     }
-  }, [phrase, subtitles, themeId, selectedSize, selectedCity, date, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, isExporting]);
+  }, [phrase, subtitles, themeId, selectedSize, selectedCity, date, time, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, isExporting, layers, starColors, gridStyle]);
 
   return (
     <>
