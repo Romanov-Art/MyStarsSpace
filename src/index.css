@@ -1,6 +1,13 @@
 /* ─── CSS Design System — atlas-stars.ru style ─────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
 
+@font-face {
+  font-family: 'Dots';
+  src: url('/fonts/Dots.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
   --color-bg: #f5f5f5;
   --color-white: #ffffff;
@@ -519,7 +526,7 @@ body {
   pointer-events: none;
   z-index: 10;
   transform: rotate(-30deg);
-  font-family: 'Inter', Arial, sans-serif;
+  font-family: 'Dots', 'Inter', Arial, sans-serif;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 6px;
