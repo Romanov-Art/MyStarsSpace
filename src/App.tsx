@@ -136,13 +136,6 @@ export default function App() {
     ctx.fillStyle = theme.background;
     ctx.fillRect(0, 0, W, H);
 
-    // 1b) Border (from theme)
-    if (theme.borderWidth > 0) {
-      const borderPx = Math.round(W * theme.borderWidth / 100);
-      ctx.strokeStyle = theme.borderColor;
-      ctx.lineWidth = borderPx;
-      ctx.strokeRect(borderPx / 2, borderPx / 2, W - borderPx, H - borderPx);
-    }
 
     // Poster padding (matches CSS: .poster-canvas { padding: 5% })
     const posterPadding = Math.round(W * 0.05);
@@ -203,7 +196,8 @@ export default function App() {
     const textAreaTop = mapY + mapSize;
     const textPadding = posterPadding; // reuse poster padding for text margins
     const textAreaHeight = H - textAreaTop - posterPadding;
-    const textGap = textAreaHeight * 0.08; // CSS gap % in flex-column
+    // CSS gap% in flex-column resolves against container WIDTH in Chrome
+    const textGap = innerW * 0.08;
 
     // Scale fonts relative to preview (~500px wide canvas)
     const scale = W / 500;
@@ -268,6 +262,14 @@ export default function App() {
     });
     ctx.globalAlpha = 1;
     ctx.letterSpacing = '0px';
+
+    // 7) Border on top of everything (from theme)
+    if (theme.borderWidth > 0) {
+      const borderPx = Math.round(W * theme.borderWidth / 100);
+      ctx.strokeStyle = theme.borderColor;
+      ctx.lineWidth = borderPx;
+      ctx.strokeRect(borderPx / 2, borderPx / 2, W - borderPx, H - borderPx);
+    }
 
     // 7) Download via Blob (better for large files)
     exportCanvas.toBlob((blob) => {
