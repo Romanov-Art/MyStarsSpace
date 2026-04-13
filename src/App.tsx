@@ -136,10 +136,14 @@ export default function App() {
     ctx.fillStyle = theme.background;
     ctx.fillRect(0, 0, W, H);
 
-    // 2) Star map area: full width square at top (matches CSS: width:100%, aspect-ratio:1)
-    const mapSize = W;
-    const mapX = 0;
-    const mapY = 0;
+    // Poster padding (matches CSS: .poster-canvas { padding: 5% })
+    const posterPadding = Math.round(W * 0.05);
+    const innerW = W - posterPadding * 2;
+
+    // 2) Star map area: square inside padding (matches CSS: width:100%, aspect-ratio:1)
+    const mapSize = innerW;
+    const mapX = posterPadding;
+    const mapY = posterPadding;
 
     // 3) Load and draw SVG frame
     const frameSvg = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -171,11 +175,11 @@ export default function App() {
     // 4) Draw star canvas on top
     ctx.drawImage(starCanvas, mapX, mapY, mapSize, mapSize);
 
-    // ── Text area (matches CSS: .poster__text padding: 5%, gap: 8%) ──
-    const textAreaTop = W;
-    const textPadding = W * 0.05; // CSS padding % is relative to width
-    const textAreaHeight = H - W;
-    const textGap = textAreaHeight * 0.08; // CSS gap % in flex-column is relative to container height
+    // ── Text area (below star map, inside poster padding) ──
+    const textAreaTop = mapY + mapSize;
+    const textPadding = posterPadding; // reuse poster padding for text margins
+    const textAreaHeight = H - textAreaTop - posterPadding;
+    const textGap = textAreaHeight * 0.08; // CSS gap % in flex-column
 
     // Scale fonts relative to preview (~500px wide canvas)
     const scale = W / 500;
@@ -188,7 +192,7 @@ export default function App() {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     const phraseY = textAreaTop + textPadding;
-    const maxTextWidth = W - textPadding * 2;
+    const maxTextWidth = innerW;
 
     // Word-wrap: split each \n line into visual lines that fit maxTextWidth
     const wrappedLines: string[] = [];
