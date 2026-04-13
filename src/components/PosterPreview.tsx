@@ -460,7 +460,7 @@ function drawGrid(
   ctx.strokeStyle = '#6c757d';
 
   // Altitude circles every 10°
-  ctx.lineWidth = Math.max(0.5, Math.min(2, 0.8 * Math.sqrt(size / 500)));
+  ctx.lineWidth = Math.max(1, 0.8 * (size / 500));
   ctx.globalAlpha = 0.4;
   for (let alt = 10; alt < 90; alt += 10) {
     const r = radius * Math.tan(((90 - alt) / 2) * Math.PI / 180) / Math.tan(45 * Math.PI / 180);
@@ -470,7 +470,7 @@ function drawGrid(
   }
 
   // Azimuth lines every 10°
-  ctx.lineWidth = Math.max(0.5, Math.min(1.5, 0.6 * Math.sqrt(size / 500)));
+  ctx.lineWidth = Math.max(1, 0.6 * (size / 500));
   ctx.globalAlpha = 0.3;
   for (let az = 0; az < 360; az += 10) {
     const azRad = (az * Math.PI) / 180;
@@ -496,7 +496,7 @@ function drawSphericalGrid(
   const STEP = 2; // sample interval in degrees for smooth curves
 
   // Declination circles every 15° from -75° to 75°
-  ctx.lineWidth = Math.max(0.5, Math.min(2, 0.8 * Math.sqrt(size / 500)));
+  ctx.lineWidth = Math.max(1, 0.8 * (size / 500));
   ctx.globalAlpha = 0.35;
   for (let dec = -75; dec <= 75; dec += 15) {
     ctx.beginPath();
@@ -517,7 +517,7 @@ function drawSphericalGrid(
   }
 
   // Right Ascension lines every 1 hour (15°)
-  ctx.lineWidth = Math.max(0.5, Math.min(1.5, 0.6 * Math.sqrt(size / 500)));
+  ctx.lineWidth = Math.max(1, 0.6 * (size / 500));
   ctx.globalAlpha = 0.25;
   for (let raH = 0; raH < 24; raH += 1) {
     ctx.beginPath();
@@ -565,24 +565,22 @@ function drawStars(
     if (dist > radius) continue;
 
     // Star sizes in PHYSICAL pixels (size is already in physical px)
-    // Use sqrt scaling so stars don't grow linearly at high DPI
     const scale = size / 500;
-    const hiresFactor = Math.sqrt(scale); // sqrt gives crisp stars at any res
     let starSize: number;
     if (star.magnitude < 0) {
-      starSize = Math.max(2, 2.0 * hiresFactor);
+      starSize = Math.max(2, 2.0 * scale);
     } else if (star.magnitude < 1) {
-      starSize = Math.max(1.5, 1.5 * hiresFactor);
+      starSize = Math.max(1.5, 1.5 * scale);
     } else if (star.magnitude < 2) {
-      starSize = Math.max(1.2, 1.1 * hiresFactor);
+      starSize = Math.max(1.2, 1.1 * scale);
     } else if (star.magnitude < 3) {
-      starSize = Math.max(1, 0.8 * hiresFactor);
+      starSize = Math.max(1, 0.8 * scale);
     } else if (star.magnitude < 4) {
-      starSize = Math.max(0.8, 0.6 * hiresFactor);
+      starSize = Math.max(0.8, 0.6 * scale);
     } else if (star.magnitude < 5) {
-      starSize = Math.max(0.6, 0.45 * hiresFactor);
+      starSize = Math.max(0.6, 0.45 * scale);
     } else {
-      starSize = Math.max(0.5, 0.35 * hiresFactor);
+      starSize = Math.max(0.5, 0.35 * scale);
     }
 
     // Opacity: brighter stars are more opaque
@@ -600,7 +598,7 @@ function drawStars(
 
       // Glow for bright stars (magnitude < 1.5)
       if (star.magnitude < 1.5) {
-        const glowRadius = starSize * 2;
+        const glowRadius = starSize * 3;
         const glow = ctx.createRadialGradient(x, y, starSize * 0.5, x, y, glowRadius);
         glow.addColorStop(0, `rgba(${r},${g},${b},${alpha * 0.35})`);
         glow.addColorStop(1, `rgba(${r},${g},${b},0)`);
@@ -616,7 +614,7 @@ function drawStars(
 
       // Simple white glow for bright stars in monochrome
       if (star.magnitude < 1.5) {
-        const glowRadius = starSize * 2;
+        const glowRadius = starSize * 3;
         const glow = ctx.createRadialGradient(x, y, starSize * 0.5, x, y, glowRadius);
         glow.addColorStop(0, `rgba(255,255,255,${alpha * 0.25})`);
         glow.addColorStop(1, 'rgba(255,255,255,0)');
@@ -667,8 +665,7 @@ function drawStars(
       candidates.unshift(polaris);
     }
 
-    const nameFontSize = Math.max(10, Math.min(18, 10 * Math.sqrt(scale)));
-    ctx.font = `${nameFontSize}px sans-serif`;
+    ctx.font = `${Math.max(10, 10 * scale)}px sans-serif`;
     ctx.fillStyle = '#ffffff';
 
     for (const c of candidates) {
