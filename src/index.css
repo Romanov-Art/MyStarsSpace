@@ -512,32 +512,7 @@ body {
   box-sizing: border-box;
 }
 
-/* Preview watermark overlay */
-.poster__watermark {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 10;
-  transform: rotate(-30deg);
-  font-family: 'Dots', 'Inter', Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 6px;
-  line-height: 3.5;
-  color: rgba(255, 255, 255, 0.15);
-  text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  user-select: none;
-  word-spacing: 20px;
-}
+
 
 .poster-canvas--black {
   background: #000;

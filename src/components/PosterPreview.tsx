@@ -286,6 +286,30 @@ export default function PosterPreview({
       drawConstellations(ctx, center, radius, lst, selectedCity.lat, theme, size, cachedConstellationLines!);
     }
 
+    // ── PREVIEW watermark (inside circle clip, not exported) ──
+    const wmScale = size / 500;
+    const wmFontSize = Math.round(28 * wmScale);
+    ctx.font = `${wmFontSize}px 'Dots', sans-serif`;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 0.5;
+    // 4 positions spread across the circle
+    const wmPositions = [
+      { x: center - radius * 0.3, y: center - radius * 0.35, angle: -25 },
+      { x: center + radius * 0.3, y: center - radius * 0.1, angle: -25 },
+      { x: center - radius * 0.15, y: center + radius * 0.2, angle: -25 },
+      { x: center + radius * 0.25, y: center + radius * 0.5, angle: -25 },
+    ];
+    for (const wm of wmPositions) {
+      ctx.save();
+      ctx.translate(wm.x, wm.y);
+      ctx.rotate(wm.angle * Math.PI / 180);
+      ctx.fillText('PREVIEW', 0, 0);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+
     ctx.restore();
 
   }, [themeId, selectedCity, dateTime, layers, theme, locale, frame, catalogLoaded, containerSize, starColors, gridStyle]);
@@ -323,11 +347,6 @@ export default function PosterPreview({
             <div className="poster__subtitle-line">{subtitles.line3}</div>
             {subtitles.line4 && <div className="poster__subtitle-line">{subtitles.line4}</div>}
           </div>
-        </div>
-
-        {/* Preview watermark — not included in export */}
-        <div className="poster__watermark">
-          {'PREVIEW  ·  '.repeat(30)}
         </div>
       </div>
     </div>
