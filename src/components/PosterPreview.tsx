@@ -327,7 +327,7 @@ export default function PosterPreview({
 
         {/* Preview watermark — not included in export */}
         <div className="poster__watermark">
-          <img src="/preview-watermark.svg" alt="" draggable={false} />
+          {'PREVIEW  ·  '.repeat(30)}
         </div>
       </div>
     </div>
