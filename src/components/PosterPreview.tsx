@@ -287,28 +287,49 @@ export default function PosterPreview({
     }
 
     // ── PREVIEW watermark (inside circle clip, not exported) ──
-    const wmScale = size / 500;
-    const wmFontSize = Math.round(14 * wmScale);
-    ctx.font = `bold ${wmFontSize}px 'Dotrice', sans-serif`;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.globalAlpha = 0.5;
-    // 3 random positions inside inner 55% of circle
-    const safeR = radius * 0.55;
-    for (let i = 0; i < 3; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const dist = Math.random() * safeR;
-      const wx = center + Math.cos(angle) * dist;
-      const wy = center + Math.sin(angle) * dist;
-      const rot = -20 - Math.random() * 15;
-      ctx.save();
-      ctx.translate(wx, wy);
-      ctx.rotate(rot * Math.PI / 180);
-      ctx.fillText('PREVIEW', 0, 0);
-      ctx.restore();
-    }
-    ctx.globalAlpha = 1;
+    // Ensure font is loaded for canvas
+    document.fonts.load("14px 'Digital'").then(() => {
+      if (!canvasRef.current) return;
+      const wmCtx = canvasRef.current.getContext('2d');
+      if (!wmCtx) return;
+      // Re-apply circle clip for watermark
+      wmCtx.save();
+      wmCtx.beginPath();
+      wmCtx.arc(center, center, radius, 0, Math.PI * 2);
+      wmCtx.clip();
+
+      const wmFontSize = Math.round(48 * (size / 500));
+      wmCtx.font = `${wmFontSize}px 'Digital', sans-serif`;
+      wmCtx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      wmCtx.textAlign = 'center';
+      wmCtx.textBaseline = 'middle';
+      wmCtx.globalAlpha = 0.5;
+      const safeR = radius * 0.55;
+      const minDist = radius * 0.4; // 20% of radius
+      const placed: { x: number; y: number }[] = [];
+      for (let i = 0; i < 3; i++) {
+        let wx = 0, wy = 0, attempts = 0;
+        do {
+          const a = Math.random() * Math.PI * 2;
+          const d = Math.random() * safeR;
+          wx = center + Math.cos(a) * d;
+          wy = center + Math.sin(a) * d;
+          attempts++;
+        } while (
+          attempts < 20 &&
+          placed.some(p => Math.hypot(p.x - wx, p.y - wy) < minDist)
+        );
+        placed.push({ x: wx, y: wy });
+        const rot = -20 + Math.random() * 30; // ±15° from horizontal
+        wmCtx.save();
+        wmCtx.translate(wx, wy);
+        wmCtx.rotate(rot * Math.PI / 180);
+        wmCtx.fillText('PREVIEW', 0, 0);
+        wmCtx.restore();
+      }
+      wmCtx.globalAlpha = 1;
+      wmCtx.restore();
+    });
 
     ctx.restore();
 
