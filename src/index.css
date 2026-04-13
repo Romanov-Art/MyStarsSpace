@@ -219,13 +219,13 @@ body {
 /* ── Theme Selector ─── */
 .theme-selector {
   display: flex;
-  gap: 12px;
-  justify-content: flex-start;
+  gap: 0;
+  justify-content: space-between;
 }
 
 .theme-circle {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
