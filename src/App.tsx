@@ -59,17 +59,19 @@ export default function App() {
   const [starColors, setStarColors] = useState(() => saved.starColors ?? true);
   const [gridStyle, setGridStyle] = useState<'hide' | 'flat' | 'spherical'>(() => saved.gridStyle || 'flat');
   const [frameStyle, setFrameStyle] = useState<'none' | 'line' | 'double' | 'border'>(() => saved.frameStyle || 'none');
+  const [compassStyle, setCompassStyle] = useState<'none' | 'simple' | 'degrees' | 'cardinal'>(() => saved.compassStyle || 'cardinal');
+  const [showZodiac, setShowZodiac] = useState(() => saved.showZodiac ?? false);
 
   // Persist settings to localStorage on every change
   React.useEffect(() => {
     saveSettings({
       locale, themeId, selectedCity, date, time, layers, phrase, subtitles,
       selectedSize, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize,
-      starColors, gridStyle, frameStyle,
+      starColors, gridStyle, frameStyle, compassStyle, showZodiac,
     });
   }, [locale, themeId, selectedCity, date, time, layers, phrase, subtitles,
       selectedSize, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize,
-      starColors, gridStyle, frameStyle]);
+      starColors, gridStyle, frameStyle, compassStyle, showZodiac]);
 
   // Helper to build date string
   const buildDateStr = (d: typeof date, t2: typeof time, loc: Locale) => {
@@ -361,6 +363,10 @@ export default function App() {
             onStarColorsChange={setStarColors}
             onGridStyleChange={setGridStyle}
             onFrameStyleChange={setFrameStyle}
+            compassStyle={compassStyle}
+            showZodiac={showZodiac}
+            onCompassStyleChange={setCompassStyle}
+            onShowZodiacChange={setShowZodiac}
           />
         </div>
 

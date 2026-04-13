@@ -323,6 +323,7 @@ body {
 .layer-toggles {
   display: flex;
   gap: 0;
+  row-gap: 16px;
   justify-content: space-between;
   flex-wrap: wrap;
 }

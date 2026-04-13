@@ -20,6 +20,8 @@ interface ControlPanelProps {
   starColors: boolean;
   gridStyle: 'hide' | 'flat' | 'spherical';
   frameStyle: 'none' | 'line' | 'double' | 'border';
+  compassStyle: 'none' | 'simple' | 'degrees' | 'cardinal';
+  showZodiac: boolean;
   onThemeChange: (id: string) => void;
   onToggleLayer: (layer: 'constellationLines' | 'constellationNames' | 'milkyWay') => void;
   onCityChange: (city: City) => void;
@@ -34,6 +36,8 @@ interface ControlPanelProps {
   onStarColorsChange: (colored: boolean) => void;
   onGridStyleChange: (style: 'hide' | 'flat' | 'spherical') => void;
   onFrameStyleChange: (style: 'none' | 'line' | 'double' | 'border') => void;
+  onCompassStyleChange: (style: 'none' | 'simple' | 'degrees' | 'cardinal') => void;
+  onShowZodiacChange: (show: boolean) => void;
 }
 
 const phraseCategories = [
@@ -56,12 +60,43 @@ const years = Array.from({ length: 100 }, (_, i) => 2026 - i);
 const hours = Array.from({ length: 24 }, (_, i) => i);
 const minutes = Array.from({ length: 60 }, (_, i) => i);
 
+// Zodiac sign determination
+const zodiacSigns = [
+  { emoji: '♑', en: 'Capricorn', ru: 'Козерог', endMonth: 1, endDay: 19 },
+  { emoji: '♒', en: 'Aquarius', ru: 'Водолей', endMonth: 2, endDay: 18 },
+  { emoji: '♓', en: 'Pisces', ru: 'Рыбы', endMonth: 3, endDay: 20 },
+  { emoji: '♈', en: 'Aries', ru: 'Овен', endMonth: 4, endDay: 19 },
+  { emoji: '♉', en: 'Taurus', ru: 'Телец', endMonth: 5, endDay: 20 },
+  { emoji: '♊', en: 'Gemini', ru: 'Близнецы', endMonth: 6, endDay: 20 },
+  { emoji: '♋', en: 'Cancer', ru: 'Рак', endMonth: 7, endDay: 22 },
+  { emoji: '♌', en: 'Leo', ru: 'Лев', endMonth: 8, endDay: 22 },
+  { emoji: '♍', en: 'Virgo', ru: 'Дева', endMonth: 9, endDay: 22 },
+  { emoji: '♎', en: 'Libra', ru: 'Весы', endMonth: 10, endDay: 22 },
+  { emoji: '♏', en: 'Scorpio', ru: 'Скорпион', endMonth: 11, endDay: 21 },
+  { emoji: '♐', en: 'Sagittarius', ru: 'Стрелец', endMonth: 12, endDay: 21 },
+];
+function getZodiacIndex(month: number, day: number): number {
+  for (let i = 0; i < zodiacSigns.length; i++) {
+    if (month < zodiacSigns[i].endMonth || (month === zodiacSigns[i].endMonth && day <= zodiacSigns[i].endDay)) {
+      return i;
+    }
+  }
+  return 0; // Capricorn (Dec 22+)
+}
+function getZodiacEmoji(month: number, day: number): string {
+  return zodiacSigns[getZodiacIndex(month, day)].emoji;
+}
+function getZodiacName(month: number, day: number, locale: string): string {
+  const z = zodiacSigns[getZodiacIndex(month, day)];
+  return locale === 'ru' ? z.ru : z.en;
+}
+
 export default function ControlPanel({
   locale, themeId, layers, selectedCity, date, time, phrase,
-  subtitles, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, starColors, gridStyle, frameStyle,
+  subtitles, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, starColors, gridStyle, frameStyle, compassStyle, showZodiac,
   onThemeChange, onToggleLayer, onCityChange,
   onDateChange, onTimeChange, onPhraseChange, onSubtitlesChange,
-  onPhraseFontChange, onPhraseFontSizeChange, onSubtitleFontChange, onSubtitleFontSizeChange, onStarColorsChange, onGridStyleChange, onFrameStyleChange,
+  onPhraseFontChange, onPhraseFontSizeChange, onSubtitleFontChange, onSubtitleFontSizeChange, onStarColorsChange, onGridStyleChange, onFrameStyleChange, onCompassStyleChange, onShowZodiacChange,
 }: ControlPanelProps) {
   const [cityQuery, setCityQuery] = useState(getCityLabel(selectedCity, locale));
   const [showCityResults, setShowCityResults] = useState(false);
@@ -238,6 +273,35 @@ export default function ControlPanel({
                 : 'Border'}
             </span>
           </div>
+          {/* Compass: None → Simple → Degrees → Cardinal */}
+          <div
+            className={`layer-toggle ${compassStyle !== 'none' ? 'layer-toggle--active' : ''}`}
+            onClick={() => {
+              const cycle: ('none' | 'simple' | 'degrees' | 'cardinal')[] = ['none', 'simple', 'degrees', 'cardinal'];
+              const idx = cycle.indexOf(compassStyle);
+              onCompassStyleChange(cycle[(idx + 1) % cycle.length]);
+            }}
+          >
+            <div className="layer-toggle__icon">🧭</div>
+            <span className="layer-toggle__label">{locale === 'ru' ? 'Компас' : 'Compass'}</span>
+            <span className="layer-toggle__status">
+              {compassStyle === 'none' ? 'None'
+                : compassStyle === 'simple' ? 'Simple'
+                : compassStyle === 'degrees' ? 'Degrees'
+                : 'Cardinal'}
+            </span>
+          </div>
+          {/* Zodiac: auto-determined from date */}
+          {date.month > 0 && (
+            <div
+              className={`layer-toggle ${showZodiac ? 'layer-toggle--active' : ''}`}
+              onClick={() => onShowZodiacChange(!showZodiac)}
+            >
+              <div className="layer-toggle__icon">{getZodiacEmoji(date.month, date.day)}</div>
+              <span className="layer-toggle__label">{locale === 'ru' ? 'Зодиак' : 'Zodiac'}</span>
+              <span className="layer-toggle__status">{showZodiac ? getZodiacName(date.month, date.day, locale) : (locale === 'ru' ? 'Скрыть' : 'Hide')}</span>
+            </div>
+          )}
         </div>
       </div>
 
