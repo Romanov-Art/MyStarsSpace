@@ -5,6 +5,7 @@ import { getDefaultConfig } from './config/celestial-config.js';
 import { getTheme, themes } from './config/themes.js';
 import { posterSizes } from './config/celestial-config.js';
 import { getDefaultFrame } from './config/frames.js';
+import { renderStarMapToCanvas } from './components/PosterPreview.js';
 import type { City, StarMapConfig, PosterSize } from './types/index.js';
 
 import ControlPanel from './components/ControlPanel.js';
@@ -116,11 +117,10 @@ export default function App() {
     if (isExporting) return;
     setIsExporting(true);
     try {
-    // Find the star map canvas directly
-    const starCanvas = document.querySelector('.poster__starmap-canvas') as HTMLCanvasElement;
-    if (!starCanvas) { setIsExporting(false); return; }
-
     const theme = getTheme(themeId);
+
+    // Build DateTime for star rendering
+    const exportDateTime = new Date(Date.UTC(date.year, date.month - 1, date.day, time.hours, time.minutes));
 
     // 300 DPI: cm → pixels (1 inch = 2.54 cm)
     const DPI = 300;
@@ -172,7 +172,11 @@ export default function App() {
       ctx.drawImage(frameSvg, mapX, mapY, mapSize, mapSize);
     }
 
-    // 4) Draw star canvas on top
+    // 4) Render star map at FULL export resolution (crisp, no upscaling blur)
+    const starCanvas = await renderStarMapToCanvas(
+      mapSize, selectedCity, exportDateTime, themeId,
+      layers, starColors, gridStyle,
+    );
     ctx.drawImage(starCanvas, mapX, mapY, mapSize, mapSize);
 
     // ── Text area (below star map, inside poster padding) ──

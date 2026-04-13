@@ -124,6 +124,69 @@ async function loadCatalogData(): Promise<void> {
   return loadingPromise;
 }
 
+/**
+ * Render the star map to an offscreen canvas at any resolution.
+ * Used by export to get a crisp high-res star map instead of scaling the preview.
+ */
+export async function renderStarMapToCanvas(
+  size: number,
+  selectedCity: City,
+  dateTime: Date,
+  themeId: string,
+  layers: { constellationLines: boolean; constellationNames: boolean; milkyWay: boolean },
+  starColors: boolean,
+  gridStyle: 'hide' | 'flat' | 'spherical',
+): Promise<HTMLCanvasElement> {
+  await loadCatalogData();
+  const theme = getTheme(themeId);
+  const frame = getDefaultFrame();
+
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+
+  const center = size / 2;
+  const radius = size * frame.starRadiusFraction;
+
+  // Fill star circle black
+  ctx.beginPath();
+  ctx.arc(center, center, radius, 0, Math.PI * 2);
+  ctx.fillStyle = '#000000';
+  ctx.fill();
+
+  // Clip to circle
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(center, center, radius, 0, Math.PI * 2);
+  ctx.clip();
+
+  const lst = getLocalSiderealTime(dateTime, selectedCity.lon);
+
+  // Milky Way
+  if (layers.milkyWay && cachedMilkyWay) {
+    drawMilkyWay(ctx, center, radius, lst, selectedCity.lat, theme, size, cachedMilkyWay);
+  }
+
+  // Grid
+  if (gridStyle === 'spherical') {
+    drawSphericalGrid(ctx, center, radius, lst, selectedCity.lat, theme, size);
+  } else if (gridStyle === 'flat') {
+    drawGrid(ctx, center, radius, theme, size);
+  }
+
+  // Stars
+  drawStars(ctx, center, radius, lst, selectedCity.lat, theme, size, layers.constellationNames, cachedStars!, starColors);
+
+  // Constellations
+  if (layers.constellationLines) {
+    drawConstellations(ctx, center, radius, lst, selectedCity.lat, theme, size, cachedConstellationLines!);
+  }
+
+  ctx.restore();
+  return canvas;
+}
+
 
 
 // ──────────────────────────────────────────────────────────────────
