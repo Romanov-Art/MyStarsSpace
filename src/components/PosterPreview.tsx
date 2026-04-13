@@ -342,8 +342,6 @@ export default function PosterPreview({
         style={{
           background: theme.background,
           color: theme.text,
-          borderColor: theme.borderColor,
-          borderWidth: theme.borderWidth > 0 ? `${theme.borderWidth}%` : '0',
         }}
       >
         {/* Square frame container: separate frame div + canvas on top */}
