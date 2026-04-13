@@ -136,6 +136,14 @@ export default function App() {
     ctx.fillStyle = theme.background;
     ctx.fillRect(0, 0, W, H);
 
+    // 1b) Border (from theme)
+    if (theme.borderWidth > 0) {
+      const borderPx = Math.round(W * theme.borderWidth / 100);
+      ctx.strokeStyle = theme.borderColor;
+      ctx.lineWidth = borderPx;
+      ctx.strokeRect(borderPx / 2, borderPx / 2, W - borderPx, H - borderPx);
+    }
+
     // Poster padding (matches CSS: .poster-canvas { padding: 5% })
     const posterPadding = Math.round(W * 0.05);
     const innerW = W - posterPadding * 2;

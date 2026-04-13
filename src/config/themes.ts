@@ -13,6 +13,8 @@ export const themes: Record<string, Theme> = {
     grid: '#6c757d',
     constellationLines: '#f8f9fa',
     text: '#ffffff',
+    borderColor: '#000000',
+    borderWidth: 0,
   },
   white: {
     id: 'white',
@@ -22,6 +24,8 @@ export const themes: Record<string, Theme> = {
     grid: '#cccccc',
     constellationLines: '#333333',
     text: '#000000',
+    borderColor: '#bbb',
+    borderWidth: 1.5,
   },
   navy: {
     id: 'navy',
@@ -31,15 +35,19 @@ export const themes: Record<string, Theme> = {
     grid: '#4a5068',
     constellationLines: '#8a9ab5',
     text: '#ffffff',
+    borderColor: '#363a44',
+    borderWidth: 0,
   },
   beige: {
     id: 'beige',
     name: 'Warm Beige',
-    background: '#dbccb6',
+    background: '#fff2e0',
     stars: '#1a1a1a',
-    grid: '#a89880',
-    constellationLines: '#4a3f33',
+    grid: '#fff2e0',
+    constellationLines: '#fff2e0',
     text: '#2c2418',
+    borderColor: '#c4b49c',
+    borderWidth: 1.5,
   },
 };
 

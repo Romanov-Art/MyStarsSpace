@@ -292,7 +292,13 @@ export default function PosterPreview({
 
   return (
     <div className="poster-frame">
-      <div className={`poster-canvas poster-canvas--${themeId}`}>
+      <div
+        className={`poster-canvas poster-canvas--${themeId}`}
+        style={{
+          borderColor: theme.borderColor,
+          borderWidth: theme.borderWidth > 0 ? `${theme.borderWidth}%` : '0',
+        }}
+      >
         {/* Square frame container: separate frame div + canvas on top */}
         <div ref={containerRef} className="poster__starmap-container">
           {/* Frame background — can be inverted independently */}

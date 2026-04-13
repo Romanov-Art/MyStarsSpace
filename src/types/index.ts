@@ -127,6 +127,9 @@ export interface Theme {
   grid: string;
   constellationLines: string;
   text: string;
+  borderColor: string;
+  /** Border width as percentage of poster width */
+  borderWidth: number;
 }
 
 /** Star map rendering configuration */
