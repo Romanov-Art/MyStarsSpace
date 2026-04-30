@@ -300,27 +300,23 @@ export default function PosterPreview({
 
       const wmFontSize = Math.round(48 * (size / 500));
       wmCtx.font = `${wmFontSize}px 'Digital', sans-serif`;
-      wmCtx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      wmCtx.fillStyle = 'rgba(255, 255, 255, 0.75)';
       wmCtx.textAlign = 'center';
       wmCtx.textBaseline = 'middle';
-      wmCtx.globalAlpha = 0.5;
-      const safeR = radius * 0.55;
-      const minDist = radius * 0.4; // 20% of radius
-      const placed: { x: number; y: number }[] = [];
+      wmCtx.globalAlpha = 0.75;
+      // Divide circle into 3 vertical zones (33% each), random X within 90% width
+      // Use smaller effective radius so text never clips outside the circle
+      const effR = radius * 0.75;
+      const textW = wmCtx.measureText('PREVIEW').width / 2;
+      const top = center - effR;
+      const zoneH = (effR * 2) / 3;
       for (let i = 0; i < 3; i++) {
-        let wx = 0, wy = 0, attempts = 0;
-        do {
-          const a = Math.random() * Math.PI * 2;
-          const d = Math.random() * safeR;
-          wx = center + Math.cos(a) * d;
-          wy = center + Math.sin(a) * d;
-          attempts++;
-        } while (
-          attempts < 20 &&
-          placed.some(p => Math.hypot(p.x - wx, p.y - wy) < minDist)
-        );
-        placed.push({ x: wx, y: wy });
-        const rot = -20 + Math.random() * 30; // ±15° from horizontal
+        const wy = top + zoneH * i + zoneH * (0.3 + Math.random() * 0.4);
+        const dy = Math.abs(wy - center);
+        const rowHalfW = Math.sqrt(Math.max(0, effR * effR - dy * dy));
+        const xRange = Math.max(0, rowHalfW - textW);
+        const wx = center + (Math.random() * 2 - 1) * xRange;
+        const rot = -25 + Math.random() * 50;
         wmCtx.save();
         wmCtx.translate(wx, wy);
         wmCtx.rotate(rot * Math.PI / 180);
