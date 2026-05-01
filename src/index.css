@@ -915,31 +915,25 @@ body {
 }
 
 
-/* ── Language selector ─── */
 /* ── Settings Bar (Language + Currency) ─── */
 .settings-bar {
   background: var(--color-white);
   border-radius: var(--radius-lg);
-  padding: 16px 20px;
+  padding: 20px;
   box-shadow: var(--shadow-sm);
 }
 
 .settings-bar__selectors {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 8px;
 }
 
 .settings-bar__divider {
-  height: 1px;
-  background: var(--color-border);
-  margin: 4px 0;
-}
-
-.settings-bar__partner {
   display: none;
 }
 
+.settings-bar__partner,
 .settings-bar__partner-dot {
   display: none;
 }
@@ -947,52 +941,51 @@ body {
 /* ── Unified Selector (Language / Currency) ─── */
 .settings-selector {
   position: relative;
-  display: inline-block;
+  display: block;
 }
 
 .settings-selector__btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 4px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: transparent;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
   color: var(--color-text);
-  transition: all 0.2s;
-  white-space: nowrap;
+  transition: border-color 0.2s;
   width: 100%;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23757575' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
 }
 
-.settings-selector__btn:hover {
-  background: var(--color-input-bg);
-  border-color: var(--color-border);
+.settings-selector__btn:hover,
+.settings-selector__btn:focus {
+  border-color: var(--color-accent);
 }
 
 .settings-selector__icon {
   font-size: 15px;
   line-height: 1;
-  opacity: 0.7;
 }
 
 .settings-selector__code {
   font-weight: 600;
-  font-size: 12px;
-  letter-spacing: 0.5px;
+  font-size: 13px;
 }
 
 .settings-selector__name {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--color-text-secondary);
 }
 
 .settings-selector__arrow {
-  font-size: 10px;
-  color: var(--color-text-secondary);
-  margin-left: 2px;
+  display: none;
 }
 
 /* Dropdown */
