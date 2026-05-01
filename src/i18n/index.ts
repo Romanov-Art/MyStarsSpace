@@ -3,9 +3,9 @@
  * Core business advantage: multi-language support for 12+ languages.
  */
 
-export type Locale = 'ru' | 'en' | 'de' | 'fr' | 'es' | 'it' | 'pt' | 'ja' | 'ko' | 'zh' | 'ar' | 'tr';
+export type Locale = 'ru' | 'en' | 'de' | 'fr' | 'es' | 'it' | 'pt' | 'ja' | 'ko' | 'zh' | 'ar' | 'tr' | 'hi' | 'th' | 'vi' | 'id' | 'ms' | 'pl' | 'nl' | 'sv';
 
-export const AVAILABLE_LOCALES: Locale[] = ['ru', 'en', 'de', 'fr', 'es', 'it', 'pt', 'ja', 'ko', 'zh', 'ar', 'tr'];
+export const AVAILABLE_LOCALES: Locale[] = ['ru', 'en', 'de', 'fr', 'es', 'it', 'pt', 'ja', 'ko', 'zh', 'ar', 'tr', 'hi', 'th', 'vi', 'id', 'ms', 'pl', 'nl', 'sv'];
 
 export const LOCALE_NAMES: Record<Locale, string> = {
   ru: 'Русский',
@@ -20,6 +20,14 @@ export const LOCALE_NAMES: Record<Locale, string> = {
   zh: '中文',
   ar: 'العربية',
   tr: 'Türkçe',
+  hi: 'हिन्दी',
+  th: 'ไทย',
+  vi: 'Tiếng Việt',
+  id: 'Indonesia',
+  ms: 'Melayu',
+  pl: 'Polski',
+  nl: 'Nederlands',
+  sv: 'Svenska',
 };
 
 // ─── Translation Store ────────────────────────────────────────────

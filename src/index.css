@@ -321,11 +321,10 @@ body {
 
 /* ── Layer Toggles ─── */
 .layer-toggles {
-  display: flex;
-  gap: 0;
-  row-gap: 16px;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px 0;
+  justify-items: center;
 }
 
 .layer-toggle {
@@ -1206,7 +1205,7 @@ body {
   }
 
   .layer-toggles {
-    gap: 12px;
+    gap: 12px 0;
   }
 
   .layer-toggle__icon {

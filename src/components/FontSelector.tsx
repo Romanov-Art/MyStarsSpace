@@ -76,6 +76,14 @@ const PREVIEW_TEXT: Record<string, string> = {
   zh: '在这片天空下',
   ar: 'تحت هذه السماء',
   tr: 'Bu gökyüzünün altında',
+  hi: 'इस आसमान के नीचे',
+  th: 'ใต้ท้องฟ้านี้',
+  vi: 'Dưới bầu trời này',
+  id: 'Di bawah langit ini',
+  ms: 'Di bawah langit ini',
+  pl: 'Pod tym niebem',
+  nl: 'Onder deze hemel',
+  sv: 'Under denna himmel',
 };
 
 export default function FontSelector({ selectedFont, selectedFontSize, onChange, onFontSizeChange, locale, sizePresets }: FontSelectorProps) {
