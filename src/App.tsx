@@ -328,7 +328,7 @@ export default function App() {
           <div className="header__logo-icon">⭐</div>
           <div className="header__logo-text">MY STARS<br/>SPACE</div>
         </div>
-        <div className="header__title">{t('ui.phrase', locale) === 'Фраза' ? 'Редактор' : 'Editor'}</div>
+        <div className="header__title">{t('ui.editor', locale)}</div>
         <div className="header__actions">
           <LanguageSelector locale={locale} onChange={handleLocaleChange} />
         </div>
@@ -380,7 +380,7 @@ export default function App() {
           {/* Size Selector Card */}
           <div className="size-section panel-section">
             <div className="panel-section__title">
-              <span>{locale === 'ru' ? 'Выбрать размер' : 'Choose Size'}</span>
+              <span>{t('ui.choose_size', locale)}</span>
               <button
                 className="size-unit-toggle"
                 onClick={() => setSizeUnit(u => u === 'cm' ? 'inch' : 'cm')}
@@ -408,19 +408,19 @@ export default function App() {
                   '45×60': '18×24"',
                   '60×90': '24×36"',
                 };
-                const cmLabel = `${size.width}×${size.height}${locale === 'ru' ? 'см' : 'cm'}`;
+                const cmLabel = `${size.width}×${size.height}${t('ui.unit_cm', locale)}`;
                 const inchLabel = inchMap[size.label] || `${(size.width / 2.54).toFixed(0)}×${(size.height / 2.54).toFixed(0)}"`;
                 const primary = sizeUnit === 'cm' ? cmLabel : inchLabel;
                 const secondary = sizeUnit === 'cm' ? inchLabel : cmLabel;
-                const sizeNames: Record<string, { ru: string; en: string }> = {
-                  '10×15': { ru: 'Открытка', en: 'Postcard' },
-                  'A4': { ru: 'A4', en: 'A4' },
-                  '30×40': { ru: 'Стандарт', en: 'Standard' },
-                  '40×50': { ru: 'Средний', en: 'Medium' },
-                  '45×60': { ru: 'Большой', en: 'Large' },
-                  '60×90': { ru: 'Макс', en: 'Max' },
+                const sizeKeyMap: Record<string, string> = {
+                  '10×15': 'size.postcard',
+                  'A4': 'size.a4',
+                  '30×40': 'size.medium',
+                  '40×50': 'size.large',
+                  '45×60': 'size.large_plus',
+                  '60×90': 'size.max',
                 };
-                const name = sizeNames[size.label]?.[locale === 'ru' ? 'ru' : 'en'] || size.label;
+                const name = t(sizeKeyMap[size.label] || size.label, locale);
                 const tooltipImg = `/tooltip/${size.label.replace('×', 'x')}.jpg`;
                 return (
                   <div key={size.label} className="size-btn-wrapper">
@@ -467,7 +467,7 @@ export default function App() {
           {/* Export Button */}
           <button className="export-btn" onClick={handleExport} disabled={isExporting}>
             {isExporting
-              ? (locale === 'ru' ? '⏳ Экспорт...' : '⏳ Exporting...')
+              ? t('ui.exporting', locale)
               : t('ui.export_png', locale)
             }
           </button>

@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { t, type Locale } from '../i18n/index.js';
 import fontsConfig from '../config/fonts.json';
 
 /** Font entry from the JSON config */
@@ -58,7 +59,7 @@ interface FontSelectorProps {
   selectedFontSize: number;
   onChange: (fontName: string) => void;
   onFontSizeChange: (size: number) => void;
-  locale: string;
+  locale: Locale;
   sizePresets?: { label: string; value: number }[];
 }
 
@@ -87,13 +88,13 @@ export default function FontSelector({ selectedFont, selectedFontSize, onChange,
   return (
     <div className="panel-section" style={{ marginBottom: 16 }}>
       <div className="panel-section__title">
-        {locale === 'ru' ? 'Шрифт' : 'Font'}
+        {t('ui.font', locale)}
       </div>
 
       {/* Font Size Selector */}
       <div className="font-size-selector">
         <span className="font-size-selector__label">
-          {locale === 'ru' ? 'Размер' : 'Size'}
+          {t('ui.size', locale)}
         </span>
         <div className="font-size-selector__buttons">
           {presets.map(preset => (

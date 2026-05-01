@@ -70,6 +70,68 @@ const ru: Record<string, string> = {
 
   // Theme names
   'theme.black': 'Чёрная', 'theme.white': 'Белая', 'theme.navy': 'Тёмно-синяя',
+
+  // UI — Style panel
+  'ui.choose_color': 'Выберите цвет',
+  'ui.choose_style': 'Выберите стиль',
+  'ui.choose_size': 'Выбрать размер',
+  'ui.stars': 'Звёзды',
+  'ui.colors': 'Цветные',
+  'ui.bw': 'Ч/Б',
+  'ui.frame': 'Рамка',
+  'ui.compass': 'Компас',
+  'ui.zodiac': 'Зодиак',
+  'ui.show': 'Показать',
+  'ui.hide': 'Скрыть',
+  'ui.flat': 'Плоская',
+  'ui.3d': '3D',
+  'ui.none': 'Нет',
+  'ui.line': 'Линия',
+  'ui.double': 'Двойная',
+  'ui.border': 'Рамка',
+  'ui.simple': 'Простой',
+  'ui.degrees': 'Градусы',
+  'ui.cardinal': 'Стороны',
+  'ui.unit_cm': 'см',
+  'ui.unit_inch': 'дюймы',
+  'ui.exporting': '⏳ Экспорт...',
+  'ui.editor': 'Редактор',
+
+  // UI — Event details
+  'ui.enter_event_details': 'Введите данные о событии',
+  'ui.format_settings': 'Настройки формата',
+  'ui.date_format': 'Формат даты',
+  'ui.full_month_name': 'Название месяца текстом',
+  'ui.time_format': 'Формат времени',
+  'ui.city_search_placeholder': '🔍 Город или координаты',
+  'ui.coords_detected': '📍 Координаты найдены — нажмите Enter',
+
+  // UI — Phrase & text
+  'ui.add_phrase': 'Добавьте фразу',
+  'ui.or_generate': 'Или сгенерируйте её',
+  'ui.editable_text': 'Текст можно отредактировать',
+  'ui.text_settings': 'Настройки текста',
+  'ui.name_placeholder': 'Имя / Компания',
+
+  // Size names
+  'size.postcard': 'Открытка',
+  'size.a4': 'A4',
+  'size.medium': 'Средний',
+  'size.large': 'Большой',
+  'size.large_plus': 'Большой+',
+  'size.max': 'Макси',
+
+  // Font selector
+  'ui.font': 'Шрифт',
+  'ui.print_color_warning': 'Цвета при печати могут отличаться от отображения на мониторе!',
+
+  // Zodiac signs
+  'zodiac.capricorn': 'Козерог', 'zodiac.aquarius': 'Водолей',
+  'zodiac.pisces': 'Рыбы', 'zodiac.aries': 'Овен',
+  'zodiac.taurus': 'Телец', 'zodiac.gemini': 'Близнецы',
+  'zodiac.cancer': 'Рак', 'zodiac.leo': 'Лев',
+  'zodiac.virgo': 'Дева', 'zodiac.libra': 'Весы',
+  'zodiac.scorpio': 'Скорпион', 'zodiac.sagittarius': 'Стрелец',
 };
 
 registerLocale('ru', ru);

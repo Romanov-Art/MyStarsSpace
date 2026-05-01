@@ -66,18 +66,18 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
 
 // Zodiac sign determination
 const zodiacSigns = [
-  { emoji: '♑', en: 'Capricorn', ru: 'Козерог', endMonth: 1, endDay: 19 },
-  { emoji: '♒', en: 'Aquarius', ru: 'Водолей', endMonth: 2, endDay: 18 },
-  { emoji: '♓', en: 'Pisces', ru: 'Рыбы', endMonth: 3, endDay: 20 },
-  { emoji: '♈', en: 'Aries', ru: 'Овен', endMonth: 4, endDay: 19 },
-  { emoji: '♉', en: 'Taurus', ru: 'Телец', endMonth: 5, endDay: 20 },
-  { emoji: '♊', en: 'Gemini', ru: 'Близнецы', endMonth: 6, endDay: 20 },
-  { emoji: '♋', en: 'Cancer', ru: 'Рак', endMonth: 7, endDay: 22 },
-  { emoji: '♌', en: 'Leo', ru: 'Лев', endMonth: 8, endDay: 22 },
-  { emoji: '♍', en: 'Virgo', ru: 'Дева', endMonth: 9, endDay: 22 },
-  { emoji: '♎', en: 'Libra', ru: 'Весы', endMonth: 10, endDay: 22 },
-  { emoji: '♏', en: 'Scorpio', ru: 'Скорпион', endMonth: 11, endDay: 21 },
-  { emoji: '♐', en: 'Sagittarius', ru: 'Стрелец', endMonth: 12, endDay: 21 },
+  { emoji: '♑', key: 'zodiac.capricorn', endMonth: 1, endDay: 19 },
+  { emoji: '♒', key: 'zodiac.aquarius', endMonth: 2, endDay: 18 },
+  { emoji: '♓', key: 'zodiac.pisces', endMonth: 3, endDay: 20 },
+  { emoji: '♈', key: 'zodiac.aries', endMonth: 4, endDay: 19 },
+  { emoji: '♉', key: 'zodiac.taurus', endMonth: 5, endDay: 20 },
+  { emoji: '♊', key: 'zodiac.gemini', endMonth: 6, endDay: 20 },
+  { emoji: '♋', key: 'zodiac.cancer', endMonth: 7, endDay: 22 },
+  { emoji: '♌', key: 'zodiac.leo', endMonth: 8, endDay: 22 },
+  { emoji: '♍', key: 'zodiac.virgo', endMonth: 9, endDay: 22 },
+  { emoji: '♎', key: 'zodiac.libra', endMonth: 10, endDay: 22 },
+  { emoji: '♏', key: 'zodiac.scorpio', endMonth: 11, endDay: 21 },
+  { emoji: '♐', key: 'zodiac.sagittarius', endMonth: 12, endDay: 21 },
 ];
 function getZodiacIndex(month: number, day: number): number {
   for (let i = 0; i < zodiacSigns.length; i++) {
@@ -92,7 +92,7 @@ function getZodiacEmoji(month: number, day: number): string {
 }
 function getZodiacName(month: number, day: number, locale: string): string {
   const z = zodiacSigns[getZodiacIndex(month, day)];
-  return locale === 'ru' ? z.ru : z.en;
+  return t(z.key, locale as Locale);
 }
 
 export default function ControlPanel({
@@ -167,8 +167,8 @@ export default function ControlPanel({
     }
   };
 
-  const showLabel = locale === 'ru' ? 'Показать' : 'Show';
-  const hideLabel = locale === 'ru' ? 'Скрыть' : 'Hide';
+  const showLabel = t('ui.show', locale);
+  const hideLabel = t('ui.hide', locale);
 
   return (
     <div className="control-panel">
@@ -176,7 +176,7 @@ export default function ControlPanel({
       {(mode !== 'content') && <>
       {/* Theme selector */}
       <div className="panel-section">
-        <div className="panel-section__title">{locale === 'ru' ? 'Выберите цвет' : 'Choose Color'}</div>
+        <div className="panel-section__title">{t('ui.choose_color', locale)}</div>
         <div className="theme-selector">
           {['black', 'white', 'navy', 'beige'].map(id => (
             <div
@@ -212,17 +212,14 @@ export default function ControlPanel({
         {themeId === 'custom' && (
           <div className="custom-color-warning">
             <span className="custom-color-warning__icon">⚠️</span>
-            <span>{locale === 'ru'
-              ? 'Цвета при печати могут отличаться от отображения на мониторе!'
-              : 'Print colors may differ from what you see on screen!'
-            }</span>
+            <span>{t('ui.print_color_warning', locale)}</span>
           </div>
         )}
       </div>
 
       {/* Layer toggles */}
       <div className="panel-section">
-        <div className="panel-section__title">{locale === 'ru' ? 'Выберите стиль' : 'Choose Style'}</div>
+        <div className="panel-section__title">{t('ui.choose_style', locale)}</div>
         <div className="layer-toggles">
           {/* Stars: Colors / B&W */}
           <div
@@ -230,8 +227,8 @@ export default function ControlPanel({
             onClick={() => onStarColorsChange(!starColors)}
           >
             <div className="layer-toggle__icon">✨</div>
-            <span className="layer-toggle__label">{locale === 'ru' ? 'Звёзды' : 'Stars'}</span>
-            <span className="layer-toggle__status">{starColors ? (locale === 'ru' ? 'Цветные' : 'Colors') : (locale === 'ru' ? 'Ч/Б' : 'B&W')}</span>
+            <span className="layer-toggle__label">{t('ui.stars', locale)}</span>
+            <span className="layer-toggle__status">{starColors ? t('ui.colors', locale) : t('ui.bw', locale)}</span>
           </div>
           {/* Meridians: Hide / Flat / 3D */}
           <div
@@ -245,8 +242,8 @@ export default function ControlPanel({
             <div className="layer-toggle__icon">🌐</div>
             <span className="layer-toggle__label">{t('ui.meridians', locale)}</span>
             <span className="layer-toggle__status">
-              {gridStyle === 'hide' ? (locale === 'ru' ? 'Скрыть' : 'Hide')
-                : gridStyle === 'flat' ? 'Flat' : '3D'}
+              {gridStyle === 'hide' ? t('ui.hide', locale)
+                : gridStyle === 'flat' ? t('ui.flat', locale) : t('ui.3d', locale)}
             </span>
           </div>
           <div className={`layer-toggle ${layers.constellationLines ? 'layer-toggle--active' : ''}`} onClick={() => onToggleLayer('constellationLines')}>
@@ -261,7 +258,7 @@ export default function ControlPanel({
           </div>
           <div className={`layer-toggle ${layers.milkyWay ? 'layer-toggle--active' : ''}`} onClick={() => onToggleLayer('milkyWay')}>
             <div className="layer-toggle__icon">🌌</div>
-            <span className="layer-toggle__label">{locale === 'ru' ? 'Млечный путь' : 'Milky Way'}</span>
+            <span className="layer-toggle__label">{t('ui.milky_way', locale)}</span>
             <span className="layer-toggle__status">{layers.milkyWay ? hideLabel : showLabel}</span>
           </div>
           {/* Frame style: None → Line → Double → Border */}
@@ -274,12 +271,12 @@ export default function ControlPanel({
             }}
           >
             <div className="layer-toggle__icon">▣</div>
-            <span className="layer-toggle__label">{locale === 'ru' ? 'Рамка' : 'Frame'}</span>
+            <span className="layer-toggle__label">{t('ui.frame', locale)}</span>
             <span className="layer-toggle__status">
-              {frameStyle === 'none' ? 'None'
-                : frameStyle === 'line' ? 'Line'
-                : frameStyle === 'double' ? 'Double'
-                : 'Border'}
+              {frameStyle === 'none' ? t('ui.none', locale)
+                : frameStyle === 'line' ? t('ui.line', locale)
+                : frameStyle === 'double' ? t('ui.double', locale)
+                : t('ui.border', locale)}
             </span>
           </div>
           {/* Compass: None → Simple → Degrees → Cardinal */}
@@ -292,12 +289,12 @@ export default function ControlPanel({
             }}
           >
             <div className="layer-toggle__icon">🧭</div>
-            <span className="layer-toggle__label">{locale === 'ru' ? 'Компас' : 'Compass'}</span>
+            <span className="layer-toggle__label">{t('ui.compass', locale)}</span>
             <span className="layer-toggle__status">
-              {compassStyle === 'none' ? 'None'
-                : compassStyle === 'simple' ? 'Simple'
-                : compassStyle === 'degrees' ? 'Degrees'
-                : 'Cardinal'}
+              {compassStyle === 'none' ? t('ui.none', locale)
+                : compassStyle === 'simple' ? t('ui.simple', locale)
+                : compassStyle === 'degrees' ? t('ui.degrees', locale)
+                : t('ui.cardinal', locale)}
             </span>
           </div>
           {/* Zodiac: auto-determined from date */}
@@ -307,8 +304,8 @@ export default function ControlPanel({
               onClick={() => onShowZodiacChange(!showZodiac)}
             >
               <div className="layer-toggle__icon">{getZodiacEmoji(date.month, date.day)}</div>
-              <span className="layer-toggle__label">{locale === 'ru' ? 'Зодиак' : 'Zodiac'}</span>
-              <span className="layer-toggle__status">{showZodiac ? getZodiacName(date.month, date.day, locale) : (locale === 'ru' ? 'Скрыть' : 'Hide')}</span>
+              <span className="layer-toggle__label">{t('ui.zodiac', locale)}</span>
+              <span className="layer-toggle__status">{showZodiac ? getZodiacName(date.month, date.day, locale) : t('ui.hide', locale)}</span>
             </div>
           )}
         </div>
@@ -320,11 +317,11 @@ export default function ControlPanel({
       {/* City + Date + Time */}
       <div className="panel-section">
         <div className="panel-section__title">
-          <span>{locale === 'ru' ? 'Введите данные о событии' : 'Enter event details'}</span>
+          <span>{t('ui.enter_event_details', locale)}</span>
           <button
             className={`text-settings-btn ${showFormatPanel ? 'text-settings-btn--active' : ''}`}
             onClick={() => setShowFormatPanel(p => !p)}
-            title={locale === 'ru' ? 'Настройки формата' : 'Format settings'}
+            title={t('ui.format_settings', locale)}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="3"/>
@@ -339,7 +336,7 @@ export default function ControlPanel({
             {/* Date Format */}
             <div style={{ marginBottom: 10 }}>
               <div style={{ fontSize: 11, color: '#757575', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>
-                {locale === 'ru' ? 'Формат даты' : 'Date format'}
+                {t('ui.date_format', locale)}
               </div>
               <div className="font-size-selector__buttons" style={{ display: 'flex', width: '100%' }}>
                 {(['DD.MM.YYYY', 'MM/DD/YYYY'] as DateFormatType[]).map(fmt => (
@@ -363,14 +360,14 @@ export default function ControlPanel({
                   })}
                   style={{ accentColor: '#c0392b' }}
                 />
-                {locale === 'ru' ? 'Название месяца текстом' : 'Full month name'}
+                {t('ui.full_month_name', locale)}
               </label>
             </div>
 
             {/* Time Format */}
             <div style={{ marginBottom: 10 }}>
               <div style={{ fontSize: 11, color: '#757575', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>
-                {locale === 'ru' ? 'Формат времени' : 'Time format'}
+                {t('ui.time_format', locale)}
               </div>
               <div className="font-size-selector__buttons" style={{ display: 'flex', width: '100%' }}>
                 {(['24h', '12h'] as TimeFormatType[]).map(fmt => (
@@ -392,7 +389,7 @@ export default function ControlPanel({
         <div className="city-search" style={{ marginBottom: 12 }}>
           <input
             className="input-field"
-            placeholder={locale === 'ru' ? '🔍 Город или координаты' : '🔍 City or coordinates'}
+            placeholder={t('ui.city_search_placeholder', locale)}
             value={cityQuery}
             onChange={e => { setCityQuery(e.target.value); setShowCityResults(true); }}
             onFocus={() => { if (cityQuery && !showCityResults) setCityQuery(''); setShowCityResults(true); }}
@@ -401,7 +398,7 @@ export default function ControlPanel({
           />
           {parsedCoords && (
             <div className="city-search__coord-hint">
-              📍 {locale === 'ru' ? 'Координаты найдены — нажмите Enter' : 'Coordinates detected — press Enter'}
+              {t('ui.coords_detected', locale)}
             </div>
           )}
           {showCityResults && cityResults.length > 0 && (
@@ -497,11 +494,11 @@ export default function ControlPanel({
       {/* Phrase */}
       <div className="panel-section">
         <div className="panel-section__title">
-          <span>{locale === 'ru' ? 'Добавьте фразу' : 'Add a phrase'}</span>
+          <span>{t('ui.add_phrase', locale)}</span>
           <button
             className={`text-settings-btn ${fontPanelFor === 'phrase' ? 'text-settings-btn--active' : ''}`}
             onClick={() => setFontPanelFor(prev => prev === 'phrase' ? null : 'phrase')}
-            title={locale === 'ru' ? 'Настройки текста' : 'Text settings'}
+            title={t('ui.text_settings', locale)}
           >
             <span className="material-symbols-outlined">text_fields</span>
           </button>
@@ -522,7 +519,7 @@ export default function ControlPanel({
         />
         <div style={{ marginTop: 10 }}>
           <div style={{ fontSize: 12, color: '#757575', marginBottom: 6 }}>
-            {locale === 'ru' ? 'Или сгенерируйте её' : 'Or generate one'}
+            {t('ui.or_generate', locale)}
           </div>
           <div className="phrase-tags">
             {phraseCategories.map(key => (
@@ -537,11 +534,11 @@ export default function ControlPanel({
       {/* Subtitles */}
       <div className="panel-section">
         <div className="panel-section__title">
-          <span>{locale === 'ru' ? 'Текст можно отредактировать' : 'Editable text'}</span>
+          <span>{t('ui.editable_text', locale)}</span>
           <button
             className={`text-settings-btn ${fontPanelFor === 'subtitle' ? 'text-settings-btn--active' : ''}`}
             onClick={() => setFontPanelFor(prev => prev === 'subtitle' ? null : 'subtitle')}
-            title={locale === 'ru' ? 'Настройки текста' : 'Text settings'}
+            title={t('ui.text_settings', locale)}
           >
             <span className="material-symbols-outlined">text_fields</span>
           </button>
@@ -560,7 +557,7 @@ export default function ControlPanel({
           <input
             className="subtitle-input"
             value={subtitles.line1}
-            placeholder={locale === 'ru' ? 'Имя / Компания' : 'Name / Company'}
+            placeholder={t('ui.name_placeholder', locale)}
             onChange={e => onSubtitlesChange({ ...subtitles, line1: e.target.value })}
           />
           <input
