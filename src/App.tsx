@@ -340,19 +340,18 @@ export default function App() {
         <div className="header__actions" />
       </header>
 
-      {/* Settings Bar — Language & Currency */}
-      <SettingsBar
-        locale={locale}
-        onLocaleChange={handleLocaleChange}
-        currency={currency}
-        onCurrencyChange={setCurrency}
-        partnerId={partnerId}
-      />
-
       {/* Main Layout */}
       <div className="editor-layout">
         {/* Left: Style Controls */}
         <div className="left-panel">
+          {/* Language & Currency */}
+          <SettingsBar
+            locale={locale}
+            onLocaleChange={handleLocaleChange}
+            currency={currency}
+            onCurrencyChange={setCurrency}
+            partnerId={partnerId}
+          />
           <ControlPanel
             mode="style"
             locale={locale}

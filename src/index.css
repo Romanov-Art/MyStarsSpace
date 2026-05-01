@@ -918,37 +918,30 @@ body {
 /* ── Language selector ─── */
 /* ── Settings Bar (Language + Currency) ─── */
 .settings-bar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 6px 32px;
   background: var(--color-white);
-  border-bottom: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-sm);
 }
 
 .settings-bar__selectors {
   display: flex;
-  align-items: center;
-  gap: 4px;
+  flex-direction: column;
+  gap: 0;
 }
 
 .settings-bar__divider {
-  width: 1px;
-  height: 20px;
+  height: 1px;
   background: var(--color-border);
-  margin: 0 4px;
+  margin: 4px 0;
 }
 
 .settings-bar__partner {
-  margin-left: 12px;
+  display: none;
 }
 
 .settings-bar__partner-dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #2ebd85;
+  display: none;
 }
 
 /* ── Unified Selector (Language / Currency) ─── */
@@ -960,10 +953,10 @@ body {
 .settings-selector__btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  gap: 8px;
+  padding: 8px 4px;
+  border: none;
+  border-radius: var(--radius-sm);
   background: transparent;
   font-family: var(--font-ui);
   font-size: 13px;
@@ -971,6 +964,7 @@ body {
   color: var(--color-text);
   transition: all 0.2s;
   white-space: nowrap;
+  width: 100%;
 }
 
 .settings-selector__btn:hover {
@@ -1005,7 +999,7 @@ body {
 .settings-selector__dropdown {
   position: absolute;
   top: 100%;
-  right: 0;
+  left: 0;
   margin-top: 4px;
   background: var(--color-white);
   border: 1px solid var(--color-border);
