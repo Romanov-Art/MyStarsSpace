@@ -3,6 +3,7 @@ import { t, type Locale } from '../i18n/index.js';
 import { cities, findCityAsync, getCityName, getCityLabel, isoToFlag, parseCoordinates, sanitizeInput } from '../data/cities.js';
 import type { City } from '../types/index.js';
 import FontSelector, { SUBTITLE_SIZE_PRESETS } from './FontSelector.js';
+import type { FormatSettings, DateFormatType, TimeFormatType, UnitSystem } from '../config/formats.js';
 
 interface ControlPanelProps {
   locale: Locale;
@@ -38,6 +39,9 @@ interface ControlPanelProps {
   onFrameStyleChange: (style: 'none' | 'line' | 'double' | 'border') => void;
   onCompassStyleChange: (style: 'none' | 'simple' | 'degrees' | 'cardinal') => void;
   onShowZodiacChange: (show: boolean) => void;
+  formatSettings: FormatSettings;
+  onFormatSettingsChange: (settings: FormatSettings) => void;
+  mode?: 'all' | 'style' | 'content';
 }
 
 const phraseCategories = [
@@ -97,10 +101,13 @@ export default function ControlPanel({
   onThemeChange, onToggleLayer, onCityChange,
   onDateChange, onTimeChange, onPhraseChange, onSubtitlesChange,
   onPhraseFontChange, onPhraseFontSizeChange, onSubtitleFontChange, onSubtitleFontSizeChange, onStarColorsChange, onGridStyleChange, onFrameStyleChange, onCompassStyleChange, onShowZodiacChange,
+  formatSettings, onFormatSettingsChange,
+  mode = 'all',
 }: ControlPanelProps) {
   const [cityQuery, setCityQuery] = useState(getCityLabel(selectedCity, locale));
   const [showCityResults, setShowCityResults] = useState(false);
   const [fontPanelFor, setFontPanelFor] = useState<'phrase' | 'subtitle' | null>(null);
+  const [showFormatPanel, setShowFormatPanel] = useState(false);
   const [customColor, setCustomColor] = useState('#6a4c93');
   const colorInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -165,6 +172,8 @@ export default function ControlPanel({
 
   return (
     <div className="control-panel">
+      {/* ═══ STYLE SECTIONS ═══ */}
+      {(mode !== 'content') && <>
       {/* Theme selector */}
       <div className="panel-section">
         <div className="panel-section__title">{locale === 'ru' ? 'Выберите цвет' : 'Choose Color'}</div>
@@ -304,10 +313,80 @@ export default function ControlPanel({
           )}
         </div>
       </div>
+      </>}
 
+      {/* ═══ CONTENT SECTIONS ═══ */}
+      {(mode !== 'style') && <>
       {/* City + Date + Time */}
       <div className="panel-section">
-        <div className="panel-section__title">{locale === 'ru' ? 'Введите данные о событии' : 'Enter event details'}</div>
+        <div className="panel-section__title">
+          <span>{locale === 'ru' ? 'Введите данные о событии' : 'Enter event details'}</span>
+          <button
+            className={`text-settings-btn ${showFormatPanel ? 'text-settings-btn--active' : ''}`}
+            onClick={() => setShowFormatPanel(p => !p)}
+            title={locale === 'ru' ? 'Настройки формата' : 'Format settings'}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Format Settings Panel */}
+        {showFormatPanel && (
+          <div className="format-settings" style={{ marginBottom: 12, padding: '10px 0', borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
+            {/* Date Format */}
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 11, color: '#757575', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>
+                {locale === 'ru' ? 'Формат даты' : 'Date format'}
+              </div>
+              <div className="font-size-selector__buttons" style={{ display: 'flex', width: '100%' }}>
+                {(['DD.MM.YYYY', 'MM/DD/YYYY'] as DateFormatType[]).map(fmt => (
+                  <button
+                    key={fmt}
+                    className={`font-size-btn ${formatSettings.dateFormat === fmt ? 'font-size-btn--active' : ''}`}
+                    style={{ flex: 1 }}
+                    onClick={() => onFormatSettingsChange({ ...formatSettings, dateFormat: fmt })}
+                  >
+                    {fmt}
+                  </button>
+                ))}
+              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 13, color: '#555', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={formatSettings.fullMonthName}
+                  onChange={e => onFormatSettingsChange({
+                    ...formatSettings,
+                    fullMonthName: e.target.checked,
+                  })}
+                  style={{ accentColor: '#c0392b' }}
+                />
+                {locale === 'ru' ? 'Название месяца текстом' : 'Full month name'}
+              </label>
+            </div>
+
+            {/* Time Format */}
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 11, color: '#757575', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>
+                {locale === 'ru' ? 'Формат времени' : 'Time format'}
+              </div>
+              <div className="font-size-selector__buttons" style={{ display: 'flex', width: '100%' }}>
+                {(['24h', '12h'] as TimeFormatType[]).map(fmt => (
+                  <button
+                    key={fmt}
+                    className={`font-size-btn ${formatSettings.timeFormat === fmt ? 'font-size-btn--active' : ''}`}
+                    style={{ flex: 1 }}
+                    onClick={() => onFormatSettingsChange({ ...formatSettings, timeFormat: fmt })}
+                  >
+                    {fmt === '24h' ? '24h' : 'AM/PM'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* City search */}
         <div className="city-search" style={{ marginBottom: 12 }}>
@@ -336,28 +415,82 @@ export default function ControlPanel({
           )}
         </div>
 
-        {/* Date */}
+        {/* Date — order follows selected format */}
         <div className="select-row" style={{ marginBottom: 8 }}>
-          <select className="select-field" value={date.day} onChange={e => onDateChange({ ...date, day: Number(e.target.value) })}>
-            {days.map(d => <option key={d} value={d}>{d}</option>)}
-          </select>
-          <select className="select-field" value={date.month} onChange={e => onDateChange({ ...date, month: Number(e.target.value) })}>
-            {months.map(m => <option key={m} value={m}>{t(`month.${m}`, locale)}</option>)}
-          </select>
-          <select className="select-field" value={date.year} onChange={e => onDateChange({ ...date, year: Number(e.target.value) })}>
-            {years.map(y => <option key={y} value={y}>{y}</option>)}
-          </select>
+          {formatSettings.dateFormat === 'MM/DD/YYYY' ? (
+            <>
+              <select className="select-field" value={date.month} onChange={e => onDateChange({ ...date, month: Number(e.target.value) })}>
+                {months.map(m => <option key={m} value={m}>{t(`month.${m}`, locale)}</option>)}
+              </select>
+              <select className="select-field" value={date.day} onChange={e => onDateChange({ ...date, day: Number(e.target.value) })}>
+                {days.map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
+              <select className="select-field" value={date.year} onChange={e => onDateChange({ ...date, year: Number(e.target.value) })}>
+                {years.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </>
+          ) : (
+            <>
+              <select className="select-field" value={date.day} onChange={e => onDateChange({ ...date, day: Number(e.target.value) })}>
+                {days.map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
+              <select className="select-field" value={date.month} onChange={e => onDateChange({ ...date, month: Number(e.target.value) })}>
+                {months.map(m => <option key={m} value={m}>{t(`month.${m}`, locale)}</option>)}
+              </select>
+              <select className="select-field" value={date.year} onChange={e => onDateChange({ ...date, year: Number(e.target.value) })}>
+                {years.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </>
+          )}
         </div>
 
         {/* Time */}
         <div className="select-row">
-          <select className="select-field" value={time.hours} onChange={e => onTimeChange({ ...time, hours: Number(e.target.value) })}>
-            {hours.map(h => <option key={h} value={h}>{String(h).padStart(2, '0')}</option>)}
-          </select>
-          <span style={{ color: '#757575' }}>:</span>
-          <select className="select-field" value={time.minutes} onChange={e => onTimeChange({ ...time, minutes: Number(e.target.value) })}>
-            {minutes.map(m => <option key={m} value={m}>{String(m).padStart(2, '0')}</option>)}
-          </select>
+          {formatSettings.timeFormat === '12h' ? (
+            <>
+              <select
+                className="select-field"
+                value={time.hours % 12 || 12}
+                onChange={e => {
+                  const h12 = Number(e.target.value);
+                  const isPM = time.hours >= 12;
+                  const h24 = isPM ? (h12 === 12 ? 12 : h12 + 12) : (h12 === 12 ? 0 : h12);
+                  onTimeChange({ ...time, hours: h24 });
+                }}
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
+                  <option key={h} value={h}>{h}</option>
+                ))}
+              </select>
+              <span style={{ color: '#757575' }}>:</span>
+              <select className="select-field" value={time.minutes} onChange={e => onTimeChange({ ...time, minutes: Number(e.target.value) })}>
+                {minutes.map(m => <option key={m} value={m}>{String(m).padStart(2, '0')}</option>)}
+              </select>
+              <select
+                className="select-field"
+                value={time.hours >= 12 ? 'PM' : 'AM'}
+                onChange={e => {
+                  const isPM = e.target.value === 'PM';
+                  const h12 = time.hours % 12 || 12;
+                  const h24 = isPM ? (h12 === 12 ? 12 : h12 + 12) : (h12 === 12 ? 0 : h12);
+                  onTimeChange({ ...time, hours: h24 });
+                }}
+              >
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </>
+          ) : (
+            <>
+              <select className="select-field" value={time.hours} onChange={e => onTimeChange({ ...time, hours: Number(e.target.value) })}>
+                {hours.map(h => <option key={h} value={h}>{String(h).padStart(2, '0')}</option>)}
+              </select>
+              <span style={{ color: '#757575' }}>:</span>
+              <select className="select-field" value={time.minutes} onChange={e => onTimeChange({ ...time, minutes: Number(e.target.value) })}>
+                {minutes.map(m => <option key={m} value={m}>{String(m).padStart(2, '0')}</option>)}
+              </select>
+            </>
+          )}
         </div>
       </div>
 
@@ -447,8 +580,8 @@ export default function ControlPanel({
           />
         </div>
 
-
       </div>
+      </>}
     </div>
   );
 }

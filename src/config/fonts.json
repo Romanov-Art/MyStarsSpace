@@ -1,0 +1,35 @@
+{
+  "fonts": [
+    { "name": "Cormorant Garamond", "category": "serif", "weight": "400;500;600", "locales": ["en", "ru", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Playfair Display", "category": "serif", "weight": "400;500;700", "locales": ["en", "ru", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Lora", "category": "serif", "weight": "400;500;700", "locales": ["en", "ru", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "EB Garamond", "category": "serif", "weight": "400;500;600", "locales": ["en", "ru", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Libre Baskerville", "category": "serif", "weight": "400;700", "locales": ["en", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Spectral", "category": "serif", "weight": "300;400;500", "locales": ["en", "ru", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Crimson Text", "category": "serif", "weight": "400;600;700", "locales": ["en", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Merriweather", "category": "serif", "weight": "300;400;700", "locales": ["en", "ru", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Montserrat", "category": "sans-serif", "weight": "300;400;600", "locales": ["en", "ru", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Raleway", "category": "sans-serif", "weight": "300;400;600", "locales": ["en", "ru", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Oswald", "category": "sans-serif", "weight": "300;400;500", "locales": ["en", "ru", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Josefin Sans", "category": "sans-serif", "weight": "300;400;600", "locales": ["en", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Comfortaa", "category": "display", "weight": "300;400;500", "locales": ["en", "ru", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Caveat", "category": "handwriting", "weight": "400;500;700", "locales": ["en", "ru", "de", "fr", "es", "it", "pt", "tr"] },
+    { "name": "Parisienne", "category": "handwriting", "weight": "400", "locales": ["en", "de", "fr", "es", "it", "pt", "tr"] }
+  ],
+  "defaultFont": "Cormorant Garamond",
+  "localeDefaults": {
+    "en": "Cormorant Garamond",
+    "ru": "Cormorant Garamond",
+    "de": "Playfair Display",
+    "fr": "Cormorant Garamond",
+    "es": "Lora",
+    "it": "Cormorant Garamond",
+    "pt": "Lora",
+    "tr": "Montserrat",
+    "ja": "Cormorant Garamond",
+    "ko": "Cormorant Garamond",
+    "zh": "Cormorant Garamond",
+    "ar": "Cormorant Garamond"
+  },
+  "_comment": "locales array = which scripts this font supports. Fonts without a locale's script will be filtered out for that locale. CJK/Arabic/Hindi fonts to be added later."
+}

@@ -1,5 +1,7 @@
 /* ─── CSS Design System — atlas-stars.ru style ─────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+/* All fonts loaded locally from /fonts/ for consistent CSS + Canvas rendering */
+@import url('/fonts/fonts.css');
+@import url('/fonts/material-symbols.css');
 
 @font-face {
   font-family: 'Dots';
@@ -117,8 +119,8 @@ body {
 /* ─── Main Layout ──────────────────────────────────────────────── */
 .editor-layout {
   display: grid;
-  grid-template-columns: 320px 1fr 280px;
-  max-width: 1400px;
+  grid-template-columns: 320px 1fr 340px;
+  max-width: 1440px;
   margin: 0 auto;
   gap: 24px;
   padding: 24px;
@@ -130,7 +132,7 @@ body {
     grid-template-columns: 300px 1fr;
   }
 
-  .editor-layout__info {
+  .right-panel {
     display: none;
   }
 }
@@ -143,7 +145,7 @@ body {
     min-height: auto;
   }
 
-  .editor-layout__info {
+  .right-panel {
     display: none;
   }
 }
@@ -153,8 +155,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  overflow-y: auto;
-  max-height: calc(100vh - 100px);
   min-width: 0;
   max-width: 100%;
 }
@@ -700,39 +700,191 @@ body {
   margin-bottom: 4px;
 }
 
-/* ── Size Selector ─── */
-.size-selector {
+/* ── Size Section (card style) ─── */
+.size-section {
+  width: 100%;
+}
+
+/* ── Unit Toggle Button ─── */
+.size-unit-toggle {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color 0.2s;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.size-unit-toggle:hover {
+  color: var(--color-accent);
+}
+
+.size-unit-toggle svg {
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.size-unit-toggle:hover svg {
+  opacity: 1;
+}
+
+/* ── Size Grid (3×2) ─── */
+.size-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  position: relative;
+}
+
+.size-btn-wrapper {
 }
 
 .size-btn {
-  padding: 10px 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 10px 4px 8px;
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-white);
   font-family: var(--font-ui);
-  font-size: 14px;
-  color: var(--color-text);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .size-btn:hover {
-  border-color: #bbb;
+  border-color: var(--color-text-secondary);
 }
 
 .size-btn--active {
   border-color: var(--color-accent);
   color: var(--color-accent);
-  font-weight: 600;
 }
 
-.size-hint {
-  font-size: 12px;
+.size-btn__name {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   color: var(--color-text-secondary);
-  text-align: center;
-  max-width: 400px;
+  margin-bottom: 2px;
+}
+
+.size-btn--active .size-btn__name {
+  color: var(--color-accent);
+}
+
+.size-btn__primary {
+  font-size: 13px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.size-btn__secondary {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.size-btn--active .size-btn__secondary {
+  color: var(--color-accent);
+  opacity: 0.6;
+}
+
+/* ── Size Button Tooltip ─── */
+.size-btn-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+  padding: 8px;
+  pointer-events: none;
+  border: 1px solid var(--color-border);
+}
+
+.size-btn-tooltip img {
+  width: 100%;
+  border-radius: var(--radius-md);
+  display: block;
+}
+
+.size-btn-wrapper:hover .size-btn-tooltip {
+  display: block;
+  animation: fadeInTooltip 0.2s ease-out;
+}
+
+@keyframes fadeInTooltip {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Right Panel ─── */
+.right-panel {
+  width: 340px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  max-height: calc(100vh - 100px);
+}
+
+/* ── Lightbox Overlay ─── */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  animation: lightboxFadeIn 0.2s ease;
+}
+
+@keyframes lightboxFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 36px;
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  z-index: 1001;
+}
+
+.lightbox-close:hover {
+  opacity: 1;
+}
+
+.lightbox-image {
+  max-width: 90vw;
+  max-height: 85vh;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.4);
+  cursor: default;
 }
 
 /* ── Export / Action Button ─── */
@@ -763,28 +915,6 @@ body {
   box-shadow: none;
 }
 
-/* ─── Right info column ───────────────────────────────────────── */
-.info-column {
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--color-text-secondary);
-}
-
-.info-column h3 {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--color-text);
-  margin-top: 28px;
-  margin-bottom: 8px;
-}
-
-.info-column h3:first-child {
-  margin-top: 0;
-}
-
-.info-column p {
-  margin-bottom: 12px;
-}
 
 /* ── Language selector ─── */
 .lang-selector {
@@ -1043,7 +1173,7 @@ body {
     min-height: auto;
   }
 
-  .editor-layout__info {
+  .right-panel {
     display: none;
   }
 

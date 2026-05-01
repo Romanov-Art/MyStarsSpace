@@ -1,0 +1,488 @@
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(Wnz6HAc5bAfYB2QLZDwfqg4.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(Wnz6HAc5bAfYB2QLZDwfqg4.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(Wnz6HAc5bAfYB2QLZDwfqg4.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(Wnz6HAc5bAfYB2QLZDwfqg4.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Comfortaa';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(1Ptsg8LJRfWJmhDAuUsIT4ttDfA.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Comfortaa';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(1Ptsg8LJRfWJmhDAuUsIT4ttDfA.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Comfortaa';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(1Ptsg8LJRfWJmhDAuUsIT4ttDfA.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Comfortaa';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(1Ptsg8LJRfWJmhDAuUsIT4ttDfA.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Comfortaa';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(1Ptsg8LJRfWJmhDAuUsIT4ttDfA.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(co3bmX5slCNuHLi8bLeY9MK7whWMhyjoq3FNsS8.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(co3bmX5slCNuHLi8bLeY9MK7whWMhyjoq3FNsS8.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(co3bmX5slCNuHLi8bLeY9MK7whWMhyjoq3FNsS8.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(co3bmX5slCNuHLi8bLeY9MK7whWMhyjoq3FNsS8.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(co3bmX5slCNuHLi8bLeY9MK7whWMhyjoq3FNsS8.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(wlp2gwHKFkZgtmSR3NB0oRJvbQJUA_M.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(wlppgwHKFkZgtmSR3NB0oRJXsCx2DtlX1LA.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(wlppgwHKFkZgtmSR3NB0oRJX1C12DtlX1LA.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(SlGUmQSNjdsmc35JDF1K5FR3Qj4dYg.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(SlGUmQSNjdsmc35JDF1K5FR3Qj4dYg.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(SlGUmQSNjdsmc35JDF1K5FR3Qj4dYg.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(SlGUmQSNjdsmc35JDF1K5FR3Qj4dYg.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(UcC73FwrK3iLTeHuS_nVMrMxCp50SjIq15j8eUY.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(UcC73FwrK3iLTeHuS_nVMrMxCp50SjIq15j8eUY.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(UcC73FwrK3iLTeHuS_nVMrMxCp50SjIq15j8eUY.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(UcC73FwrK3iLTeHuS_nVMrMxCp50SjIq15j8eUY.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(UcC73FwrK3iLTeHuS_nVMrMxCp50SjIq15j8eUY.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Josefin Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(Qw3aZQNVED7rKGKxtqIqX5EkD3Z_dH0.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Josefin Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(Qw3aZQNVED7rKGKxtqIqX5EkD3Z_dH0.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Josefin Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(Qw3aZQNVED7rKGKxtqIqX5EkD3Z_dH0.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Josefin Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(Qw3aZQNVED7rKGKxtqIqX5EkD3Z_dH0.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Josefin Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(Qw3aZQNVED7rKGKxtqIqX5EkD3Z_dH0.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(kmKnZrc3Hgbbcjq75U4uslyuy4kn0pNbYRQ4CQ.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(kmKnZrc3Hgbbcjq75U4uslyuy4kn0pNbYRQ4CQ.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(kmKnZrc3Hgbbcjq75U4uslyuy4kn0pNbYRQ4CQ.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(kmKnZrc3Hgbbcjq75U4uslyuy4kn0pNbYRQ4CQ.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(0QIvMX1D_JOuAwjxJNNO.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(0QIvMX1D_JOuAwjxJNNO.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(0QIvMX1D_JOuAwjxJNNO.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(0QIvMX1D_JOuAwjxJNNO.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 300;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(u-4e0qyriQwlOrhSvowK_l5UcA6zuSYEqOzpPe3HOZJ5eX1WtLaQwmYiSdqoLe61qQ.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(u-4e0qyriQwlOrhSvowK_l5UcA6zuSYEqOzpPe3HOZJ5eX1WtLaQwmYiSdqoLe61qQ.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(u-4e0qyriQwlOrhSvowK_l5UcA6zuSYEqOzpPe3HOZJ5eX1WtLaQwmYiSdqoLe61qQ.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(u-4e0qyriQwlOrhSvowK_l5UcA6zuSYEqOzpPe3HOZJ5eX1WtLaQwmYiSdqoLe61qQ.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(u-4e0qyriQwlOrhSvowK_l5UcA6zuSYEqOzpPe3HOZJ5eX1WtLaQwmYiSdqoLe61qQ.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(JTUSjIg1_i6t8kCHKm45xWtrzAbj.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(JTUSjIg1_i6t8kCHKm45xWtrzAbj.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(JTUSjIg1_i6t8kCHKm45xWtrzAbj.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(JTUSjIg1_i6t8kCHKm45xWtrzAbj.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(JTUSjIg1_i6t8kCHKm45xWtrzAbj.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(TK3iWkUHHAIjg75GGzUBte8.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(TK3iWkUHHAIjg75GGzUBte8.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(TK3iWkUHHAIjg75GGzUBte8.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(TK3iWkUHHAIjg75GGzUBte8.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(TK3iWkUHHAIjg75GGzUBte8.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Parisienne';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(E21i_d3kivvAkxhLEVZpcyp6COKv.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(nuFiD-vYSZviVYUb_rj3ij__anPXPT7Sh2E-.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(nuFiD-vYSZviVYUb_rj3ij__anPXPT7Sh2E-.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(nuFiD-vYSZviVYUb_rj3ij__anPXPT7Sh2E-.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(nuFiD-vYSZviVYUb_rj3ij__anPXPT7Sh2E-.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(1Ptug8zYS_SKggPN-C8CSKlv.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(1Ptug8zYS_SKggPN-C8CSKlv.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(1Ptug8zYS_SKggPN-C8CSKlv.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(1Ptug8zYS_SKggPN-C8CSKlv.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(1Ptug8zYS_SKggPN-C8CSKlv.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(rnCs-xNNww_2s0amA9uSsF3DY_GtWA.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(rnCr-xNNww_2s0amA-M7mH_OSQ.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(rnCs-xNNww_2s0amA9vKsV3DY_GtWA.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(rnCs-xNNww_2s0amA9vmtl3DY_GtWA.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(rnCs-xNNww_2s0amA9uCt13DY_GtWA.woff2) format('woff2');
+}

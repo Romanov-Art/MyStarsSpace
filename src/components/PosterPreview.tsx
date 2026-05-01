@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { t, type Locale } from '../i18n/index.js';
 import { getTheme } from '../config/themes.js';
-import { getDefaultFrame } from '../config/frames.js';
+import { getDefaultFrame, getFrameForCompass } from '../config/frames.js';
 import { getLocalSiderealTime } from '../core/astronomy.js';
 import { equatorialToHorizontal, stereographicProjection } from '../core/coordinates.js';
 import type { City, StarData } from '../types/index.js';
@@ -21,6 +21,9 @@ interface PosterPreviewProps {
   subtitleFontSize: number;
   starColors: boolean;
   gridStyle: 'hide' | 'flat' | 'spherical';
+  frameStyle: 'none' | 'line' | 'double' | 'border';
+  compassStyle: 'none' | 'simple' | 'degrees' | 'cardinal';
+  selectedSize?: { width: number; height: number };
 }
 
 // ──────────────────────────────────────────────────────────────────
@@ -136,10 +139,11 @@ export async function renderStarMapToCanvas(
   layers: { constellationLines: boolean; constellationNames: boolean; milkyWay: boolean },
   starColors: boolean,
   gridStyle: 'hide' | 'flat' | 'spherical',
+  compassStyle: 'none' | 'simple' | 'degrees' | 'cardinal' = 'none',
 ): Promise<HTMLCanvasElement> {
   await loadCatalogData();
   const theme = getTheme(themeId);
-  const frame = getDefaultFrame();
+  const frame = getFrameForCompass(compassStyle);
 
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -192,13 +196,81 @@ export async function renderStarMapToCanvas(
 // ──────────────────────────────────────────────────────────────────
 // COMPONENT
 // ──────────────────────────────────────────────────────────────────
+/** Compute the frame border color: contrasts with the background */
+function getFrameColor(bg: string): string {
+  const hex = bg.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  const lum = r * 0.299 + g * 0.587 + b * 0.114;
+  return lum > 150 ? '#000000' : '#ffffff';
+}
+
+/**
+ * Draw poster frame borders on a canvas.
+ * All dimensions are percentage-based for resolution independence.
+ * Used by export for print-quality rendering.
+ */
+export function drawPosterFrame(
+  ctx: CanvasRenderingContext2D,
+  W: number, H: number,
+  frameStyle: 'none' | 'line' | 'double' | 'border',
+  bgColor: string,
+) {
+  if (frameStyle === 'none') return;
+
+  const frameColor = getFrameColor(bgColor);
+  ctx.save();
+  ctx.strokeStyle = frameColor;
+  ctx.fillStyle = frameColor;
+
+  if (frameStyle === 'line') {
+    // Single thin line at 3% inset (all sides based on W for equal spacing)
+    const lw = Math.max(1, Math.round(W * 0.002));
+    ctx.lineWidth = lw;
+    const i = W * 0.025;
+    ctx.strokeRect(i, i, W - i * 2, H - i * 2);
+  }
+
+  if (frameStyle === 'double') {
+    // Outer line thicker, inner thinner, small gap (W-based)
+    const i1 = W * 0.015;
+    ctx.lineWidth = Math.max(2, Math.round(W * 0.004));
+    ctx.strokeRect(i1, i1, W - i1 * 2, H - i1 * 2);
+    const i2 = W * 0.025;
+    ctx.lineWidth = Math.max(1, Math.round(W * 0.0015));
+    ctx.strokeRect(i2, i2, W - i2 * 2, H - i2 * 2);
+  }
+
+  if (frameStyle === 'border') {
+    // Thick solid border from edge, 4% wide (W-based, even-odd fill)
+    const inn = W * 0.04;
+    ctx.beginPath();
+    // Outer rect clockwise (full edge)
+    ctx.moveTo(0, 0);
+    ctx.lineTo(W, 0);
+    ctx.lineTo(W, H);
+    ctx.lineTo(0, H);
+    ctx.closePath();
+    // Inner rect counter-clockwise (hole)
+    ctx.moveTo(inn, inn);
+    ctx.lineTo(inn, H - inn);
+    ctx.lineTo(W - inn, H - inn);
+    ctx.lineTo(W - inn, inn);
+    ctx.closePath();
+    ctx.fill('evenodd');
+  }
+
+  ctx.restore();
+}
+
 export default function PosterPreview({
-  themeId, locale, selectedCity, date, time, layers, phrase, subtitles, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, starColors, gridStyle,
+  themeId, locale, selectedCity, date, time, layers, phrase, subtitles, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, starColors, gridStyle, frameStyle, compassStyle, selectedSize,
 }: PosterPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const theme = getTheme(themeId);
-  const frame = getDefaultFrame();
+  const frame = getFrameForCompass(compassStyle);
   const [catalogLoaded, setCatalogLoaded] = useState(!!cachedStars);
   const [containerSize, setContainerSize] = useState(0);
 
@@ -329,10 +401,12 @@ export default function PosterPreview({
 
     ctx.restore();
 
-  }, [themeId, selectedCity, dateTime, layers, theme, locale, frame, catalogLoaded, containerSize, starColors, gridStyle]);
+  }, [themeId, selectedCity, dateTime, layers, theme, locale, frame, catalogLoaded, containerSize, starColors, gridStyle, compassStyle]);
+
+  const frameColor = getFrameColor(theme.background);
 
   return (
-    <div className="poster-frame">
+    <div className="poster-frame" style={{ aspectRatio: selectedSize ? `${selectedSize.width} / ${selectedSize.height}` : '3/4' }}>
       <div
         className={`poster-canvas poster-canvas--${themeId}`}
         style={{
@@ -340,6 +414,43 @@ export default function PosterPreview({
           color: theme.text,
         }}
       >
+        {/* Decorative poster border frame */}
+        {frameStyle !== 'none' && (
+          <div className="poster__border-frame" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 10 }}>
+            {frameStyle === 'line' && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                margin: '2.5%',
+                border: `1px solid ${frameColor}`,
+              }} />
+            )}
+            {frameStyle === 'double' && (
+              <>
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  margin: '1.5%',
+                  border: `2px solid ${frameColor}`,
+                }} />
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  margin: '2.5%',
+                  border: `1px solid ${frameColor}`,
+                }} />
+              </>
+            )}
+            {frameStyle === 'border' && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                boxShadow: `inset 0 0 0 calc(min(2.4vw, 12px)) ${frameColor}`,
+              }} />
+            )}
+          </div>
+        )}
+
         {/* Square frame container: separate frame div + canvas on top */}
         <div ref={containerRef} className="poster__starmap-container">
           {/* Frame background — can be inverted independently */}

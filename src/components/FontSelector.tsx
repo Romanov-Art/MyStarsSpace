@@ -1,23 +1,29 @@
-import React, { useEffect } from 'react';
+import React, { useMemo } from 'react';
+import fontsConfig from '../config/fonts.json';
 
-/** 15 curated Google Fonts for poster text */
-export const POSTER_FONTS = [
-  { name: 'Cormorant Garamond', category: 'serif', weight: '400;500;600' },
-  { name: 'Playfair Display', category: 'serif', weight: '400;500;700' },
-  { name: 'Lora', category: 'serif', weight: '400;500;700' },
-  { name: 'EB Garamond', category: 'serif', weight: '400;500;600' },
-  { name: 'Libre Baskerville', category: 'serif', weight: '400;700' },
-  { name: 'Spectral', category: 'serif', weight: '300;400;500' },
-  { name: 'Crimson Text', category: 'serif', weight: '400;600;700' },
-  { name: 'Merriweather', category: 'serif', weight: '300;400;700' },
-  { name: 'Montserrat', category: 'sans-serif', weight: '300;400;600' },
-  { name: 'Raleway', category: 'sans-serif', weight: '300;400;600' },
-  { name: 'Oswald', category: 'sans-serif', weight: '300;400;500' },
-  { name: 'Josefin Sans', category: 'sans-serif', weight: '300;400;600' },
-  { name: 'Comfortaa', category: 'display', weight: '300;400;500' },
-  { name: 'Caveat', category: 'handwriting', weight: '400;500;700' },
-  { name: 'Parisienne', category: 'handwriting', weight: '400' },
-];
+/** Font entry from the JSON config */
+export interface PosterFont {
+  name: string;
+  category: string;
+  weight: string;
+  locales: string[];
+}
+
+/** All fonts from config */
+export const POSTER_FONTS: PosterFont[] = fontsConfig.fonts;
+
+/** Get fonts filtered for a specific locale */
+export function getFontsForLocale(locale: string): PosterFont[] {
+  const filtered = POSTER_FONTS.filter(f => f.locales.includes(locale));
+  // Fallback: if no fonts match the locale, return all fonts (latin subset)
+  return filtered.length > 0 ? filtered : POSTER_FONTS;
+}
+
+/** Get the default font for a locale */
+export function getDefaultFontForLocale(locale: string): string {
+  const defaults = fontsConfig.localeDefaults as Record<string, string>;
+  return defaults[locale] || fontsConfig.defaultFont;
+}
 
 /** Preset font sizes */
 export const FONT_SIZE_PRESETS = [
@@ -44,25 +50,8 @@ export const BODY_SIZE_PRESETS = [
   { label: 'XXL', value: 16 },
 ];
 
-/** Build Google Fonts CSS URL for all fonts */
-function buildGoogleFontsUrl(): string {
-  const families = POSTER_FONTS.map(f => {
-    const name = f.name.replace(/ /g, '+');
-    return `family=${name}:wght@${f.weight}`;
-  });
-  return `https://fonts.googleapis.com/css2?${families.join('&')}&display=swap`;
-}
-
-/** Load all poster fonts on mount */
-let fontsLoaded = false;
-function loadAllFonts() {
-  if (fontsLoaded) return;
-  fontsLoaded = true;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = buildGoogleFontsUrl();
-  document.head.appendChild(link);
-}
+// All fonts are loaded locally from /fonts/ via CSS @import in index.css.
+// No dynamic CDN loading needed — fonts are always available for both CSS and Canvas.
 
 interface FontSelectorProps {
   selectedFont: string;
@@ -89,7 +78,8 @@ const PREVIEW_TEXT: Record<string, string> = {
 };
 
 export default function FontSelector({ selectedFont, selectedFontSize, onChange, onFontSizeChange, locale, sizePresets }: FontSelectorProps) {
-  useEffect(() => { loadAllFonts(); }, []);
+  // Filter fonts by locale — only show fonts that support the current script
+  const availableFonts = useMemo(() => getFontsForLocale(locale), [locale]);
 
   const preview = PREVIEW_TEXT[locale] || PREVIEW_TEXT.en;
   const presets = sizePresets || FONT_SIZE_PRESETS;
@@ -120,7 +110,7 @@ export default function FontSelector({ selectedFont, selectedFontSize, onChange,
 
       {/* Font Family Selector */}
       <div className="font-selector__list">
-        {POSTER_FONTS.map(font => (
+        {availableFonts.map(font => (
           <button
             key={font.name}
             className={`font-selector__item ${selectedFont === font.name ? 'font-selector__item--active' : ''}`}

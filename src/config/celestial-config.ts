@@ -33,8 +33,10 @@ export function getDefaultConfig(themeId = 'black'): StarMapConfig {
  * Available poster sizes in centimeters.
  */
 export const posterSizes: PosterSize[] = [
-  { width: 21, height: 30, label: '21×30' },
+  { width: 10, height: 15, label: '10×15' },
+  { width: 21, height: 29.7, label: 'A4' },
   { width: 30, height: 40, label: '30×40' },
   { width: 40, height: 50, label: '40×50' },
-  { width: 50, height: 70, label: '50×70' },
+  { width: 45, height: 60, label: '45×60' },
+  { width: 60, height: 90, label: '60×90' },
 ];
