@@ -12,7 +12,8 @@ import type { City, StarMapConfig, PosterSize } from './types/index.js';
 
 import ControlPanel from './components/ControlPanel.js';
 import PosterPreview from './components/PosterPreview.js';
-import LanguageSelector from './components/LanguageSelector.js';
+import SettingsBar from './components/SettingsBar.js';
+import { DEFAULT_CURRENCY } from './config/currencies.js';
 
 const LS_KEY = 'starmap-settings';
 
@@ -76,6 +77,13 @@ export default function App() {
   const [showZodiac, setShowZodiac] = useState(() => saved.showZodiac ?? false);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [sizeUnit, setSizeUnit] = useState<'cm' | 'inch'>('cm');
+  const [currency, setCurrency] = useState(() => saved.currency || DEFAULT_CURRENCY);
+
+  // Embed / whitelabel: read partner ID from URL ?partner=xxx
+  const partnerId = React.useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('partner') || undefined;
+  }, []);
   const [formatSettings, setFormatSettings] = useState<FormatSettings>(() => {
     const defaults = getDefaultFormats(saved.locale || getLocale());
     if (!saved.formatSettings) return defaults;
@@ -91,7 +99,7 @@ export default function App() {
     saveSettings({
       locale, themeId, selectedCity, date, time, layers, phrase, subtitles,
       selectedSize, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize,
-      starColors, gridStyle, frameStyle, compassStyle, showZodiac, formatSettings,
+      starColors, gridStyle, frameStyle, compassStyle, showZodiac, formatSettings, currency,
     });
   }, [locale, themeId, selectedCity, date, time, layers, phrase, subtitles,
       selectedSize, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize,
@@ -329,10 +337,17 @@ export default function App() {
           <div className="header__logo-text">MY STARS<br/>SPACE</div>
         </div>
         <div className="header__title">{t('ui.editor', locale)}</div>
-        <div className="header__actions">
-          <LanguageSelector locale={locale} onChange={handleLocaleChange} />
-        </div>
+        <div className="header__actions" />
       </header>
+
+      {/* Settings Bar — Language & Currency */}
+      <SettingsBar
+        locale={locale}
+        onLocaleChange={handleLocaleChange}
+        currency={currency}
+        onCurrencyChange={setCurrency}
+        partnerId={partnerId}
+      />
 
       {/* Main Layout */}
       <div className="editor-layout">
