@@ -429,9 +429,9 @@ export default function App() {
                 const sizeKeyMap: Record<string, string> = {
                   '10×15': 'size.postcard',
                   'A4': 'size.a4',
-                  '30×40': 'size.medium',
-                  '40×50': 'size.large',
-                  '45×60': 'size.large_plus',
+                  '30×40': 'size.standard',
+                  '40×50': 'size.medium',
+                  '45×60': 'size.large',
                   '60×90': 'size.max',
                 };
                 const name = t(sizeKeyMap[size.label] || size.label, locale);

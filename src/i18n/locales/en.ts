@@ -117,9 +117,9 @@ const en: Record<string, string> = {
   // Size names
   'size.postcard': 'Postcard',
   'size.a4': 'A4',
+  'size.standard': 'Standard',
   'size.medium': 'Medium',
   'size.large': 'Large',
-  'size.large_plus': 'Large+',
   'size.max': 'Max',
 
   // Font selector

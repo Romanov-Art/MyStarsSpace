@@ -82,9 +82,9 @@ const de: Record<string, string> = {
   // Size names
   'size.postcard': 'Postkarte',
   'size.a4': 'A4',
+  'size.standard': 'Standard',
   'size.medium': 'Mittel',
   'size.large': 'Groß',
-  'size.large_plus': 'Groß+',
   'size.max': 'Max',
   'ui.font': 'Schriftart',
   'ui.print_color_warning': 'Druckfarben können von der Bildschirmdarstellung abweichen!',

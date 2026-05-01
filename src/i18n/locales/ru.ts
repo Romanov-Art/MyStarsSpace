@@ -115,11 +115,10 @@ const ru: Record<string, string> = {
 
   // Size names
   'size.postcard': 'Открытка',
-  'size.a4': 'A4',
+  'size.a4': 'A4', 'size.standard': 'Стандарт',
   'size.medium': 'Средний',
   'size.large': 'Большой',
-  'size.large_plus': 'Большой+',
-  'size.max': 'Макси',
+  'size.max': 'Макс',
 
   // Font selector
   'ui.font': 'Шрифт',
