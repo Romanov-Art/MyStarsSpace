@@ -293,8 +293,8 @@ export function drawPosterFrame(
   }
 
   if (frameStyle === 'border') {
-    // Thick solid border from edge, 4% wide (W-based, even-odd fill)
-    const inn = W * 0.04;
+    // Thick solid border from edge, 1.5% wide (W-based, even-odd fill)
+    const inn = W * 0.015;
     ctx.beginPath();
     // Outer rect clockwise (full edge)
     ctx.moveTo(0, 0);
@@ -495,7 +495,7 @@ export default function PosterPreview({
               <div style={{
                 position: 'absolute',
                 inset: 0,
-                boxShadow: `inset 0 0 0 calc(min(2.4vw, 12px)) ${frameColor}`,
+                boxShadow: `inset 0 0 0 calc(min(1.5%, 8px)) ${frameColor}`,
               }} />
             )}
           </div>
