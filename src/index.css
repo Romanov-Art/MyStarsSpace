@@ -925,6 +925,9 @@ body {
   padding: 6px 14px;
   margin: 6px auto 0;
   line-height: 1.4;
+  width: 100%;
+  max-width: 500px;
+  box-sizing: border-box;
 }
 
 /* ── Order / Pricing Block ─── */
@@ -935,6 +938,7 @@ body {
   gap: 6px;
   margin-top: 6px;
   width: 100%;
+  max-width: 500px;
 }
 
 .order-block__price {
