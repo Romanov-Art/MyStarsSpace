@@ -42,6 +42,50 @@ const STAR_NAMES: Record<number, string> = {
   62956: 'Alioth',
 };
 
+/** Localized star names for languages with non-Latin scripts */
+const STAR_NAMES_LOCALIZED: Record<string, Record<string, string>> = {
+  ru: {
+    Sirius: 'Сириус', Canopus: 'Канопус', Arcturus: 'Арктур', Vega: 'Вега',
+    Capella: 'Капелла', Rigel: 'Ригель', Procyon: 'Процион', Betelgeuse: 'Бетельгейзе',
+    Altair: 'Альтаир', Aldebaran: 'Альдебаран', Antares: 'Антарес', Spica: 'Спика',
+    Pollux: 'Поллукс', Fomalhaut: 'Фомальгаут', Deneb: 'Денеб', Regulus: 'Регул',
+    Polaris: 'Полярная',
+  },
+  ja: {
+    Sirius: 'シリウス', Canopus: 'カノープス', Arcturus: 'アークトゥルス', Vega: 'ベガ',
+    Capella: 'カペラ', Rigel: 'リゲル', Procyon: 'プロキオン', Betelgeuse: 'ベテルギウス',
+    Altair: 'アルタイル', Aldebaran: 'アルデバラン', Antares: 'アンタレス', Spica: 'スピカ',
+    Pollux: 'ポルックス', Deneb: 'デネブ', Regulus: 'レグルス', Polaris: 'ポラリス',
+  },
+  ko: {
+    Sirius: '시리우스', Canopus: '카노푸스', Arcturus: '아르크투루스', Vega: '베가',
+    Capella: '카펠라', Rigel: '리겔', Procyon: '프로키온', Betelgeuse: '베텔게우스',
+    Altair: '알타이르', Aldebaran: '알데바란', Antares: '안타레스', Spica: '스피카',
+    Deneb: '데네브', Regulus: '레굴루스', Polaris: '폴라리스',
+  },
+  zh: {
+    Sirius: '天狼星', Canopus: '老人星', Arcturus: '大角星', Vega: '织女星',
+    Capella: '五车二', Rigel: '参宿七', Procyon: '南河三', Betelgeuse: '参宿四',
+    Altair: '牛郎星', Aldebaran: '毕宿五', Antares: '心宿二', Spica: '角宿一',
+    Deneb: '天津四', Regulus: '轩辕十四', Polaris: '北极星',
+  },
+  ar: {
+    Sirius: 'الشعرى', Canopus: 'سهيل', Arcturus: 'السماك', Vega: 'النسر الواقع',
+    Capella: 'العيوق', Rigel: 'رجل الجبار', Altair: 'النسر الطائر',
+    Aldebaran: 'الدبران', Antares: 'قلب العقرب', Polaris: 'الجدي',
+  },
+  hi: {
+    Sirius: 'व्याध', Vega: 'अभिजित', Altair: 'श्रवण', Polaris: 'ध्रुव',
+    Arcturus: 'स्वाती', Spica: 'चित्रा', Antares: 'ज्येष्ठा',
+    Regulus: 'मघा', Aldebaran: 'रोहिणी',
+  },
+};
+
+/** Get localized star name */
+function getStarNameLocalized(englishName: string, locale: string): string {
+  return STAR_NAMES_LOCALIZED[locale]?.[englishName] || englishName;
+}
+
 interface ConstellationLineData {
   id: string;
   lines: [number, number, number, number][]; // [ra1_deg, dec1, ra2_deg, dec2]
@@ -140,6 +184,7 @@ export async function renderStarMapToCanvas(
   starColors: boolean,
   gridStyle: 'hide' | 'flat' | 'spherical',
   compassStyle: 'none' | 'simple' | 'degrees' | 'cardinal' = 'none',
+  locale: string = 'en',
 ): Promise<HTMLCanvasElement> {
   await loadCatalogData();
   const theme = getTheme(themeId);
@@ -180,7 +225,7 @@ export async function renderStarMapToCanvas(
   }
 
   // Stars
-  drawStars(ctx, center, radius, lst, selectedCity.lat, theme, size, layers.constellationNames, cachedStars!, starColors);
+  drawStars(ctx, center, radius, lst, selectedCity.lat, theme, size, layers.constellationNames, cachedStars!, starColors, locale);
 
   // Constellations
   if (layers.constellationLines) {
@@ -351,7 +396,7 @@ export default function PosterPreview({
     }
 
     // ── Stars ──
-    drawStars(ctx, center, radius, lst, selectedCity.lat, theme, size, layers.constellationNames, cachedStars!, starColors);
+    drawStars(ctx, center, radius, lst, selectedCity.lat, theme, size, layers.constellationNames, cachedStars!, starColors, locale);
 
     // ── Constellation lines ──
     if (layers.constellationLines) {
@@ -706,6 +751,7 @@ function drawStars(
   showNames: boolean = false,
   allStars: StarData[],
   useColors: boolean = true,
+  locale: string = 'en',
 ) {
   // Star circle is always dark — stars always render in light-on-dark mode
 
@@ -833,7 +879,7 @@ function drawStars(
       );
       if (tooClose && c.name !== 'Polaris') continue; // Never skip Polaris
       ctx.globalAlpha = 0.9;
-      ctx.fillText(c.name, c.x + 5, c.y - 5);
+      ctx.fillText(getStarNameLocalized(c.name, locale), c.x + 5, c.y - 5);
       placed.push({ x: c.x, y: c.y });
     }
   }

@@ -297,7 +297,7 @@ export default function App() {
       // Render star map at FULL export resolution (crisp, no upscaling blur)
       const starCanvas = await renderStarMapToCanvas(
         mapSize, selectedCity, exportDateTime, themeId,
-        layers, starColors, gridStyle, compassStyle,
+        layers, starColors, gridStyle, compassStyle, locale,
       );
       ctx.drawImage(starCanvas, mapX, mapY, mapSize, mapSize);
     }

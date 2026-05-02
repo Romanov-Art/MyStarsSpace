@@ -67,6 +67,12 @@ export function formatDate(
 
   if (fullMonthName) {
     const monthName = (MONTH_NAMES[locale] || MONTH_NAMES.en)[month - 1];
+
+    // CJK languages: YYYY年MM月DD日 order
+    if (locale === 'ja') return `${year}年${monthName}${day}日`;
+    if (locale === 'zh') return `${year}年${monthName}${day}日`;
+    if (locale === 'ko') return `${year}년 ${monthName} ${day}일`;
+
     // MM/DD/YYYY → "October 12, 1995"  |  DD.MM.YYYY → "12 October 1995"
     if (format === 'MM/DD/YYYY') {
       return `${monthName} ${day}, ${year}`;
