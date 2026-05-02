@@ -107,6 +107,22 @@ export function getCityName(city: City, locale: string): string {
 }
 
 /**
+ * Get localized country name using Intl.DisplayNames API.
+ * Accepts either ISO code ("RU") or English name ("Russia").
+ */
+export function getCountryDisplayName(country: string, locale: string): string {
+  if (!country) return '';
+  const iso = country.length === 2 ? country : countryToISO(country);
+  if (!iso) return country;
+  try {
+    const dn = new Intl.DisplayNames([locale], { type: 'region' });
+    return dn.of(iso) || country;
+  } catch {
+    return country;
+  }
+}
+
+/**
  * Get display label for search dropdown: "🇷🇺 Moscow" (always English name).
  * For non-English locale, appends localized name: "🇷🇺 Moscow · Москва"
  */

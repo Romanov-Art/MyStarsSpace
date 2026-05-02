@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { t, setLocale, getLocale, type Locale, LOCALE_NAMES, AVAILABLE_LOCALES } from './i18n/index.js';
-import { cities, getCityName, sanitizeInput, formatCoordsDMS } from './data/cities.js';
+import { cities, getCityName, getCountryDisplayName, sanitizeInput, formatCoordsDMS } from './data/cities.js';
 import { getDefaultConfig } from './config/celestial-config.js';
 import { getTheme, themes } from './config/themes.js';
 import { posterSizes } from './config/celestial-config.js';
@@ -120,7 +120,8 @@ export default function App() {
   const handleCityChange = useCallback((city: City) => {
     setSelectedCity(city);
     const cityName = getCityName(city, locale);
-    const cityWithCountry = city.country ? `${cityName}, ${city.country}` : cityName;
+    const countryName = city.country ? getCountryDisplayName(city.country, locale) : '';
+    const cityWithCountry = countryName ? `${cityName}, ${countryName}` : cityName;
     const coords = formatCoordsDMS(city.lat, city.lon);
     setSubtitles((prev: typeof subtitles) => ({ ...prev, line2: cityWithCountry, line4: coords }));
   }, [locale]);
@@ -150,11 +151,18 @@ export default function App() {
     // Update phrase to new locale
     setPhrase(t('phrase.birthday.1', newLocale));
     // Update format settings to locale defaults
-    setFormatSettings(getDefaultFormats(newLocale));
-    setSubtitles((prev: typeof subtitles) => ({
-      ...prev,
-    }));
-  }, []);
+    const newFormats = getDefaultFormats(newLocale);
+    setFormatSettings(newFormats);
+    // Re-translate city + country subtitle
+    setSubtitles((prev: typeof subtitles) => {
+      const cityName = getCityName(selectedCity, newLocale);
+      const countryName = selectedCity.country ? getCountryDisplayName(selectedCity.country, newLocale) : '';
+      const cityWithCountry = countryName ? `${cityName}, ${countryName}` : cityName;
+      const dateStr = formatDate(date.day, date.month, date.year, newFormats.dateFormat, newLocale, newFormats.fullMonthName);
+      const timeStr = formatTime(time.hours, time.minutes, newFormats.timeFormat);
+      return { ...prev, line2: cityWithCountry, line3: `${dateStr}, ${timeStr}` };
+    });
+  }, [selectedCity, date, time]);
 
   const handleThemeChange = useCallback((id: string) => {
     if (id.startsWith('custom:')) {
