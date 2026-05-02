@@ -495,7 +495,7 @@ export default function PosterPreview({
               <div style={{
                 position: 'absolute',
                 inset: 0,
-                boxShadow: `inset 0 0 0 calc(min(1.5%, 8px)) ${frameColor}`,
+                boxShadow: `inset 0 0 0 6px ${frameColor}`,
               }} />
             )}
           </div>
