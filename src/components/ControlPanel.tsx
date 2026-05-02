@@ -50,12 +50,12 @@ const phraseCategories = [
 ];
 
 const phrasesMap: Record<string, string[]> = {
-  'category.birthday': ['phrase.birthday.1', 'phrase.birthday.2', 'phrase.birthday.3'],
-  'category.wedding': ['phrase.wedding.1', 'phrase.wedding.2', 'phrase.wedding.3'],
-  'category.relationship': ['phrase.relationship.1', 'phrase.relationship.2', 'phrase.relationship.3'],
-  'category.memorial': ['poster.moment_in_time'],
-  'category.baby': ['poster.stars_of_your_birth'],
-  'category.business': ['phrase.business.1', 'phrase.business.2', 'phrase.business.3'],
+  'category.birthday': Array.from({ length: 10 }, (_, i) => `phrase.birthday.${i + 1}`),
+  'category.wedding': Array.from({ length: 10 }, (_, i) => `phrase.wedding.${i + 1}`),
+  'category.relationship': Array.from({ length: 10 }, (_, i) => `phrase.relationship.${i + 1}`),
+  'category.memorial': Array.from({ length: 10 }, (_, i) => `phrase.memorial.${i + 1}`),
+  'category.baby': Array.from({ length: 10 }, (_, i) => `phrase.baby.${i + 1}`),
+  'category.business': Array.from({ length: 10 }, (_, i) => `phrase.business.${i + 1}`),
 };
 
 const days = Array.from({ length: 31 }, (_, i) => i + 1);

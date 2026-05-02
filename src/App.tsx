@@ -44,7 +44,7 @@ export default function App() {
     constellationNames: true,
     milkyWay: true,
   });
-  const [phrase, setPhrase] = useState(() => saved.phrase || t('poster.under_this_sky', getLocale()));
+  const [phrase, setPhrase] = useState(() => saved.phrase || t('phrase.birthday.1', getLocale()));
   const [subtitles, setSubtitles] = useState(() => {
     if (!saved.subtitles) return { line1: '', line2: '', line3: '', line4: '' };
     const s = saved.subtitles;
@@ -148,7 +148,7 @@ export default function App() {
     setLocale(newLocale);
     _setLocale(newLocale);
     // Update phrase to new locale
-    setPhrase(t('poster.under_this_sky', newLocale));
+    setPhrase(t('phrase.birthday.1', newLocale));
     // Update format settings to locale defaults
     setFormatSettings(getDefaultFormats(newLocale));
     setSubtitles((prev: typeof subtitles) => ({

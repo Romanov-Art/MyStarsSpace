@@ -28,14 +28,6 @@ const en: Record<string, string> = {
   'ui.size': 'Size',
   'ui.language': 'Language',
 
-  // Poster phrases
-  'poster.under_this_sky': 'Under This Sky',
-  'poster.the_night_we_met': 'The Night We Met',
-  'poster.stars_of_your_birth': 'The Stars on Your Birthday',
-  'poster.our_special_night': 'Our Special Night',
-  'poster.written_in_stars': 'Written in the Stars',
-  'poster.moment_in_time': 'A Moment in Time',
-
   // Phrase categories
   'category.birthday': 'Birthday',
   'category.wedding': 'Wedding',
@@ -47,23 +39,75 @@ const en: Record<string, string> = {
 
   // Birthday phrases
   'phrase.birthday.1': 'The sky on the day you were born',
-  'phrase.birthday.2': 'Under these stars, you came into this world',
-  'phrase.birthday.3': 'The sky on your birthday',
+  'phrase.birthday.2': 'Under these stars you came into this world',
+  'phrase.birthday.3': 'The stars on your birthday',
+  'phrase.birthday.4': 'A sky just for you',
+  'phrase.birthday.5': 'Born under these stars',
+  'phrase.birthday.6': 'Your first starry night',
+  'phrase.birthday.7': 'The universe welcomed you',
+  'phrase.birthday.8': 'Stars aligned for you',
+  'phrase.birthday.9': 'The night sky of your birth',
+  'phrase.birthday.10': 'A constellation of joy',
 
   // Wedding phrases
   'phrase.wedding.1': 'The sky on our wedding day',
-  'phrase.wedding.2': 'Under these stars, we said "I do"',
+  'phrase.wedding.2': 'Under these stars we said I do',
   'phrase.wedding.3': 'The stars of our best day',
+  'phrase.wedding.4': 'Written in the stars forever',
+  'phrase.wedding.5': 'Two hearts one sky',
+  'phrase.wedding.6': 'Our love under the stars',
+  'phrase.wedding.7': 'The night we became one',
+  'phrase.wedding.8': 'Forever begins tonight',
+  'phrase.wedding.9': 'Stars witnessed our vows',
+  'phrase.wedding.10': 'A promise under the sky',
 
   // Relationship phrases
   'phrase.relationship.1': 'The night we met',
   'phrase.relationship.2': 'Our first kiss under the stars',
   'phrase.relationship.3': 'The stars that witnessed our love',
+  'phrase.relationship.4': 'Under this sky we found each other',
+  'phrase.relationship.5': 'Our story began here',
+  'phrase.relationship.6': 'The sky remembers us',
+  'phrase.relationship.7': 'Love written in the stars',
+  'phrase.relationship.8': 'That magical night',
+  'phrase.relationship.9': 'Where it all started',
+  'phrase.relationship.10': 'Our special night',
+
+  // Memorial phrases (memorable events + motivational)
+  'phrase.memorial.1': 'Through hardships to the stars',
+  'phrase.memorial.2': 'The day I met you',
+  'phrase.memorial.3': 'The whole world is open to you',
+  'phrase.memorial.4': 'Dream. Discover new stars.',
+  'phrase.memorial.5': 'It was unforgettable',
+  'phrase.memorial.6': 'Anniversary under the stars',
+  'phrase.memorial.7': 'The moment that changed everything',
+  'phrase.memorial.8': 'That very evening',
+  'phrase.memorial.9': 'The sky of our first meeting',
+  'phrase.memorial.10': 'The stars remember this day',
+
+  // Baby phrases
+  'phrase.baby.1': 'The stars on your birthday',
+  'phrase.baby.2': 'Welcome to the world',
+  'phrase.baby.3': 'A new star was born',
+  'phrase.baby.4': 'The sky smiled for you',
+  'phrase.baby.5': 'Tiny hands big universe',
+  'phrase.baby.6': 'Born under a lucky star',
+  'phrase.baby.7': 'Our little star',
+  'phrase.baby.8': 'The night you arrived',
+  'phrase.baby.9': 'A miracle under the stars',
+  'phrase.baby.10': 'Hello little one',
 
   // Business phrases
-  'phrase.business.1': 'The beginning of the great journey to the stars',
+  'phrase.business.1': 'The beginning of a great journey',
   'phrase.business.2': 'The night the vision became reality',
-  'phrase.business.3': 'Written in the stars from the very first day',
+  'phrase.business.3': 'Written in the stars from day one',
+  'phrase.business.4': 'Where ambition met the stars',
+  'phrase.business.5': 'A dream launched under this sky',
+  'phrase.business.6': 'The sky on our founding day',
+  'phrase.business.7': 'Stars of a new beginning',
+  'phrase.business.8': 'Our journey started here',
+  'phrase.business.9': 'Reaching for the stars',
+  'phrase.business.10': 'The night it all began',
 
   // Months
   'month.1': 'January', 'month.2': 'February', 'month.3': 'March',
@@ -112,7 +156,7 @@ const en: Record<string, string> = {
 
   // UI — Phrase & text
   'ui.add_phrase': 'Add a Phrase',
-  'ui.or_generate': 'Or generate one',
+  'ui.or_generate': 'Pick a variant',
   'ui.editable_text': 'Editable Text',
   'ui.text_settings': 'Text settings',
   'ui.name_placeholder': 'Name / Company',

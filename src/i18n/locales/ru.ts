@@ -28,14 +28,6 @@ const ru: Record<string, string> = {
   'ui.size': 'Размер',
   'ui.language': 'Язык',
 
-  // Poster phrases
-  'poster.under_this_sky': 'Под этим небом',
-  'poster.the_night_we_met': 'Ночь, когда мы встретились',
-  'poster.stars_of_your_birth': 'Звёзды в день твоего рождения',
-  'poster.our_special_night': 'Наша особенная ночь',
-  'poster.written_in_stars': 'Написано на звёздах',
-  'poster.moment_in_time': 'Момент во времени',
-
   // Phrase categories
   'category.birthday': 'День Рождения',
   'category.wedding': 'Свадьба',
@@ -46,24 +38,76 @@ const ru: Record<string, string> = {
   'category.business': 'Бизнес',
 
   // Birthday phrases
-  'phrase.birthday.1': 'Звёздное небо в день, когда ты появился на свет',
-  'phrase.birthday.2': 'Под этими звёздами ты пришёл в этот мир',
-  'phrase.birthday.3': 'Небо в день твоего рождения',
+  'phrase.birthday.1': 'Небо в день твоего рождения',
+  'phrase.birthday.2': 'Под этими звёздами ты появился на свет',
+  'phrase.birthday.3': 'Звёзды в день рождения',
+  'phrase.birthday.4': 'Небо только для тебя',
+  'phrase.birthday.5': 'Рождённый под этими звёздами',
+  'phrase.birthday.6': 'Твоя первая звёздная ночь',
+  'phrase.birthday.7': 'Вселенная приветствовала тебя',
+  'phrase.birthday.8': 'Звёзды сошлись для тебя',
+  'phrase.birthday.9': 'Ночное небо твоего рождения',
+  'phrase.birthday.10': 'Под этими звёздами ты пришёл в этот мир',
 
   // Wedding phrases
   'phrase.wedding.1': 'Небо в день нашей свадьбы',
   'phrase.wedding.2': 'Под этими звёздами мы сказали «Да»',
-  'phrase.wedding.3': 'Карта звёзд нашего лучшего дня',
+  'phrase.wedding.3': 'Звёзды нашего лучшего дня',
+  'phrase.wedding.4': 'Навсегда записано на звёздах',
+  'phrase.wedding.5': 'Два сердца — одно небо',
+  'phrase.wedding.6': 'Наша любовь под звёздами',
+  'phrase.wedding.7': 'Ночь, когда мы стали одним целым',
+  'phrase.wedding.8': 'Вечность начинается сегодня',
+  'phrase.wedding.9': 'Звёзды были свидетелями наших клятв',
+  'phrase.wedding.10': 'Обещание под звёздным небом',
 
   // Relationship phrases
   'phrase.relationship.1': 'Ночь, когда мы встретились',
   'phrase.relationship.2': 'Наш первый поцелуй под звёздами',
   'phrase.relationship.3': 'Звёзды, что видели нашу любовь',
+  'phrase.relationship.4': 'Под этим небом мы нашли друг друга',
+  'phrase.relationship.5': 'Наша история началась здесь',
+  'phrase.relationship.6': 'Небо помнит нас',
+  'phrase.relationship.7': 'Любовь, записанная на звёздах',
+  'phrase.relationship.8': 'Та самая волшебная ночь',
+  'phrase.relationship.9': 'Где всё началось',
+  'phrase.relationship.10': 'Наша особенная ночь',
+
+  // Memorial phrases (memorable events + motivational)
+  'phrase.memorial.1': 'Через тернии к звёздам',
+  'phrase.memorial.2': 'День, когда я тебя встретил',
+  'phrase.memorial.3': 'Весь мир открыт для тебя',
+  'phrase.memorial.4': 'Мечтай. Открывай новые звёзды.',
+  'phrase.memorial.5': 'Это было незабываемо',
+  'phrase.memorial.6': 'Годовщина под звёздами',
+  'phrase.memorial.7': 'Момент, который изменил всё',
+  'phrase.memorial.8': 'Тот самый вечер',
+  'phrase.memorial.9': 'Небо нашей первой встречи',
+  'phrase.memorial.10': 'Звёзды помнят этот день',
+
+  // Baby phrases
+  'phrase.baby.1': 'Звёзды в день твоего рождения',
+  'phrase.baby.2': 'Добро пожаловать в мир',
+  'phrase.baby.3': 'Новая звезда родилась',
+  'phrase.baby.4': 'Небо улыбнулось тебе',
+  'phrase.baby.5': 'Маленькие ручки — большая вселенная',
+  'phrase.baby.6': 'Рождён под счастливой звездой',
+  'phrase.baby.7': 'Наша маленькая звёздочка',
+  'phrase.baby.8': 'Ночь, когда ты появился',
+  'phrase.baby.9': 'Чудо под звёздами',
+  'phrase.baby.10': 'Привет, малыш',
 
   // Business phrases
-  'phrase.business.1': 'Начало великого пути к звёздам',
+  'phrase.business.1': 'Начало великого пути',
   'phrase.business.2': 'Ночь, когда мечта стала реальностью',
   'phrase.business.3': 'Записано на звёздах с первого дня',
+  'phrase.business.4': 'Где амбиции встретили звёзды',
+  'phrase.business.5': 'Мечта, запущенная под этим небом',
+  'phrase.business.6': 'Небо в день основания',
+  'phrase.business.7': 'Звёзды нового начала',
+  'phrase.business.8': 'Наш путь начался здесь',
+  'phrase.business.9': 'Стремясь к звёздам',
+  'phrase.business.10': 'Ночь, когда всё началось',
 
   // Months
   'month.1': 'Январь', 'month.2': 'Февраль', 'month.3': 'Март',
@@ -111,7 +155,7 @@ const ru: Record<string, string> = {
 
   // UI — Phrase & text
   'ui.add_phrase': 'Добавьте фразу',
-  'ui.or_generate': 'Или сгенерируйте её',
+  'ui.or_generate': 'Подобрать вариант',
   'ui.editable_text': 'Текст можно отредактировать',
   'ui.text_settings': 'Настройки текста',
   'ui.name_placeholder': 'Имя / Компания',
