@@ -5,5 +5,10 @@
   "panel": "1a2540",
   "radius": "12",
   "locale": "en",
-  "theme": "navy"
+  "theme": "navy",
+  "currency": "USD",
+  "dateFormat": "MM/DD/YYYY",
+  "timeFormat": "12h",
+  "units": "inch",
+  "fullMonthName": true
 }

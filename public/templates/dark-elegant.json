@@ -5,5 +5,10 @@
   "panel": "16213e",
   "radius": "8",
   "locale": "ru",
-  "theme": "black"
+  "theme": "black",
+  "currency": "RUB",
+  "dateFormat": "DD.MM.YYYY",
+  "timeFormat": "24h",
+  "units": "cm",
+  "fullMonthName": false
 }

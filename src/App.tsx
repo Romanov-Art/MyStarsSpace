@@ -57,6 +57,7 @@ applyCSSVars(embedOverrides);
 
 const embedLocale = embedOverrides.locale as Locale | null || null;
 const embedTheme = embedOverrides.theme || null;
+const embedCurrency = embedOverrides.currency || null;
 const embedTemplate = embedOverrides.template || null;
 
 export default function App() {
@@ -78,16 +79,27 @@ export default function App() {
     if (!embedTemplate) return;
     fetch(`/templates/${embedTemplate}.json`)
       .then(r => r.ok ? r.json() : null)
-      .then((tpl: Record<string, string> | null) => {
+      .then((tpl: Record<string, any> | null) => {
         if (!tpl) return;
         // Merge: template values as base, URL params override
         const merged = { ...tpl, ...embedOverrides };
-        delete merged.template; // don't re-apply template key
+        delete merged.template;
         applyCSSVars(merged);
         if (merged.theme) setThemeId(merged.theme);
+        if (merged.currency) setCurrency(merged.currency);
+        if (merged.units) setSizeUnit(merged.units as 'cm' | 'inch');
         if (merged.locale) {
           _setLocale(merged.locale as Locale);
           setLocale(merged.locale as Locale);
+        }
+        // Apply format settings from template
+        if (merged.dateFormat || merged.timeFormat || merged.fullMonthName !== undefined) {
+          setFormatSettings(prev => ({
+            ...prev,
+            ...(merged.dateFormat && { dateFormat: merged.dateFormat }),
+            ...(merged.timeFormat && { timeFormat: merged.timeFormat }),
+            ...(merged.fullMonthName !== undefined && { fullMonthName: merged.fullMonthName }),
+          }));
         }
       })
       .catch(() => {});
@@ -129,7 +141,7 @@ export default function App() {
   const [showZodiac, setShowZodiac] = useState(() => saved.showZodiac ?? false);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [sizeUnit, setSizeUnit] = useState<'cm' | 'inch'>('cm');
-  const [currency, setCurrency] = useState(() => saved.currency || DEFAULT_CURRENCY);
+  const [currency, setCurrency] = useState(() => embedCurrency || saved.currency || DEFAULT_CURRENCY);
   const exchangeRates = useExchangeRates();
 
   // Embed / whitelabel: read partner ID from URL ?partner=xxx
