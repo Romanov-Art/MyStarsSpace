@@ -506,6 +506,12 @@ export default function App() {
             const showStrike = maxPrice !== null && currentPrice !== null && maxPrice > currentPrice;
             return (
               <div className="order-block">
+                <button className="export-btn" onClick={handleExport} disabled={isExporting}>
+                  {isExporting
+                    ? t('ui.exporting', locale)
+                    : `${t('ui.order_pdf', locale)}: ${currentPrice !== null ? formatPrice(currentPrice, currency, sym) : '...'}`
+                  }
+                </button>
                 <div className="order-block__price">
                   <span className="order-block__label">{t('ui.total', locale)}</span>
                   <span className="order-block__current">
@@ -517,12 +523,6 @@ export default function App() {
                     </span>
                   )}
                 </div>
-                <button className="export-btn" onClick={handleExport} disabled={isExporting}>
-                  {isExporting
-                    ? t('ui.exporting', locale)
-                    : `${t('ui.order_pdf', locale)}: ${currentPrice !== null ? formatPrice(currentPrice, currency, sym) : '...'}`
-                  }
-                </button>
               </div>
             );
           })()}
