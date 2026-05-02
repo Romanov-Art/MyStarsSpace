@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { t, setLocale, getLocale, type Locale, LOCALE_NAMES, AVAILABLE_LOCALES } from './i18n/index.js';
 import { cities, getCityName, getCountryDisplayName, sanitizeInput, formatCoordsDMS } from './data/cities.js';
 import { getDefaultConfig } from './config/celestial-config.js';
@@ -31,11 +31,39 @@ function saveSettings(s: Record<string, any>) {
   try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch {}
 }
 
+/**
+ * Apply CSS custom properties from a settings object.
+ */
+function applyCSSVars(cfg: Record<string, string>) {
+  const root = document.documentElement;
+  if (cfg.bg) root.style.setProperty('--embed-bg', `#${cfg.bg}`);
+  if (cfg.text) root.style.setProperty('--embed-text', `#${cfg.text}`);
+  if (cfg.accent) root.style.setProperty('--embed-accent', `#${cfg.accent}`);
+  if (cfg.radius) root.style.setProperty('--embed-radius', `${cfg.radius}px`);
+  if (cfg.panel) root.style.setProperty('--embed-panel-bg', `#${cfg.panel}`);
+}
+
+/**
+ * Parse URL params for embed customization:
+ * ?template=sky-blue&bg=1a1a2e&text=ffffff&accent=e94560&locale=ru
+ * Template loads /templates/{name}.json, URL params override template values.
+ */
+const embedParams = new URLSearchParams(window.location.search);
+const embedOverrides: Record<string, string> = {};
+for (const [k, v] of embedParams.entries()) embedOverrides[k] = v;
+
+// Apply immediate URL param CSS vars (will be re-applied after template loads)
+applyCSSVars(embedOverrides);
+
+const embedLocale = embedOverrides.locale as Locale | null || null;
+const embedTheme = embedOverrides.theme || null;
+const embedTemplate = embedOverrides.template || null;
+
 export default function App() {
   const saved = React.useMemo(() => loadSettings(), []);
 
-  const [locale, _setLocale] = useState<Locale>(() => saved.locale || getLocale());
-  const [themeId, setThemeId] = useState(() => saved.themeId || 'black');
+  const [locale, _setLocale] = useState<Locale>(() => embedLocale || saved.locale || getLocale());
+  const [themeId, setThemeId] = useState(() => embedTheme || saved.themeId || 'black');
   const [selectedCity, setSelectedCity] = useState<City>(() => saved.selectedCity || cities[0]);
   const [date, setDate] = useState(() => saved.date || { day: 26, month: 3, year: 2026 });
   const [time, setTime] = useState(() => saved.time || { hours: 0, minutes: 0 });
@@ -44,6 +72,27 @@ export default function App() {
     constellationNames: true,
     milkyWay: true,
   });
+
+  // Load template from /templates/{name}.json
+  useEffect(() => {
+    if (!embedTemplate) return;
+    fetch(`/templates/${embedTemplate}.json`)
+      .then(r => r.ok ? r.json() : null)
+      .then((tpl: Record<string, string> | null) => {
+        if (!tpl) return;
+        // Merge: template values as base, URL params override
+        const merged = { ...tpl, ...embedOverrides };
+        delete merged.template; // don't re-apply template key
+        applyCSSVars(merged);
+        if (merged.theme) setThemeId(merged.theme);
+        if (merged.locale) {
+          _setLocale(merged.locale as Locale);
+          setLocale(merged.locale as Locale);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const [phrase, setPhrase] = useState(() => saved.phrase || t('phrase.birthday.1', getLocale()));
   const [subtitles, setSubtitles] = useState(() => {
     if (!saved.subtitles) return { line1: '', line2: '', line3: '', line4: '' };
