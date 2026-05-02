@@ -914,6 +914,53 @@ body {
   box-shadow: none;
 }
 
+/* ── Preview Info (hint style) ─── */
+.preview-info {
+  text-align: center;
+  font-size: 11px;
+  color: #856404;
+  background: #fff3cd;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin: 10px auto 4px;
+  line-height: 1.4;
+  max-width: 420px;
+}
+
+/* ── Order / Pricing Block ─── */
+.order-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.order-block__price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-ui);
+}
+
+.order-block__label {
+  font-size: 14px;
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.order-block__current {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.order-block__was {
+  font-size: 15px;
+  color: var(--color-muted);
+  text-decoration: line-through;
+  font-weight: 400;
+}
 
 /* ── Settings Bar (Language + Currency) ─── */
 .settings-bar {

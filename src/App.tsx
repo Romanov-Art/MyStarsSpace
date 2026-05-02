@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { t, setLocale, getLocale, type Locale, LOCALE_NAMES, AVAILABLE_LOCALES } from './i18n/index.js';
 import { cities, getCityName, sanitizeInput, formatCoordsDMS } from './data/cities.js';
 import { getDefaultConfig } from './config/celestial-config.js';
@@ -7,6 +7,9 @@ import { posterSizes } from './config/celestial-config.js';
 import { getDefaultFrame, getFrameForCompass } from './config/frames.js';
 import { renderStarMapToCanvas, drawPosterFrame } from './components/PosterPreview.js';
 import { getDefaultFormats, formatDate, formatTime, formatSize } from './config/formats.js';
+import { getBasePrice, SIZE_PRICES_USD } from './config/pricing.js';
+import { useExchangeRates, convertPrice, formatPrice } from './services/exchangeRates.js';
+import { CURRENCIES } from './config/currencies.js';
 import type { FormatSettings } from './config/formats.js';
 import type { City, StarMapConfig, PosterSize } from './types/index.js';
 
@@ -78,6 +81,7 @@ export default function App() {
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [sizeUnit, setSizeUnit] = useState<'cm' | 'inch'>('cm');
   const [currency, setCurrency] = useState(() => saved.currency || DEFAULT_CURRENCY);
+  const exchangeRates = useExchangeRates();
 
   // Embed / whitelabel: read partner ID from URL ?partner=xxx
   const partnerId = React.useMemo(() => {
@@ -478,13 +482,42 @@ export default function App() {
             selectedSize={selectedSize}
           />
 
-          {/* Export Button */}
-          <button className="export-btn" onClick={handleExport} disabled={isExporting}>
-            {isExporting
-              ? t('ui.exporting', locale)
-              : t('ui.export_png', locale)
-            }
-          </button>
+          {/* Preview Info */}
+          <div className="preview-info">
+            {t('ui.preview_info', locale)}
+          </div>
+
+          {/* Pricing + Order */}
+          {(() => {
+            const currInfo = CURRENCIES.find(c => c.code === currency);
+            const sym = currInfo?.symbol || '$';
+            const baseUSD = getBasePrice(selectedSize.label);
+            const maxUSD = SIZE_PRICES_USD['60×90'];
+            const currentPrice = convertPrice(baseUSD, currency, exchangeRates);
+            const maxPrice = convertPrice(maxUSD, currency, exchangeRates);
+            const showStrike = maxPrice !== null && currentPrice !== null && maxPrice > currentPrice;
+            return (
+              <div className="order-block">
+                <div className="order-block__price">
+                  <span className="order-block__label">{t('ui.total', locale)}</span>
+                  <span className="order-block__current">
+                    {currentPrice !== null ? formatPrice(currentPrice, currency, sym) : '...'}
+                  </span>
+                  {showStrike && (
+                    <span className="order-block__was">
+                      {formatPrice(maxPrice!, currency, sym)}
+                    </span>
+                  )}
+                </div>
+                <button className="export-btn" onClick={handleExport} disabled={isExporting}>
+                  {isExporting
+                    ? t('ui.exporting', locale)
+                    : `${t('ui.order_pdf', locale)}: ${currentPrice !== null ? formatPrice(currentPrice, currency, sym) : '...'}`
+                  }
+                </button>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Right: Content Controls */}
