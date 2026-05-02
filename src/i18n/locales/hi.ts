@@ -57,6 +57,7 @@ const hi: Record<string, string> = {
   'ui.editable_text': 'संपादन योग्य टेक्स्ट', 'ui.text_settings': 'टेक्स्ट सेटिंग',
   'ui.name_placeholder': 'नाम / कंपनी',
   'size.postcard': 'पोस्टकार्ड', 'size.a4': 'A4', 'size.standard': 'मानक', 'size.medium': 'मध्यम',
+  'size.large': 'बड़ा', 'size.max': 'अधिकतम',
   'ui.font': 'फॉन्ट', 'ui.print_color_warning': 'प्रिंट रंग स्क्रीन पर दिखाई देने वाले से भिन्न हो सकते हैं!',
   'zodiac.capricorn': 'मकर', 'zodiac.aquarius': 'कुम्भ',
   'zodiac.pisces': 'मीन', 'zodiac.aries': 'मेष',

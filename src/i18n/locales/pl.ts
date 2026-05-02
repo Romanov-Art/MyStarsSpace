@@ -57,6 +57,7 @@ const pl: Record<string, string> = {
   'ui.editable_text': 'Edytowalny tekst', 'ui.text_settings': 'Ustawienia tekstu',
   'ui.name_placeholder': 'Imię / Firma',
   'size.postcard': 'Pocztówka', 'size.a4': 'A4', 'size.standard': 'Standardowy', 'size.medium': 'Średni',
+  'size.large': 'Duży', 'size.max': 'Maks',
   'ui.font': 'Czcionka', 'ui.print_color_warning': 'Kolory druku mogą różnić się od wyświetlanych na ekranie!',
   'zodiac.capricorn': 'Koziorożec', 'zodiac.aquarius': 'Wodnik',
   'zodiac.pisces': 'Ryby', 'zodiac.aries': 'Baran',

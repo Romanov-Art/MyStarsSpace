@@ -57,6 +57,7 @@ const th: Record<string, string> = {
   'ui.editable_text': 'ข้อความแก้ไขได้', 'ui.text_settings': 'การตั้งค่าข้อความ',
   'ui.name_placeholder': 'ชื่อ / บริษัท',
   'size.postcard': 'โปสการ์ด', 'size.a4': 'A4', 'size.standard': 'มาตรฐาน', 'size.medium': 'กลาง',
+  'size.large': 'ใหญ่', 'size.max': 'ใหญ่สุด',
   'ui.font': 'แบบอักษร', 'ui.print_color_warning': 'สีพิมพ์อาจแตกต่างจากที่แสดงบนหน้าจอ!',
   'zodiac.capricorn': 'มังกร', 'zodiac.aquarius': 'กุมภ์', 'zodiac.pisces': 'มีน', 'zodiac.aries': 'เมษ',
   'zodiac.taurus': 'พฤษภ', 'zodiac.gemini': 'เมถุน', 'zodiac.cancer': 'กรกฎ', 'zodiac.leo': 'สิงห์',

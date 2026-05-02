@@ -60,6 +60,7 @@ const zh: Record<string, string> = {
   'ui.editable_text': '可编辑文本', 'ui.text_settings': '文本设置',
   'ui.name_placeholder': '姓名 / 公司',
   'size.postcard': '明信片', 'size.a4': 'A4', 'size.standard': '标准', 'size.medium': '中等',
+  'size.large': '大', 'size.max': '最大',
   'ui.font': '字体',
   'ui.print_color_warning': '打印颜色可能与屏幕显示有所不同！',
   'zodiac.capricorn': '摩羯座', 'zodiac.aquarius': '水瓶座',

@@ -57,6 +57,7 @@ const nl: Record<string, string> = {
   'ui.editable_text': 'Bewerkbare tekst', 'ui.text_settings': 'Tekstinstellingen',
   'ui.name_placeholder': 'Naam / Bedrijf',
   'size.postcard': 'Ansichtkaart', 'size.a4': 'A4', 'size.standard': 'Standaard', 'size.medium': 'Medium',
+  'size.large': 'Groot', 'size.max': 'Max',
   'ui.font': 'Lettertype', 'ui.print_color_warning': 'Printkleuren kunnen afwijken van wat u op het scherm ziet!',
   'zodiac.capricorn': 'Steenbok', 'zodiac.aquarius': 'Waterman',
   'zodiac.pisces': 'Vissen', 'zodiac.aries': 'Ram',

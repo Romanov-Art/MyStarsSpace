@@ -57,6 +57,7 @@ const vi: Record<string, string> = {
   'ui.editable_text': 'Văn bản có thể chỉnh sửa', 'ui.text_settings': 'Cài đặt văn bản',
   'ui.name_placeholder': 'Tên / Công ty',
   'size.postcard': 'Bưu thiếp', 'size.a4': 'A4', 'size.standard': 'Tiêu chuẩn', 'size.medium': 'Trung bình',
+  'size.large': 'Lớn', 'size.max': 'Tối đa',
   'ui.font': 'Phông chữ', 'ui.print_color_warning': 'Màu in có thể khác với hiển thị trên màn hình!',
   'zodiac.capricorn': 'Ma Kết', 'zodiac.aquarius': 'Bảo Bình', 'zodiac.pisces': 'Song Ngư', 'zodiac.aries': 'Bạch Dương',
   'zodiac.taurus': 'Kim Ngưu', 'zodiac.gemini': 'Song Tử', 'zodiac.cancer': 'Cự Giải', 'zodiac.leo': 'Sư Tử',

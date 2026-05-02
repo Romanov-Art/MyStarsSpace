@@ -71,7 +71,7 @@ const en: Record<string, string> = {
   'month.7': 'July', 'month.8': 'August', 'month.9': 'September',
   'month.10': 'October', 'month.11': 'November', 'month.12': 'December',
 
-  // Theme names
+
   // Theme names
   'theme.black': 'Black', 'theme.white': 'White', 'theme.navy': 'Navy',
 

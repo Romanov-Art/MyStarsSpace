@@ -60,6 +60,7 @@ const ar: Record<string, string> = {
   'ui.editable_text': 'نص قابل للتعديل', 'ui.text_settings': 'إعدادات النص',
   'ui.name_placeholder': 'الاسم / الشركة',
   'size.postcard': 'بطاقة بريدية', 'size.a4': 'A4', 'size.standard': 'قياسي', 'size.medium': 'متوسط',
+  'size.large': 'كبير', 'size.max': 'أقصى',
   'ui.font': 'الخط',
   'ui.print_color_warning': 'قد تختلف ألوان الطباعة عما تراه على الشاشة!',
   'zodiac.capricorn': 'الجدي', 'zodiac.aquarius': 'الدلو',

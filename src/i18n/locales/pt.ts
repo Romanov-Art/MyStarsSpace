@@ -61,6 +61,7 @@ const pt: Record<string, string> = {
   'ui.name_placeholder': 'Nome / Empresa',
   'size.postcard': 'Postal', 'size.a4': 'A4',
   'size.standard': 'Padrão', 'size.medium': 'Médio',
+  'size.large': 'Grande', 'size.max': 'Máx',
   'ui.font': 'Fonte',
   'ui.print_color_warning': 'As cores impressas podem diferir do que você vê na tela!',
   'zodiac.capricorn': 'Capricórnio', 'zodiac.aquarius': 'Aquário',

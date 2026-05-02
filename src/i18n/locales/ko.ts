@@ -60,6 +60,7 @@ const ko: Record<string, string> = {
   'ui.editable_text': '편집 가능한 텍스트', 'ui.text_settings': '텍스트 설정',
   'ui.name_placeholder': '이름 / 회사명',
   'size.postcard': '엽서', 'size.a4': 'A4', 'size.standard': '표준', 'size.medium': '중간',
+  'size.large': '대형', 'size.max': '최대',
   'ui.font': '글꼴',
   'ui.print_color_warning': '인쇄 색상은 화면 표시와 다를 수 있습니다!',
   'zodiac.capricorn': '염소자리', 'zodiac.aquarius': '물병자리',

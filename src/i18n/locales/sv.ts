@@ -57,6 +57,7 @@ const sv: Record<string, string> = {
   'ui.editable_text': 'Redigerbar text', 'ui.text_settings': 'Textinställningar',
   'ui.name_placeholder': 'Namn / Företag',
   'size.postcard': 'Vykort', 'size.a4': 'A4', 'size.standard': 'Standard', 'size.medium': 'Medium',
+  'size.large': 'Stor', 'size.max': 'Max',
   'ui.font': 'Typsnitt', 'ui.print_color_warning': 'Utskriftsfärger kan skilja sig från det som visas på skärmen!',
   'zodiac.capricorn': 'Stenbocken', 'zodiac.aquarius': 'Vattumannen',
   'zodiac.pisces': 'Fiskarna', 'zodiac.aries': 'Väduren',

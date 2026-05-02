@@ -60,6 +60,7 @@ const ja: Record<string, string> = {
   'ui.editable_text': '編集可能なテキスト', 'ui.text_settings': 'テキスト設定',
   'ui.name_placeholder': '名前 / 会社名',
   'size.postcard': 'ポストカード', 'size.a4': 'A4', 'size.standard': 'スタンダード', 'size.medium': 'ミディアム',
+  'size.large': 'ラージ', 'size.max': 'マックス',
   'ui.font': 'フォント',
   'ui.print_color_warning': '印刷色は画面表示と異なる場合があります！',
   'zodiac.capricorn': 'やぎ座', 'zodiac.aquarius': 'みずがめ座',

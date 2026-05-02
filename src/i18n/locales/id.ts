@@ -57,6 +57,7 @@ const id: Record<string, string> = {
   'ui.editable_text': 'Teks dapat diedit', 'ui.text_settings': 'Pengaturan teks',
   'ui.name_placeholder': 'Nama / Perusahaan',
   'size.postcard': 'Kartu pos', 'size.a4': 'A4', 'size.standard': 'Standar', 'size.medium': 'Sedang',
+  'size.large': 'Besar', 'size.max': 'Maks',
   'ui.font': 'Font', 'ui.print_color_warning': 'Warna cetak mungkin berbeda dari tampilan di layar!',
   'zodiac.capricorn': 'Capricorn', 'zodiac.aquarius': 'Aquarius', 'zodiac.pisces': 'Pisces', 'zodiac.aries': 'Aries',
   'zodiac.taurus': 'Taurus', 'zodiac.gemini': 'Gemini', 'zodiac.cancer': 'Cancer', 'zodiac.leo': 'Leo',

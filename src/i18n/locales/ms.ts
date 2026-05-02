@@ -57,6 +57,7 @@ const ms: Record<string, string> = {
   'ui.editable_text': 'Teks boleh diedit', 'ui.text_settings': 'Tetapan teks',
   'ui.name_placeholder': 'Nama / Syarikat',
   'size.postcard': 'Poskad', 'size.a4': 'A4', 'size.standard': 'Standard', 'size.medium': 'Sederhana',
+  'size.large': 'Besar', 'size.max': 'Maks',
   'ui.font': 'Fon', 'ui.print_color_warning': 'Warna cetakan mungkin berbeza daripada paparan skrin!',
   'zodiac.capricorn': 'Capricorn', 'zodiac.aquarius': 'Aquarius', 'zodiac.pisces': 'Pisces', 'zodiac.aries': 'Aries',
   'zodiac.taurus': 'Taurus', 'zodiac.gemini': 'Gemini', 'zodiac.cancer': 'Cancer', 'zodiac.leo': 'Leo',

@@ -893,7 +893,7 @@ body {
   background: var(--color-accent);
   color: white;
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   font-family: var(--font-ui);
   font-size: 16px;
   font-weight: 600;

@@ -61,6 +61,7 @@ const tr: Record<string, string> = {
   'ui.name_placeholder': 'İsim / Şirket',
   'size.postcard': 'Kartpostal', 'size.a4': 'A4',
   'size.standard': 'Standart', 'size.medium': 'Orta',
+  'size.large': 'Büyük', 'size.max': 'Maks',
   'ui.font': 'Yazı tipi',
   'ui.print_color_warning': 'Baskı renkleri ekranda gördüğünüzden farklı olabilir!',
   'zodiac.capricorn': 'Oğlak', 'zodiac.aquarius': 'Kova',
