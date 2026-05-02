@@ -342,15 +342,7 @@ export default function App() {
 
   return (
     <>
-      {/* Header */}
-      <header className="header">
-        <div className="header__logo">
-          <div className="header__logo-icon">⭐</div>
-          <div className="header__logo-text">MY STARS<br/>SPACE</div>
-        </div>
-        <div className="header__title">{t('ui.editor', locale)}</div>
-        <div className="header__actions" />
-      </header>
+
 
       {/* Main Layout */}
       <div className="editor-layout">
