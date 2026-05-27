@@ -478,11 +478,11 @@ export default function App() {
               {posterSizes.map(size => {
                 const inchMap: Record<string, string> = {
                   '10×15': '4×6"',
-                  'A4': '8×12"',
+                  'A4': '8×11.7"',
                   '30×40': '12×16"',
                   '40×50': '16×20"',
-                  '45×60': '18×24"',
-                  '60×90': '24×36"',
+                  '40×60': '16×24"',
+                  '50×70': '20×28"',
                 };
                 const cmLabel = `${size.width}×${size.height}${t('ui.unit_cm', locale)}`;
                 const inchLabel = inchMap[size.label] || `${(size.width / 2.54).toFixed(0)}×${(size.height / 2.54).toFixed(0)}"`;
@@ -493,8 +493,8 @@ export default function App() {
                   'A4': 'size.a4',
                   '30×40': 'size.standard',
                   '40×50': 'size.medium',
-                  '45×60': 'size.large',
-                  '60×90': 'size.max',
+                  '40×60': 'size.large',
+                  '50×70': 'size.max',
                 };
                 const name = t(sizeKeyMap[size.label] || size.label, locale);
                 const tooltipImg = `/tooltip/${size.label.replace('×', 'x')}.jpg`;
@@ -550,7 +550,7 @@ export default function App() {
             const currInfo = CURRENCIES.find(c => c.code === currency);
             const sym = currInfo?.symbol || '$';
             const baseUSD = getBasePrice(selectedSize.label);
-            const maxUSD = SIZE_PRICES_USD['60×90'];
+            const maxUSD = SIZE_PRICES_USD['50×70'];
             const currentPrice = convertPrice(baseUSD, currency, exchangeRates);
             const maxPrice = convertPrice(maxUSD, currency, exchangeRates);
             const showStrike = maxPrice !== null && currentPrice !== null && maxPrice > currentPrice;

@@ -4,8 +4,8 @@ export const SIZE_PRICES_USD: Record<string, number> = {
   'A4':    9.99,
   '30×40': 12.99,
   '40×50': 15.99,
-  '45×60': 17.99,
-  '60×90': 19.99,
+  '40×60': 17.99,
+  '50×70': 19.99,
 };
 
 /** Get base USD price for a size label */
