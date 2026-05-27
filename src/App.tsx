@@ -130,9 +130,9 @@ export default function App() {
     return posterSizes[1];
   });
   const [phraseFont, setPhraseFont] = useState(() => saved.phraseFont || 'Cormorant Garamond');
-  const [phraseFontSize, setPhraseFontSize] = useState(() => saved.phraseFontSize || 16);
+  const [phraseFontSize, setPhraseFontSize] = useState(() => saved.phraseFontSize || 30);
   const [subtitleFont, setSubtitleFont] = useState(() => saved.subtitleFont || 'Cormorant Garamond');
-  const [subtitleFontSize, setSubtitleFontSize] = useState(() => saved.subtitleFontSize || 16);
+  const [subtitleFontSize, setSubtitleFontSize] = useState(() => saved.subtitleFontSize || 12);
   const [isExporting, setIsExporting] = useState(false);
   const [starColors, setStarColors] = useState(() => saved.starColors ?? true);
   const [gridStyle, setGridStyle] = useState<'hide' | 'flat' | 'spherical'>(() => saved.gridStyle || 'flat');
@@ -374,25 +374,22 @@ export default function App() {
     // Poster frame border (rendered on canvas for print-quality export)
     drawPosterFrame(ctx, W, H, frameStyle, theme.background);
 
-    // Download via Blob (better for large files)
-    await new Promise<void>((resolve, reject) => {
-      exportCanvas.toBlob((blob) => {
-        if (!blob) {
-          reject(new Error('Canvas toBlob returned null — canvas may be tainted'));
-          return;
-        }
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = `starmap-${selectedCity.name || 'custom'}-${selectedSize.width}x${selectedSize.height}cm-300dpi.png`;
-        link.href = url;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        // Delay revoke so browser has time to start the download
-        setTimeout(() => URL.revokeObjectURL(url), 10000);
-        resolve();
-      }, 'image/png');
+    const baseName = `starmap-${selectedCity.name || 'custom'}-${selectedSize.width}x${selectedSize.height}cm-300dpi`;
+
+    // Generate PDF from the rendered canvas
+    const { default: jsPDF } = await import('jspdf');
+    const widthMM = selectedSize.width * 10;   // cm → mm
+    const heightMM = selectedSize.height * 10; // cm → mm
+    const pdf = new jsPDF({
+      orientation: widthMM > heightMM ? 'landscape' : 'portrait',
+      unit: 'mm',
+      format: [widthMM, heightMM],
+      compress: true,
     });
+    // Embed the canvas as a full-bleed lossless PNG image
+    const imgData = exportCanvas.toDataURL('image/png');
+    pdf.addImage(imgData, 'PNG', 0, 0, widthMM, heightMM);
+    pdf.save(`${baseName}.pdf`);
     } catch (err: unknown) {
       console.error('[Export] FAILED:', err);
       alert('Export failed: ' + (err instanceof Error ? err.message : String(err)));

@@ -26,29 +26,31 @@ export function getDefaultFontForLocale(locale: string): string {
   return defaults[locale] || fontsConfig.defaultFont;
 }
 
-/** Preset font sizes */
+/** Preset font sizes — heading: L is default (shifted +2 from original scale) */
 export const FONT_SIZE_PRESETS = [
-  { label: 'S', value: 12 },
-  { label: 'M', value: 16 },
-  { label: 'L', value: 20 },
-  { label: 'XL', value: 24 },
-  { label: 'XXL', value: 30 },
+  { label: 'S', value: 20 },
+  { label: 'M', value: 24 },
+  { label: 'L', value: 30 },
+  { label: 'XL', value: 36 },
+  { label: 'XXL', value: 44 },
 ];
 
+/** Subtitle sizes — M is default (shifted +1 from original scale) */
 export const SUBTITLE_SIZE_PRESETS = [
+  { label: 'S', value: 10 },
+  { label: 'M', value: 12 },
+  { label: 'L', value: 16 },
+  { label: 'XL', value: 20 },
+  { label: 'XXL', value: 26 },
+];
+
+/** Body sizes — M is default (shifted +1 from original scale) */
+export const BODY_SIZE_PRESETS = [
   { label: 'S', value: 8 },
   { label: 'M', value: 10 },
   { label: 'L', value: 12 },
   { label: 'XL', value: 16 },
   { label: 'XXL', value: 20 },
-];
-
-export const BODY_SIZE_PRESETS = [
-  { label: 'S', value: 5 },
-  { label: 'M', value: 8 },
-  { label: 'L', value: 10 },
-  { label: 'XL', value: 12 },
-  { label: 'XXL', value: 16 },
 ];
 
 // All fonts are loaded locally from /fonts/ via CSS @import in index.css.

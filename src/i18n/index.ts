@@ -3,11 +3,25 @@
  * Core business advantage: multi-language support for 12+ languages.
  */
 
-export type Locale = 'ru' | 'en' | 'de' | 'fr' | 'es' | 'it' | 'pt' | 'ja' | 'ko' | 'zh' | 'ar' | 'tr' | 'hi' | 'th' | 'vi' | 'id' | 'ms' | 'pl' | 'nl' | 'sv';
+export type Locale =
+  // Original 20
+  | 'ru' | 'en' | 'de' | 'fr' | 'es' | 'it' | 'pt' | 'ja' | 'ko' | 'zh'
+  | 'ar' | 'tr' | 'hi' | 'th' | 'vi' | 'id' | 'ms' | 'pl' | 'nl' | 'sv'
+  // New 21
+  | 'bn' | 'ur' | 'fa' | 'cs' | 'ro' | 'hu' | 'el' | 'no' | 'fi' | 'da'
+  | 'jv' | 'ta' | 'pa' | 'uk' | 'be' | 'kk' | 'uz' | 'az' | 'hy' | 'ka' | 'ky';
 
-export const AVAILABLE_LOCALES: Locale[] = ['ru', 'en', 'de', 'fr', 'es', 'it', 'pt', 'ja', 'ko', 'zh', 'ar', 'tr', 'hi', 'th', 'vi', 'id', 'ms', 'pl', 'nl', 'sv'];
+export const AVAILABLE_LOCALES: Locale[] = [
+  // Original 20
+  'ru', 'en', 'de', 'fr', 'es', 'it', 'pt', 'ja', 'ko', 'zh',
+  'ar', 'tr', 'hi', 'th', 'vi', 'id', 'ms', 'pl', 'nl', 'sv',
+  // New 21
+  'bn', 'ur', 'fa', 'cs', 'ro', 'hu', 'el', 'no', 'fi', 'da',
+  'jv', 'ta', 'pa', 'uk', 'be', 'kk', 'uz', 'az', 'hy', 'ka', 'ky',
+];
 
 export const LOCALE_NAMES: Record<Locale, string> = {
+  // Original 20
   ru: 'Русский',
   en: 'English',
   de: 'Deutsch',
@@ -23,11 +37,33 @@ export const LOCALE_NAMES: Record<Locale, string> = {
   hi: 'हिन्दी',
   th: 'ไทย',
   vi: 'Tiếng Việt',
-  id: 'Indonesia',
-  ms: 'Melayu',
+  id: 'Bahasa Indonesia',
+  ms: 'Bahasa Melayu',
   pl: 'Polski',
   nl: 'Nederlands',
   sv: 'Svenska',
+  // New 21
+  bn: 'বাংলা',
+  ur: 'اردو',
+  fa: 'فارسی',
+  cs: 'Čeština',
+  ro: 'Română',
+  hu: 'Magyar',
+  el: 'Ελληνικά',
+  no: 'Norsk',
+  fi: 'Suomi',
+  da: 'Dansk',
+  jv: 'Basa Jawa',
+  ta: 'தமிழ்',
+  pa: 'ਪੰਜਾਬੀ',
+  uk: 'Українська',
+  be: 'Беларуская',
+  kk: 'Қазақша',
+  uz: "O'zbekcha",
+  az: 'Azərbaycanca',
+  hy: 'Հայերէն',
+  ka: 'ქართული',
+  ky: 'Кыргызча',
 };
 
 // ─── Translation Store ────────────────────────────────────────────
