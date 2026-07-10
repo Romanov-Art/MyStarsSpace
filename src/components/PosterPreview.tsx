@@ -1,9 +1,10 @@
 import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { t, type Locale } from '../i18n/index.js';
 import { getTheme } from '../config/themes.js';
-import { getDefaultFrame, getFrameForCompass } from '../config/frames.js';
-import { getLocalSiderealTime } from '../core/astronomy.js';
+import { getFrameForCompass } from '../config/frames.js';
+import { getLocalSiderealTime, DEG_TO_RAD } from '../core/astronomy.js';
 import { equatorialToHorizontal, stereographicProjection } from '../core/coordinates.js';
+import { zonedTimeToUtc } from '../core/timezone.js';
 import type { City, StarData } from '../types/index.js';
 
 interface PosterPreviewProps {
@@ -96,19 +97,28 @@ interface ConstellationLineData {
   lines: [number, number, number, number][]; // [ra1_deg, dec1, ra2_deg, dec2]
 }
 
-/** Parse stars.6.json GeoJSON into StarData[] */
-function parseStarsGeoJSON(geojson: any): StarData[] {
+/** StarData with per-star trigonometry precomputed once at load time */
+interface PrecomputedStar extends StarData {
+  sinDec: number;
+  cosDec: number;
+}
+
+/** Parse stars.6.json GeoJSON into PrecomputedStar[] */
+function parseStarsGeoJSON(geojson: any): PrecomputedStar[] {
   return geojson.features.map((f: any) => {
     const [raDeg, dec] = f.geometry.coordinates;
     const id = Number(f.id);
+    const decRad = dec * DEG_TO_RAD;
     return {
       id: String(id),
       ra: raDeg / 15.0, // degrees → hours
       dec,
       magnitude: f.properties.mag ?? 6.0,
       name: STAR_NAMES[id],
-      bv: f.properties.bv ? parseFloat(f.properties.bv) : undefined,
-    } as StarData;
+      bv: f.properties.bv != null ? parseFloat(f.properties.bv) : undefined,
+      sinDec: Math.sin(decRad),
+      cosDec: Math.cos(decRad),
+    } as PrecomputedStar;
   });
 }
 
@@ -151,7 +161,7 @@ function parseMilkyWayGeoJSON(geojson: any): MilkyWayData[] {
 }
 
 // Global catalog cache
-let cachedStars: StarData[] | null = null;
+let cachedStars: PrecomputedStar[] | null = null;
 let cachedConstellationLines: ConstellationLineData[] | null = null;
 let cachedMilkyWay: MilkyWayData[] | null = null;
 let loadingPromise: Promise<void> | null = null;
@@ -166,13 +176,20 @@ async function loadCatalogData(): Promise<void> {
       fetch('/data/constellations.lines.json'),
       fetch('/data/mw.json'),
     ]);
+    if (!starsRes.ok || !constRes.ok || !mwRes.ok) {
+      throw new Error('Catalog fetch failed');
+    }
     const starsJson = await starsRes.json();
     const constJson = await constRes.json();
     const mwJson = await mwRes.json();
     cachedStars = parseStarsGeoJSON(starsJson);
     cachedConstellationLines = parseConstellationLinesGeoJSON(constJson);
     cachedMilkyWay = parseMilkyWayGeoJSON(mwJson);
-  })();
+  })().catch((err) => {
+    // Allow a later call to retry instead of caching the rejection forever
+    loadingPromise = null;
+    throw err;
+  });
   return loadingPromise;
 }
 
@@ -324,9 +341,17 @@ export default function PosterPreview({
   const [catalogLoaded, setCatalogLoaded] = useState(!!cachedStars);
   const [containerSize, setContainerSize] = useState(0);
 
-  // Load star catalog data on mount
+  // Load star catalog data on mount (one automatic retry on failure)
   useEffect(() => {
-    loadCatalogData().then(() => setCatalogLoaded(true));
+    let cancelled = false;
+    const markLoaded = () => { if (!cancelled) setCatalogLoaded(true); };
+    loadCatalogData()
+      .then(markLoaded)
+      .catch(() => new Promise(r => setTimeout(r, 2000))
+        .then(loadCatalogData)
+        .then(markLoaded)
+        .catch((err) => console.error('[StarMap] catalog load failed:', err)));
+    return () => { cancelled = true; };
   }, []);
 
   // Track container size for canvas resize
@@ -345,20 +370,43 @@ export default function PosterPreview({
     return () => observer.disconnect();
   }, []);
 
+  // Track devicePixelRatio: browser/page zoom changes it, and the canvas must
+  // re-render at the new density — otherwise the browser upscales the old
+  // bitmap and stars/lines turn blurry
+  const [dpr, setDpr] = useState(() => window.devicePixelRatio || 1);
+  useEffect(() => {
+    let mql: MediaQueryList | undefined;
+    const onChange = () => {
+      setDpr(window.devicePixelRatio || 1);
+      attach(); // re-subscribe: the media query is specific to the old dpr value
+    };
+    const attach = () => {
+      mql?.removeEventListener('change', onChange);
+      mql = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`);
+      mql.addEventListener('change', onChange);
+    };
+    attach();
+    return () => mql?.removeEventListener('change', onChange);
+  }, []);
+
+  // Interpret the chosen wall-clock time as LOCAL time of the selected city
   const dateTime = useMemo(() => {
-    return new Date(Date.UTC(date.year, date.month - 1, date.day, time.hours, time.minutes));
-  }, [date, time]);
+    return zonedTimeToUtc(date.year, date.month, date.day, time.hours, time.minutes, selectedCity.timezone);
+  }, [date, time, selectedCity.timezone]);
+
+  // Render generation counter: invalidates stale async watermark callbacks
+  const renderGenRef = useRef(0);
 
   useEffect(() => {
     if (!catalogLoaded || !cachedStars || containerSize === 0) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Canvas fills the square frame container
+    // Canvas fills the square frame container.
+    // At least 2000px for crisp preview; cssSize·dpr keeps it sharp under
+    // browser zoom / retina; 4096 cap bounds memory at extreme zoom levels
     const cssSize = containerSize;
-    const dpr = window.devicePixelRatio || 1;
-    // Render at high resolution: at least 1500px for crisp preview
-    const size = Math.max(1500, Math.round(cssSize * dpr));
+    const size = Math.min(4096, Math.max(2000, Math.round(cssSize * dpr)));
     canvas.width = size;
     canvas.height = size;
     canvas.style.width = `${cssSize}px`;
@@ -410,7 +458,10 @@ export default function PosterPreview({
 
     // ── PREVIEW watermark (inside circle clip, not exported) ──
     // Ensure font is loaded for canvas
+    const renderGen = ++renderGenRef.current;
     document.fonts.load("14px 'Digital'").then(() => {
+      // Canvas was redrawn by a newer effect run — skip stale watermark
+      if (renderGen !== renderGenRef.current) return;
       if (!canvasRef.current) return;
       const wmCtx = canvasRef.current.getContext('2d');
       if (!wmCtx) return;
@@ -451,7 +502,7 @@ export default function PosterPreview({
 
     ctx.restore();
 
-  }, [themeId, selectedCity, dateTime, layers, theme, locale, frame, catalogLoaded, containerSize, starColors, gridStyle, compassStyle]);
+  }, [themeId, selectedCity, dateTime, layers, theme, locale, frame, catalogLoaded, containerSize, dpr, starColors, gridStyle, compassStyle]);
 
   const frameColor = getFrameColor(theme.background);
 
@@ -589,11 +640,16 @@ function drawMilkyWay(
   size: number,
   mwData: MilkyWayData[],
 ) {
-  // Render Milky Way on offscreen canvas, then blur for smooth gradients
+  // Render Milky Way on offscreen canvas at HALF resolution, then blur and
+  // scale up — the layer is blurred anyway, and blur cost drops 4×.
+  const offScale = 0.5;
+  const offSize = Math.max(1, Math.round(size * offScale));
   const offCanvas = document.createElement('canvas');
-  offCanvas.width = size;
-  offCanvas.height = size;
+  offCanvas.width = offSize;
+  offCanvas.height = offSize;
   const offCtx = offCanvas.getContext('2d')!;
+  // Draw in full-size coordinates, scaled down by the context transform
+  offCtx.scale(offScale, offScale);
 
   // Clip to circle on offscreen canvas too
   offCtx.beginPath();
@@ -643,19 +699,28 @@ function drawMilkyWay(
     }
   }
 
-  // Apply moderate blur for smooth gradients (less aggressive)
-  const blurAmount = Math.max(4, size / 200);
-  ctx.save();
-  ctx.filter = `blur(${blurAmount}px)`;
-  ctx.drawImage(offCanvas, 0, 0);
-  ctx.restore();
+  // Apply both blur passes in HALF-resolution space (4× fewer pixels for the
+  // expensive blur filter), then upscale the composed result once.
+  // Blur radii are halved to match the half-res space — visually identical.
+  const blurAmount = Math.max(4, size / 200) * offScale;
+  const blurCanvas = document.createElement('canvas');
+  blurCanvas.width = offSize;
+  blurCanvas.height = offSize;
+  const blurCtx = blurCanvas.getContext('2d')!;
+
+  // Moderate blur for smooth gradients (less aggressive)
+  blurCtx.filter = `blur(${blurAmount}px)`;
+  blurCtx.drawImage(offCanvas, 0, 0);
 
   // Second pass with minimal blur for core structure
+  blurCtx.filter = `blur(${blurAmount * 0.3}px)`;
+  blurCtx.globalAlpha = 0.4;
+  blurCtx.drawImage(offCanvas, 0, 0);
+
   ctx.save();
-  ctx.filter = `blur(${blurAmount * 0.3}px)`;
-  ctx.globalAlpha = 0.4;
-  ctx.drawImage(offCanvas, 0, 0);
-  ctx.globalAlpha = 1;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(blurCanvas, 0, 0, size, size);
   ctx.restore();
 }
 
@@ -754,24 +819,41 @@ function drawStars(
   theme: { stars: string; background: string },
   size: number,
   showNames: boolean = false,
-  allStars: StarData[],
+  allStars: PrecomputedStar[],
   useColors: boolean = true,
   locale: string = 'en',
 ) {
   // Star circle is always dark — stars always render in light-on-dark mode
 
+  // Observer trigonometry computed once per render (not per star);
+  // per-star sinDec/cosDec precomputed at catalog load time.
+  const latRad = lat * DEG_TO_RAD;
+  const sinLat = Math.sin(latRad);
+  const cosLat = Math.cos(latRad);
+  const SIN_MIN_ALT = Math.sin(-2 * DEG_TO_RAD);
+
   for (const star of allStars) {
     if (star.magnitude > 6.5) continue;
 
-    const hz = equatorialToHorizontal(star.ra, star.dec, lat, lst);
-    if (hz.altitude < -2) continue;
+    const haRad = (lst - star.ra) * 15 * DEG_TO_RAD;
+    const sinAlt = sinLat * star.sinDec + cosLat * star.cosDec * Math.cos(haRad);
+    if (sinAlt < SIN_MIN_ALT) continue; // below -2° altitude
 
-    const proj = stereographicProjection(hz.altitude, hz.azimuth, radius);
-    const x = center + proj.x;
-    const y = center + proj.y;
+    // Stereographic projection: r = R·tan((90° − alt)/2); r equals the
+    // distance from center, so r > radius ⇔ outside the horizon circle
+    const altRad = Math.asin(sinAlt);
+    const r = radius * Math.tan((Math.PI / 2 - altRad) / 2);
+    if (r > radius) continue;
 
-    const dist = Math.sqrt((x - center) ** 2 + (y - center) ** 2);
-    if (dist > radius) continue;
+    const cosAlt = Math.sqrt(Math.max(0, 1 - sinAlt * sinAlt));
+    // Degenerate zenith case (cosAlt→0): r→0, azimuth is irrelevant — avoid 0/0 NaN
+    const denom = cosLat * cosAlt;
+    const cosAz = denom < 1e-12 ? 1 : (star.sinDec - sinLat * sinAlt) / denom;
+    let azRad = Math.acos(Math.max(-1, Math.min(1, cosAz)));
+    if (Math.sin(haRad) > 0) azRad = 2 * Math.PI - azRad;
+
+    const x = center - r * Math.sin(azRad); // East is left (sky seen from below)
+    const y = center - r * Math.cos(azRad); // North is up
 
     // Star sizes in PHYSICAL pixels (size is already in physical px)
     const scale = size / 500;

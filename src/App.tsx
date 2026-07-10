@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { t, setLocale, getLocale, type Locale, LOCALE_NAMES, AVAILABLE_LOCALES } from './i18n/index.js';
+import { t, setLocale, getLocale, type Locale, AVAILABLE_LOCALES } from './i18n/index.js';
 import { cities, getCityName, getCountryDisplayName, sanitizeInput, formatCoordsDMS } from './data/cities.js';
-import { getDefaultConfig } from './config/celestial-config.js';
 import { getTheme, themes } from './config/themes.js';
 import { posterSizes } from './config/celestial-config.js';
-import { getDefaultFrame, getFrameForCompass } from './config/frames.js';
+import { getFrameForCompass } from './config/frames.js';
 import { renderStarMapToCanvas, drawPosterFrame } from './components/PosterPreview.js';
-import { getDefaultFormats, formatDate, formatTime, formatSize } from './config/formats.js';
+import { zonedTimeToUtc } from './core/timezone.js';
+import { getDefaultFormats, formatDate, formatTime } from './config/formats.js';
 import { getBasePrice, SIZE_PRICES_USD } from './config/pricing.js';
 import { useExchangeRates, convertPrice, formatPrice } from './services/exchangeRates.js';
 import { CURRENCIES } from './config/currencies.js';
@@ -19,6 +19,21 @@ import SettingsBar from './components/SettingsBar.js';
 import { DEFAULT_CURRENCY } from './config/currencies.js';
 
 const LS_KEY = 'starmap-settings';
+
+// Frame SVG text cache — avoids re-downloading the same frame on every export
+const frameSvgCache = new Map<string, Promise<string>>();
+function fetchFrameSvg(url: string): Promise<string> {
+  let promise = frameSvgCache.get(url);
+  if (!promise) {
+    promise = fetch(url).then(r => {
+      if (!r.ok) throw new Error(`Failed to fetch frame SVG: ${r.status}`);
+      return r.text();
+    });
+    promise.catch(() => frameSvgCache.delete(url));
+    frameSvgCache.set(url, promise);
+  }
+  return promise;
+}
 
 function loadSettings(): Record<string, any> {
   try {
@@ -55,7 +70,11 @@ for (const [k, v] of embedParams.entries()) embedOverrides[k] = v;
 // Apply immediate URL param CSS vars (will be re-applied after template loads)
 applyCSSVars(embedOverrides);
 
-const embedLocale = embedOverrides.locale as Locale | null || null;
+// Validate URL locale against known locales — junk like ?locale=xx must not break the UI
+const embedLocale: Locale | null =
+  embedOverrides.locale && AVAILABLE_LOCALES.includes(embedOverrides.locale as Locale)
+    ? (embedOverrides.locale as Locale)
+    : null;
 const embedTheme = embedOverrides.theme || null;
 const embedCurrency = embedOverrides.currency || null;
 const embedTemplate = embedOverrides.template || null;
@@ -88,7 +107,7 @@ export default function App() {
         if (merged.theme) setThemeId(merged.theme);
         if (merged.currency) setCurrency(merged.currency);
         if (merged.units) setSizeUnit(merged.units as 'cm' | 'inch');
-        if (merged.locale) {
+        if (merged.locale && AVAILABLE_LOCALES.includes(merged.locale as Locale)) {
           _setLocale(merged.locale as Locale);
           setLocale(merged.locale as Locale);
         }
@@ -168,7 +187,7 @@ export default function App() {
     });
   }, [locale, themeId, selectedCity, date, time, layers, phrase, subtitles,
       selectedSize, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize,
-      starColors, gridStyle, frameStyle, compassStyle, showZodiac, formatSettings]);
+      starColors, gridStyle, frameStyle, compassStyle, showZodiac, formatSettings, currency]);
 
   // Helper to build date string using format settings
   const buildDateStr = (d: typeof date, t2: typeof time, loc: Locale) => {
@@ -304,12 +323,19 @@ export default function App() {
     exportCanvas.height = H;
     const ctx = exportCanvas.getContext('2d')!;
 
+    const theme = getTheme(themeId);
+
+    // Opaque background first: JPEG has no alpha — any transparent pixels
+    // left by the DOM capture would otherwise turn black
+    ctx.fillStyle = theme.background;
+    ctx.fillRect(0, 0, W, H);
+
     // Draw the DOM capture (contains all text, frames, background at exact layout)
     ctx.drawImage(domCanvas, 0, 0, W, H);
 
-    // Now overlay the star map at full export resolution
-    const theme = getTheme(themeId);
-    const exportDateTime = new Date(Date.UTC(date.year, date.month - 1, date.day, time.hours, time.minutes));
+    // Now overlay the star map at full export resolution.
+    // The chosen wall-clock time is interpreted as LOCAL time of the city.
+    const exportDateTime = zonedTimeToUtc(date.year, date.month, date.day, time.hours, time.minutes, selectedCity.timezone);
 
     // Find the star map container position relative to poster
     const starmapContainer = posterEl.querySelector('.poster__starmap-container') as HTMLElement;
@@ -323,7 +349,7 @@ export default function App() {
 
       // Draw the SVG frame at full resolution
       const frameUrl = `/${getFrameForCompass(compassStyle).filename}`;
-      const svgText = await fetch(frameUrl).then(r => r.text());
+      const svgText = await fetchFrameSvg(frameUrl);
       const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgText)}`;
       const frameSvg = await new Promise<HTMLImageElement>((resolve, reject) => {
         const img = new Image();
@@ -386,9 +412,10 @@ export default function App() {
       format: [widthMM, heightMM],
       compress: true,
     });
-    // Embed the canvas as a full-bleed lossless PNG image
-    const imgData = exportCanvas.toDataURL('image/png');
-    pdf.addImage(imgData, 'PNG', 0, 0, widthMM, heightMM);
+    // Embed the canvas as a full-bleed JPEG (q0.95: visually lossless for
+    // posters, ~10× smaller and faster than PNG — avoids OOM on large sizes)
+    const imgData = exportCanvas.toDataURL('image/jpeg', 0.95);
+    pdf.addImage(imgData, 'JPEG', 0, 0, widthMM, heightMM);
     pdf.save(`${baseName}.pdf`);
     } catch (err: unknown) {
       console.error('[Export] FAILED:', err);
@@ -396,7 +423,7 @@ export default function App() {
     } finally {
       setIsExporting(false);
     }
-  }, [phrase, subtitles, themeId, selectedSize, selectedCity, date, time, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, isExporting, layers, starColors, gridStyle, frameStyle, compassStyle]);
+  }, [phrase, subtitles, themeId, selectedSize, selectedCity, date, time, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, isExporting, layers, starColors, gridStyle, frameStyle, compassStyle, locale]);
 
   return (
     <>

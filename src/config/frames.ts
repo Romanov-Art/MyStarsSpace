@@ -35,14 +35,24 @@ const COMPASS_FRAME_MAP: Record<CompassStyle, string> = {
   cardinal: 'frame-degrees.svg', // reuses degrees frame
 };
 
+// Pre-built configs: stable object identity matters — FrameConfig is used
+// in React effect dependency arrays (a fresh object per call would retrigger
+// a full star map redraw on every render).
+const FRAME_CONFIGS: Record<CompassStyle, FrameConfig> = Object.fromEntries(
+  (Object.keys(COMPASS_FRAME_MAP) as CompassStyle[]).map((style) => [
+    style,
+    {
+      filename: COMPASS_FRAME_MAP[style],
+      viewBoxSize: SHARED_GEOMETRY.viewBoxSize,
+      innerRadius: SHARED_GEOMETRY.innerRadius,
+      starRadiusFraction,
+    },
+  ]),
+) as Record<CompassStyle, FrameConfig>;
+
 /** Get frame config for a given compass style */
 export function getFrameForCompass(compassStyle: CompassStyle): FrameConfig {
-  return {
-    filename: COMPASS_FRAME_MAP[compassStyle],
-    viewBoxSize: SHARED_GEOMETRY.viewBoxSize,
-    innerRadius: SHARED_GEOMETRY.innerRadius,
-    starRadiusFraction,
-  };
+  return FRAME_CONFIGS[compassStyle] ?? FRAME_CONFIGS.none;
 }
 
 /** Default frame (backwards compat) */

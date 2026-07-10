@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { t, type Locale } from '../i18n/index.js';
 import { cities, findCityAsync, getCityName, getCityLabel, isoToFlag, parseCoordinates, sanitizeInput } from '../data/cities.js';
+import { estimateTimezone } from '../data/timezones.js';
 import type { City } from '../types/index.js';
 import FontSelector, { SUBTITLE_SIZE_PRESETS } from './FontSelector.js';
 import type { FormatSettings, DateFormatType, TimeFormatType, UnitSystem } from '../config/formats.js';
@@ -153,7 +154,9 @@ export default function ControlPanel({
         country: '',
         lat: parsedCoords.lat,
         lon: parsedCoords.lon,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        // Zone of the entered POINT (by longitude), not of the browser —
+        // the user may be composing a map for a place far from home
+        timezone: estimateTimezone(parsedCoords.lat, parsedCoords.lon),
       };
       handleCitySelect(customCity);
     }

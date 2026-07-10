@@ -4,6 +4,7 @@
 import { registerLocale } from '../index.js';
 
 const nl: Record<string, string> = {
+  'ui.phrase': 'Zin', 'ui.size': 'Formaat', 'ui.language': 'Taal',
   'cardinal.north': 'N', 'cardinal.south': 'Z', 'cardinal.east': 'O', 'cardinal.west': 'W',
   'ui.city': 'Stad', 'ui.date': 'Datum', 'ui.time': 'Tijd', 'ui.theme': 'Thema',
   'ui.layers': 'Lagen', 'ui.meridians': 'Meridianen', 'ui.constellations': 'Sterrenbeelden',

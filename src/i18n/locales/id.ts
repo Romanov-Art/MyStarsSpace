@@ -4,6 +4,7 @@
 import { registerLocale } from '../index.js';
 
 const id: Record<string, string> = {
+  'ui.phrase': 'Frasa', 'ui.size': 'Ukuran', 'ui.language': 'Bahasa',
   'cardinal.north': 'U', 'cardinal.south': 'S', 'cardinal.east': 'T', 'cardinal.west': 'B',
   'ui.city': 'Kota', 'ui.date': 'Tanggal', 'ui.time': 'Waktu', 'ui.theme': 'Tema',
   'ui.layers': 'Lapisan', 'ui.meridians': 'Meridian', 'ui.constellations': 'Rasi bintang',

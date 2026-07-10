@@ -4,6 +4,7 @@
 import { registerLocale } from '../index.js';
 
 const ko: Record<string, string> = {
+  'ui.phrase': '문구', 'ui.size': '크기', 'ui.language': '언어',
   'cardinal.north': '북', 'cardinal.south': '남', 'cardinal.east': '동', 'cardinal.west': '서',
   'ui.city': '도시', 'ui.date': '날짜', 'ui.time': '시간', 'ui.theme': '테마',
   'ui.layers': '레이어', 'ui.meridians': '경위선', 'ui.constellations': '별자리',

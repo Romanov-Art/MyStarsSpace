@@ -4,6 +4,7 @@
 import { registerLocale } from '../index.js';
 
 const tr: Record<string, string> = {
+  'ui.phrase': 'İfade', 'ui.size': 'Boyut', 'ui.language': 'Dil',
   'cardinal.north': 'K', 'cardinal.south': 'G', 'cardinal.east': 'D', 'cardinal.west': 'B',
   'ui.city': 'Şehir', 'ui.date': 'Tarih', 'ui.time': 'Saat', 'ui.theme': 'Tema',
   'ui.layers': 'Katmanlar', 'ui.meridians': 'Meridyenler', 'ui.constellations': 'Takımyıldızlar',

@@ -4,6 +4,7 @@
 import { registerLocale } from '../index.js';
 
 const pt: Record<string, string> = {
+  'ui.phrase': 'Frase', 'ui.size': 'Tamanho', 'ui.language': 'Idioma',
   'cardinal.north': 'N', 'cardinal.south': 'S', 'cardinal.east': 'L', 'cardinal.west': 'O',
   'ui.city': 'Cidade', 'ui.date': 'Data', 'ui.time': 'Hora', 'ui.theme': 'Tema',
   'ui.layers': 'Camadas', 'ui.meridians': 'Meridianos', 'ui.constellations': 'Constelações',

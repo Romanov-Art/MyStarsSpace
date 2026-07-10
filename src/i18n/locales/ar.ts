@@ -4,6 +4,7 @@
 import { registerLocale } from '../index.js';
 
 const ar: Record<string, string> = {
+  'ui.phrase': 'عبارة', 'ui.size': 'الحجم', 'ui.language': 'اللغة',
   'cardinal.north': 'ش', 'cardinal.south': 'ج', 'cardinal.east': 'شر', 'cardinal.west': 'غ',
   'ui.city': 'المدينة', 'ui.date': 'التاريخ', 'ui.time': 'الوقت', 'ui.theme': 'السمة',
   'ui.layers': 'الطبقات', 'ui.meridians': 'خطوط الطول', 'ui.constellations': 'الأبراج',

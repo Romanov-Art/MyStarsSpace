@@ -7,6 +7,7 @@
 
 import type { City } from '../types/index.js';
 import { cities as curatedCities } from './cities-data.js';
+import { resolveTimezone } from './timezones.js';
 export { cities } from './cities-data.js';
 
 // ── Lazy-loaded full city database ──────────────────────────────
@@ -44,11 +45,6 @@ export function isoToFlag(iso: string): string {
   );
 }
 
-// ── ISO → timezone estimate (by longitude) ──────────────────────
-function estimateTimezone(lat: number, lon: number): string {
-  const offsetHours = Math.round(lon / 15);
-  return `Etc/GMT${offsetHours <= 0 ? '+' : '-'}${Math.abs(offsetHours)}`;
-}
 
 // ── Search: curated first, then full DB ─────────────────────────
 export function findCity(query: string, locale?: string): City[] {
@@ -78,7 +74,7 @@ export function findCity(query: string, locale?: string): City[] {
           country: iso,
           lat,
           lon: lng,
-          timezone: estimateTimezone(lat, lng),
+          timezone: resolveTimezone(iso, lat, lng),
           localizedNames: {},
         });
       }

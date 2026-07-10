@@ -8,18 +8,22 @@ interface CachedRates {
   timestamp: number;
 }
 
-/** Fetch exchange rates from open API, cached for 1h in localStorage */
-async function fetchRates(): Promise<Record<string, number>> {
-  // Check cache first
+function readCachedRates(): CachedRates | null {
   try {
     const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      const data: CachedRates = JSON.parse(cached);
-      if (Date.now() - data.timestamp < CACHE_TTL) {
-        return data.rates;
-      }
-    }
-  } catch { /* ignore */ }
+    return cached ? (JSON.parse(cached) as CachedRates) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Fetch exchange rates from open API, cached for 1h in localStorage */
+async function fetchRates(): Promise<Record<string, number>> {
+  // Check fresh cache first
+  const cached = readCachedRates();
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.rates;
+  }
 
   // Fetch fresh rates
   try {
@@ -37,7 +41,8 @@ async function fetchRates(): Promise<Record<string, number>> {
     return rates;
   } catch (err) {
     console.warn('Failed to fetch exchange rates:', err);
-    return {};
+    // Stale rates beat no rates — prices would show "..." forever otherwise
+    return cached?.rates ?? {};
   }
 }
 

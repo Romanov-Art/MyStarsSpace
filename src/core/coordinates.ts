@@ -49,9 +49,10 @@ export function equatorialToHorizontal(
   const sinAlt = Math.sin(latRad) * Math.sin(decRad) + Math.cos(latRad) * Math.cos(decRad) * Math.cos(haRad);
   const altitude = radiansToDegrees(Math.asin(sinAlt));
 
-  // Azimuth
+  // Azimuth — cos(asin(x)) === sqrt(1 - x²), avoids a second asin per star
+  const cosAlt = Math.sqrt(Math.max(0, 1 - sinAlt * sinAlt));
   const cosAz =
-    (Math.sin(decRad) - Math.sin(latRad) * sinAlt) / (Math.cos(latRad) * Math.cos(Math.asin(sinAlt)));
+    (Math.sin(decRad) - Math.sin(latRad) * sinAlt) / (Math.cos(latRad) * cosAlt);
 
   // Clamp to [-1, 1] to avoid NaN from floating-point errors
   const cosAzClamped = Math.max(-1, Math.min(1, cosAz));
@@ -88,9 +89,10 @@ export function horizontalToEquatorial(
   const sinDec = Math.sin(altRad) * Math.sin(latRad) + Math.cos(altRad) * Math.cos(latRad) * Math.cos(azRad);
   const dec = radiansToDegrees(Math.asin(sinDec));
 
-  // Hour angle
+  // Hour angle — cos(asin(x)) === sqrt(1 - x²)
+  const cosDec = Math.sqrt(Math.max(0, 1 - sinDec * sinDec));
   const cosHA =
-    (Math.sin(altRad) - Math.sin(latRad) * sinDec) / (Math.cos(latRad) * Math.cos(Math.asin(sinDec)));
+    (Math.sin(altRad) - Math.sin(latRad) * sinDec) / (Math.cos(latRad) * cosDec);
   const cosHAClamped = Math.max(-1, Math.min(1, cosHA));
   let ha = radiansToDegrees(Math.acos(cosHAClamped));
 

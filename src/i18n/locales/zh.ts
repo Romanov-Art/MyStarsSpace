@@ -4,6 +4,7 @@
 import { registerLocale } from '../index.js';
 
 const zh: Record<string, string> = {
+  'ui.phrase': '短语', 'ui.size': '尺寸', 'ui.language': '语言',
   'cardinal.north': '北', 'cardinal.south': '南', 'cardinal.east': '东', 'cardinal.west': '西',
   'ui.city': '城市', 'ui.date': '日期', 'ui.time': '时间', 'ui.theme': '主题',
   'ui.layers': '图层', 'ui.meridians': '经纬线', 'ui.constellations': '星座',

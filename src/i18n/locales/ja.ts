@@ -4,6 +4,7 @@
 import { registerLocale } from '../index.js';
 
 const ja: Record<string, string> = {
+  'ui.phrase': 'フレーズ', 'ui.size': 'サイズ', 'ui.language': '言語',
   'cardinal.north': '北', 'cardinal.south': '南', 'cardinal.east': '東', 'cardinal.west': '西',
   'ui.city': '都市', 'ui.date': '日付', 'ui.time': '時刻', 'ui.theme': 'テーマ',
   'ui.layers': 'レイヤー', 'ui.meridians': '経緯線', 'ui.constellations': '星座',

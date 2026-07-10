@@ -4,6 +4,7 @@
 import { registerLocale } from '../index.js';
 
 const hi: Record<string, string> = {
+  'ui.phrase': 'वाक्यांश', 'ui.size': 'आकार', 'ui.language': 'भाषा',
   'cardinal.north': 'उ', 'cardinal.south': 'द', 'cardinal.east': 'पू', 'cardinal.west': 'प',
   'ui.city': 'शहर', 'ui.date': 'तारीख', 'ui.time': 'समय', 'ui.theme': 'थीम',
   'ui.layers': 'परतें', 'ui.meridians': 'याम्योत्तर', 'ui.constellations': 'तारामंडल',

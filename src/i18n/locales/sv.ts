@@ -4,6 +4,7 @@
 import { registerLocale } from '../index.js';
 
 const sv: Record<string, string> = {
+  'ui.phrase': 'Fras', 'ui.size': 'Storlek', 'ui.language': 'Språk',
   'cardinal.north': 'N', 'cardinal.south': 'S', 'cardinal.east': 'Ö', 'cardinal.west': 'V',
   'ui.city': 'Stad', 'ui.date': 'Datum', 'ui.time': 'Tid', 'ui.theme': 'Tema',
   'ui.layers': 'Lager', 'ui.meridians': 'Meridianer', 'ui.constellations': 'Stjärnbilder',

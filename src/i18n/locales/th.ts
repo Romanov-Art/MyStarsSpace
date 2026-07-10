@@ -4,6 +4,7 @@
 import { registerLocale } from '../index.js';
 
 const th: Record<string, string> = {
+  'ui.phrase': 'วลี', 'ui.size': 'ขนาด', 'ui.language': 'ภาษา',
   'cardinal.north': 'เหนือ', 'cardinal.south': 'ใต้', 'cardinal.east': 'ตอ.', 'cardinal.west': 'ตก.',
   'ui.city': 'เมือง', 'ui.date': 'วันที่', 'ui.time': 'เวลา', 'ui.theme': 'ธีม',
   'ui.layers': 'เลเยอร์', 'ui.meridians': 'เส้นเมริเดียน', 'ui.constellations': 'กลุ่มดาว',

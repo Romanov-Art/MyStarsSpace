@@ -4,6 +4,7 @@
 import { registerLocale } from '../index.js';
 
 const vi: Record<string, string> = {
+  'ui.phrase': 'Cụm từ', 'ui.size': 'Kích thước', 'ui.language': 'Ngôn ngữ',
   'cardinal.north': 'B', 'cardinal.south': 'N', 'cardinal.east': 'Đ', 'cardinal.west': 'T',
   'ui.city': 'Thành phố', 'ui.date': 'Ngày', 'ui.time': 'Giờ', 'ui.theme': 'Chủ đề',
   'ui.layers': 'Lớp', 'ui.meridians': 'Kinh tuyến', 'ui.constellations': 'Chòm sao',
