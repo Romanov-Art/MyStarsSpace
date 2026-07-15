@@ -108,18 +108,3 @@ export function formatTime(
   const h12 = hours % 12 || 12;
   return `${h12}:${mm} ${period}`;
 }
-
-/** Convert between metric and imperial for poster size display */
-export function formatSize(
-  widthCm: number,
-  heightCm: number,
-  units: UnitSystem,
-): string {
-  if (units === 'metric') {
-    return `${widthCm}×${heightCm} cm`;
-  }
-  // Convert cm to inches (1 inch = 2.54 cm)
-  const wIn = (widthCm / 2.54).toFixed(1).replace(/\.0$/, '');
-  const hIn = (heightCm / 2.54).toFixed(1).replace(/\.0$/, '');
-  return `${wIn}×${hIn} in`;
-}

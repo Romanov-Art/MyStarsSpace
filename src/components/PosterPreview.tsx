@@ -3,7 +3,7 @@ import { t, type Locale } from '../i18n/index.js';
 import { getTheme } from '../config/themes.js';
 import { getFrameForCompass } from '../config/frames.js';
 import { getLocalSiderealTime, DEG_TO_RAD } from '../core/astronomy.js';
-import { equatorialToHorizontal, stereographicProjection } from '../core/coordinates.js';
+import { equatorialToHorizontal, stereographicProjection, projectStarStereographic } from '../core/coordinates.js';
 import { zonedTimeToUtc } from '../core/timezone.js';
 import type { City, StarData } from '../types/index.js';
 
@@ -341,17 +341,22 @@ export default function PosterPreview({
   const [catalogLoaded, setCatalogLoaded] = useState(!!cachedStars);
   const [containerSize, setContainerSize] = useState(0);
 
-  // Load star catalog data on mount (one automatic retry on failure)
+  // Load star catalog data on mount; retry with capped backoff until it
+  // succeeds — a transient network failure must not leave the map empty forever
   useEffect(() => {
     let cancelled = false;
-    const markLoaded = () => { if (!cancelled) setCatalogLoaded(true); };
-    loadCatalogData()
-      .then(markLoaded)
-      .catch(() => new Promise(r => setTimeout(r, 2000))
-        .then(loadCatalogData)
-        .then(markLoaded)
-        .catch((err) => console.error('[StarMap] catalog load failed:', err)));
-    return () => { cancelled = true; };
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const attempt = (delayMs: number) => {
+      loadCatalogData()
+        .then(() => { if (!cancelled) setCatalogLoaded(true); })
+        .catch((err) => {
+          if (cancelled) return;
+          console.warn(`[StarMap] catalog load failed, retrying in ${delayMs}ms:`, err);
+          timer = setTimeout(() => attempt(Math.min(delayMs * 2, 30_000)), delayMs);
+        });
+    };
+    attempt(2000);
+    return () => { cancelled = true; if (timer) clearTimeout(timer); };
   }, []);
 
   // Track container size for canvas resize
@@ -835,25 +840,13 @@ function drawStars(
   for (const star of allStars) {
     if (star.magnitude > 6.5) continue;
 
-    const haRad = (lst - star.ra) * 15 * DEG_TO_RAD;
-    const sinAlt = sinLat * star.sinDec + cosLat * star.cosDec * Math.cos(haRad);
-    if (sinAlt < SIN_MIN_ALT) continue; // below -2° altitude
+    const p = projectStarStereographic(
+      star.ra, star.sinDec, star.cosDec, sinLat, cosLat, lst, radius, SIN_MIN_ALT,
+    );
+    if (!p) continue; // below -2° altitude or outside the horizon circle
 
-    // Stereographic projection: r = R·tan((90° − alt)/2); r equals the
-    // distance from center, so r > radius ⇔ outside the horizon circle
-    const altRad = Math.asin(sinAlt);
-    const r = radius * Math.tan((Math.PI / 2 - altRad) / 2);
-    if (r > radius) continue;
-
-    const cosAlt = Math.sqrt(Math.max(0, 1 - sinAlt * sinAlt));
-    // Degenerate zenith case (cosAlt→0): r→0, azimuth is irrelevant — avoid 0/0 NaN
-    const denom = cosLat * cosAlt;
-    const cosAz = denom < 1e-12 ? 1 : (star.sinDec - sinLat * sinAlt) / denom;
-    let azRad = Math.acos(Math.max(-1, Math.min(1, cosAz)));
-    if (Math.sin(haRad) > 0) azRad = 2 * Math.PI - azRad;
-
-    const x = center - r * Math.sin(azRad); // East is left (sky seen from below)
-    const y = center - r * Math.cos(azRad); // North is up
+    const x = center + p.x;
+    const y = center + p.y;
 
     // Star sizes in PHYSICAL pixels (size is already in physical px)
     const scale = size / 500;

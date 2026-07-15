@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { t, setLocale, getLocale, type Locale, AVAILABLE_LOCALES } from './i18n/index.js';
+import { t, setLocale, getLocale, type Locale } from './i18n/index.js';
 import { cities, getCityName, getCountryDisplayName, sanitizeInput, formatCoordsDMS } from './data/cities.js';
 import { getTheme, themes } from './config/themes.js';
 import { posterSizes } from './config/celestial-config.js';
@@ -7,18 +7,24 @@ import { getFrameForCompass } from './config/frames.js';
 import { renderStarMapToCanvas, drawPosterFrame } from './components/PosterPreview.js';
 import { zonedTimeToUtc } from './core/timezone.js';
 import { getDefaultFormats, formatDate, formatTime } from './config/formats.js';
-import { getBasePrice, SIZE_PRICES_USD } from './config/pricing.js';
+import { getBasePrice, getPartnerPrice, SIZE_PRICES_USD } from './config/pricing.js';
+import { trackPartnerEvent, trackPartnerViewOnce } from './services/partnerTracking.js';
 import { useExchangeRates, convertPrice, formatPrice } from './services/exchangeRates.js';
 import { CURRENCIES } from './config/currencies.js';
 import type { FormatSettings } from './config/formats.js';
 import type { City, StarMapConfig, PosterSize } from './types/index.js';
+import {
+  sanitizeId, resolveTemplateUrl, settingsStorageKey, sanitizeTemplate,
+  isValidLocale, isValidCurrency,
+} from './core/embedConfig.js';
 
 import ControlPanel from './components/ControlPanel.js';
 import PosterPreview from './components/PosterPreview.js';
 import SettingsBar from './components/SettingsBar.js';
 import { DEFAULT_CURRENCY } from './config/currencies.js';
 
-const LS_KEY = 'starmap-settings';
+// Partner embeds persist settings under their own namespace (see embedConfig)
+const LS_KEY = settingsStorageKey(new URLSearchParams(window.location.search));
 
 // Frame SVG text cache — avoids re-downloading the same frame on every export
 const frameSvgCache = new Map<string, Promise<string>>();
@@ -70,19 +76,20 @@ for (const [k, v] of embedParams.entries()) embedOverrides[k] = v;
 // Apply immediate URL param CSS vars (will be re-applied after template loads)
 applyCSSVars(embedOverrides);
 
-// Validate URL locale against known locales — junk like ?locale=xx must not break the UI
-const embedLocale: Locale | null =
-  embedOverrides.locale && AVAILABLE_LOCALES.includes(embedOverrides.locale as Locale)
-    ? (embedOverrides.locale as Locale)
-    : null;
+// Untrusted values (URL params, templates, localStorage) are validated via
+// embedConfig — junk like ?locale=xx or ?currency=XXX must not break the UI
+const embedLocale: Locale | null = isValidLocale(embedOverrides.locale) ? embedOverrides.locale : null;
 const embedTheme = embedOverrides.theme || null;
-const embedCurrency = embedOverrides.currency || null;
-const embedTemplate = embedOverrides.template || null;
+const embedCurrency = isValidCurrency(embedOverrides.currency) ? embedOverrides.currency : null;
+// ?template=name → /templates/{name}.json; else ?partner=id → /templates/partners/{id}.json
+const embedTemplateUrl = resolveTemplateUrl(embedParams);
 
 export default function App() {
   const saved = React.useMemo(() => loadSettings(), []);
 
-  const [locale, _setLocale] = useState<Locale>(() => embedLocale || saved.locale || getLocale());
+  const [locale, _setLocale] = useState<Locale>(
+    () => embedLocale || (isValidLocale(saved.locale) ? saved.locale : getLocale()),
+  );
   const [themeId, setThemeId] = useState(() => embedTheme || saved.themeId || 'black');
   const [selectedCity, setSelectedCity] = useState<City>(() => saved.selectedCity || cities[0]);
   const [date, setDate] = useState(() => saved.date || { day: 26, month: 3, year: 2026 });
@@ -93,23 +100,24 @@ export default function App() {
     milkyWay: true,
   });
 
-  // Load template from /templates/{name}.json
+  // Load template JSON (named template or partner default)
   useEffect(() => {
-    if (!embedTemplate) return;
-    fetch(`/templates/${embedTemplate}.json`)
+    if (!embedTemplateUrl) return;
+    fetch(embedTemplateUrl)
       .then(r => r.ok ? r.json() : null)
-      .then((tpl: Record<string, any> | null) => {
+      .then((tpl: unknown) => {
         if (!tpl) return;
-        // Merge: template values as base, URL params override
-        const merged = { ...tpl, ...embedOverrides };
-        delete merged.template;
+        // Merge: template values as base, URL params override; unknown keys
+        // and invalid values are dropped so they never reach app state
+        const merged = sanitizeTemplate(tpl, embedOverrides);
         applyCSSVars(merged);
         if (merged.theme) setThemeId(merged.theme);
         if (merged.currency) setCurrency(merged.currency);
+        if (merged.markup !== undefined) setPartnerMarkup(merged.markup);
         if (merged.units) setSizeUnit(merged.units as 'cm' | 'inch');
-        if (merged.locale && AVAILABLE_LOCALES.includes(merged.locale as Locale)) {
-          _setLocale(merged.locale as Locale);
-          setLocale(merged.locale as Locale);
+        if (merged.locale) {
+          _setLocale(merged.locale);
+          setLocale(merged.locale);
         }
         // Apply format settings from template
         if (merged.dateFormat || merged.timeFormat || merged.fullMonthName !== undefined) {
@@ -132,7 +140,7 @@ export default function App() {
     if (s.line3 && s.line3.includes('undefined')) {
       const d = saved.date || { day: 26, month: 3, year: 2026 };
       const t2 = saved.time || { hours: 0, minutes: 0 };
-      const loc = saved.locale || getLocale();
+      const loc = isValidLocale(saved.locale) ? saved.locale : getLocale();
       const fmt = saved.formatSettings || getDefaultFormats(loc);
       const validFormats = ['DD.MM.YYYY', 'MM/DD/YYYY'];
       const df = validFormats.includes(fmt.dateFormat) ? fmt.dateFormat : 'DD.MM.YYYY';
@@ -160,16 +168,23 @@ export default function App() {
   const [showZodiac, setShowZodiac] = useState(() => saved.showZodiac ?? false);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [sizeUnit, setSizeUnit] = useState<'cm' | 'inch'>('cm');
-  const [currency, setCurrency] = useState(() => embedCurrency || saved.currency || DEFAULT_CURRENCY);
+  const [currency, setCurrency] = useState(
+    () => embedCurrency || (isValidCurrency(saved.currency) ? saved.currency : DEFAULT_CURRENCY),
+  );
   const exchangeRates = useExchangeRates();
 
   // Embed / whitelabel: read partner ID from URL ?partner=xxx
-  const partnerId = React.useMemo(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('partner') || undefined;
-  }, []);
+  const partnerId = React.useMemo(
+    () => sanitizeId(new URLSearchParams(window.location.search).get('partner')) || undefined,
+    [],
+  );
+  // Partner markup in USD, set only via the partner's template JSON
+  const [partnerMarkup, setPartnerMarkup] = useState(0);
+
+  // Billing: count the embed view once per session
+  useEffect(() => { trackPartnerViewOnce(partnerId); }, [partnerId]);
   const [formatSettings, setFormatSettings] = useState<FormatSettings>(() => {
-    const defaults = getDefaultFormats(saved.locale || getLocale());
+    const defaults = getDefaultFormats(isValidLocale(saved.locale) ? saved.locale : getLocale());
     if (!saved.formatSettings) return defaults;
     const s = saved.formatSettings as FormatSettings;
     // Sanitize legacy values (e.g. 'full' dateFormat removed in refactor)
@@ -417,13 +432,16 @@ export default function App() {
     const imgData = exportCanvas.toDataURL('image/jpeg', 0.95);
     pdf.addImage(imgData, 'JPEG', 0, 0, widthMM, heightMM);
     pdf.save(`${baseName}.pdf`);
+
+    // Billing: count the successful generation for the partner
+    trackPartnerEvent(partnerId, 'export');
     } catch (err: unknown) {
       console.error('[Export] FAILED:', err);
       alert('Export failed: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setIsExporting(false);
     }
-  }, [phrase, subtitles, themeId, selectedSize, selectedCity, date, time, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, isExporting, layers, starColors, gridStyle, frameStyle, compassStyle, locale]);
+  }, [phrase, subtitles, themeId, selectedSize, selectedCity, date, time, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, isExporting, layers, starColors, gridStyle, frameStyle, compassStyle, locale, partnerId]);
 
   return (
     <>
@@ -576,8 +594,13 @@ export default function App() {
           {(() => {
             const currInfo = CURRENCIES.find(c => c.code === currency);
             const sym = currInfo?.symbol || '$';
-            const baseUSD = getBasePrice(selectedSize.label);
-            const maxUSD = SIZE_PRICES_USD['50×70'];
+            // Partner embeds: price floored at $5 minimum + partner markup
+            const baseUSD = partnerId
+              ? getPartnerPrice(getBasePrice(selectedSize.label), partnerMarkup)
+              : getBasePrice(selectedSize.label);
+            const maxUSD = partnerId
+              ? getPartnerPrice(SIZE_PRICES_USD['50×70'], partnerMarkup)
+              : SIZE_PRICES_USD['50×70'];
             const currentPrice = convertPrice(baseUSD, currency, exchangeRates);
             const maxPrice = convertPrice(maxUSD, currency, exchangeRates);
             const showStrike = maxPrice !== null && currentPrice !== null && maxPrice > currentPrice;

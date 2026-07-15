@@ -1,0 +1,15 @@
+{
+  "bg": "0f1b2d",
+  "text": "f0f4f8",
+  "accent": "4da3ff",
+  "panel": "16283f",
+  "radius": "10",
+  "locale": "en",
+  "theme": "black",
+  "currency": "USD",
+  "dateFormat": "MM/DD/YYYY",
+  "timeFormat": "12h",
+  "units": "inch",
+  "fullMonthName": false,
+  "markup": 3
+}

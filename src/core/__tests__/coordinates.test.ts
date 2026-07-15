@@ -6,6 +6,7 @@ import {
   equatorialToHorizontal,
   horizontalToEquatorial,
   stereographicProjection,
+  projectStarStereographic,
   degreesToRadians,
   radiansToDegrees,
   starRenderSize,
@@ -162,6 +163,53 @@ describe('stereographicProjection', () => {
     for (const d of distances) {
       expect(d).toBeCloseTo(avg, 5);
     }
+  });
+});
+
+describe('projectStarStereographic (fast path)', () => {
+  it('matches equatorialToHorizontal + stereographicProjection for a sky sweep', () => {
+    const radius = 300;
+    const minAltDeg = -2;
+    const minSinAlt = Math.sin(degreesToRadians(minAltDeg));
+
+    for (const lat of [-60, -30, 0, 30, 55.75, 89.9]) {
+      const sinLat = Math.sin(degreesToRadians(lat));
+      const cosLat = Math.cos(degreesToRadians(lat));
+      for (let raH = 0; raH < 24; raH += 1.7) {
+        for (let dec = -85; dec <= 85; dec += 13) {
+          for (const lst of [0, 5.3, 12, 18.9]) {
+            const hz = equatorialToHorizontal(raH, dec, lat, lst);
+            const slow = stereographicProjection(hz.altitude, hz.azimuth, radius);
+            const slowVisible =
+              hz.altitude >= minAltDeg &&
+              Math.sqrt(slow.x ** 2 + slow.y ** 2) <= radius;
+
+            const decRad = degreesToRadians(dec);
+            const fast = projectStarStereographic(
+              raH, Math.sin(decRad), Math.cos(decRad), sinLat, cosLat, lst, radius, minSinAlt,
+            );
+
+            expect(fast !== null, `visibility diverged at lat=${lat} ra=${raH} dec=${dec} lst=${lst}`)
+              .toBe(slowVisible);
+            if (fast && slowVisible) {
+              expect(fast.x).toBeCloseTo(slow.x, 6);
+              expect(fast.y).toBeCloseTo(slow.y, 6);
+            }
+          }
+        }
+      }
+    }
+  });
+
+  it('returns null below the altitude cutoff', () => {
+    // Star at dec=-89 is never visible from lat=+60
+    const decRad = degreesToRadians(-89);
+    const latRad = degreesToRadians(60);
+    const p = projectStarStereographic(
+      12, Math.sin(decRad), Math.cos(decRad), Math.sin(latRad), Math.cos(latRad),
+      0, 300, Math.sin(degreesToRadians(-2)),
+    );
+    expect(p).toBeNull();
   });
 });
 

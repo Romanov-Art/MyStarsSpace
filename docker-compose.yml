@@ -4,8 +4,32 @@ services:
     ports:
       - "3000:80"
     restart: unless-stopped
+    depends_on:
+      - track
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost/"]
       interval: 30s
       timeout: 3s
       retries: 3
+
+  track:
+    build: ./server
+    restart: unless-stopped
+    volumes:
+      - track-data:/data
+    environment:
+      LIBSQL_URL: file:/data/track.db
+      # LIBSQL_AUTH_TOKEN: set when pointing LIBSQL_URL at a remote libsql/Turso instance
+      ADMIN_TOKEN: ${TRACK_ADMIN_TOKEN:?set TRACK_ADMIN_TOKEN in .env}
+      IP_HASH_SECRET: ${TRACK_IP_HASH_SECRET:?set TRACK_IP_HASH_SECRET in .env}
+      # Lock these down in production:
+      ALLOWED_ORIGINS: ${TRACK_ALLOWED_ORIGINS:-}
+      PARTNERS: ${TRACK_PARTNERS:-}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8787/api/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  track-data:

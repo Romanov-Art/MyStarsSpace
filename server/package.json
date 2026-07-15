@@ -1,0 +1,13 @@
+{
+  "name": "starmap-track",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Partner generation counter for billing (LibSQL)",
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.15"
+  }
+}

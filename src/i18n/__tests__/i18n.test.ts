@@ -8,8 +8,13 @@ import { t, setLocale, getLocale, getAvailableLocales, validateLocale, getRegist
 import '../all-locales.js';
 
 describe('i18n core', () => {
-  it('should expose all declared locales', () => {
-    expect(getAvailableLocales()).toHaveLength(AVAILABLE_LOCALES.length);
+  it('should expose all declared locales, each actually registered', () => {
+    // getAvailableLocales() mirrors AVAILABLE_LOCALES, so comparing lengths
+    // proves nothing — instead check every declared locale has translations
+    for (const locale of AVAILABLE_LOCALES) {
+      const { complete } = validateLocale(locale, ['ui.city']);
+      expect(complete, `locale "${locale}" is declared but not registered`).toBe(true);
+    }
     expect(getAvailableLocales()).toContain('ru');
     expect(getAvailableLocales()).toContain('en');
     expect(getAvailableLocales()).toContain('de');

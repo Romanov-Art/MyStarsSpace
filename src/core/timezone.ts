@@ -9,17 +9,30 @@
  * Get the UTC offset (in milliseconds) of a timezone at a given instant.
  * Positive for zones east of Greenwich (e.g. Moscow → +3h).
  */
+// Intl.DateTimeFormat construction is expensive (~ms); cache per timezone —
+// the formatter itself is reusable across timestamps
+const dtfCache = new Map<string, Intl.DateTimeFormat>();
+
+function getDtf(timeZone: string): Intl.DateTimeFormat {
+  let dtf = dtfCache.get(timeZone);
+  if (!dtf) {
+    dtf = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hour12: false,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    dtfCache.set(timeZone, dtf);
+  }
+  return dtf;
+}
+
 function tzOffsetMs(utcTimestamp: number, timeZone: string): number {
-  const dtf = new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    hour12: false,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
+  const dtf = getDtf(timeZone);
 
   const parts: Record<string, number> = {};
   for (const { type, value } of dtf.formatToParts(utcTimestamp)) {

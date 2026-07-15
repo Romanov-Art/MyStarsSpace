@@ -10,6 +10,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    // Dev-only: forward tracking beacons to a locally running server/index.mjs
+    proxy: {
+      '/api': 'http://localhost:8787',
+    },
+  },
   test: {
     globals: true,
     environment: 'node',

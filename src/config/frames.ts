@@ -54,8 +54,3 @@ const FRAME_CONFIGS: Record<CompassStyle, FrameConfig> = Object.fromEntries(
 export function getFrameForCompass(compassStyle: CompassStyle): FrameConfig {
   return FRAME_CONFIGS[compassStyle] ?? FRAME_CONFIGS.none;
 }
-
-/** Default frame (backwards compat) */
-export function getDefaultFrame(): FrameConfig {
-  return getFrameForCompass('none');
-}

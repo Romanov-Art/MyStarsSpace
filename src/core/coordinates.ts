@@ -144,6 +144,51 @@ export function stereographicProjection(
 }
 
 /**
+ * Fast combined transform: equatorial → horizontal → stereographic, using
+ * trigonometry precomputed per star (sinDec/cosDec) and per observer
+ * (sinLat/cosLat). Single source of truth for the hot star-rendering path —
+ * algebraically identical to equatorialToHorizontal + stereographicProjection
+ * above (same orientation: East left, North up).
+ *
+ * @param raHours - Right Ascension in hours (0–24)
+ * @param minSinAlt - Visibility cutoff as sin(minAltitude)
+ * @returns {x, y} offset from the map center, or null when the star is below
+ * minSinAlt or projects outside the horizon circle of the given radius
+ */
+export function projectStarStereographic(
+  raHours: number,
+  sinDec: number,
+  cosDec: number,
+  sinLat: number,
+  cosLat: number,
+  lst: number,
+  radius: number,
+  minSinAlt: number,
+): ProjectedPoint | null {
+  const haRad = (lst - raHours) * 15 * DEG_TO_RAD;
+  const sinAlt = sinLat * sinDec + cosLat * cosDec * Math.cos(haRad);
+  if (sinAlt < minSinAlt) return null;
+
+  // r = R·tan((90° − alt)/2); r equals the distance from center,
+  // so r > radius ⇔ outside the horizon circle
+  const altRad = Math.asin(sinAlt);
+  const r = radius * Math.tan((Math.PI / 2 - altRad) / 2);
+  if (r > radius) return null;
+
+  const cosAlt = Math.sqrt(Math.max(0, 1 - sinAlt * sinAlt));
+  // Degenerate zenith case (cosAlt→0): r→0, azimuth is irrelevant — avoid 0/0 NaN
+  const denom = cosLat * cosAlt;
+  const cosAz = denom < 1e-12 ? 1 : (sinDec - sinLat * sinAlt) / denom;
+  let azRad = Math.acos(Math.max(-1, Math.min(1, cosAz)));
+  if (Math.sin(haRad) > 0) azRad = 2 * Math.PI - azRad;
+
+  return {
+    x: -r * Math.sin(azRad), // East is left (sky seen from below)
+    y: -r * Math.cos(azRad), // North is up
+  };
+}
+
+/**
  * Calculate the rendered size of a star based on its magnitude.
  *
  * Brighter stars (lower magnitude) get larger dots.
