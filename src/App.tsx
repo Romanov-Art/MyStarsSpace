@@ -8,7 +8,8 @@ import { renderStarMapToCanvas, drawPosterFrame } from './components/PosterPrevi
 import { zonedTimeToUtc } from './core/timezone.js';
 import { getDefaultFormats, formatDate, formatTime } from './config/formats.js';
 import { getBasePrice, getPartnerPrice, SIZE_PRICES_USD } from './config/pricing.js';
-import { trackPartnerEvent, trackPartnerViewOnce } from './services/partnerTracking.js';
+import { trackPartnerEvent, trackPartnerViewOnce, trackAffiliateClick } from './services/partnerTracking.js';
+import { captureAffiliateRef, getAffiliateRef } from './services/affiliate.js';
 import { useExchangeRates, convertPrice, formatPrice } from './services/exchangeRates.js';
 import { CURRENCIES } from './config/currencies.js';
 import type { FormatSettings } from './config/formats.js';
@@ -183,6 +184,12 @@ export default function App() {
 
   // Billing: count the embed view once per session
   useEffect(() => { trackPartnerViewOnce(partnerId); }, [partnerId]);
+
+  // Affiliate: capture ?ref=CODE (30-day last-click attribution) and report the click
+  useEffect(() => {
+    const newRef = captureAffiliateRef(window.location.search);
+    if (newRef) trackAffiliateClick(newRef);
+  }, []);
   const [formatSettings, setFormatSettings] = useState<FormatSettings>(() => {
     const defaults = getDefaultFormats(isValidLocale(saved.locale) ? saved.locale : getLocale());
     if (!saved.formatSettings) return defaults;
@@ -433,8 +440,9 @@ export default function App() {
     pdf.addImage(imgData, 'JPEG', 0, 0, widthMM, heightMM);
     pdf.save(`${baseName}.pdf`);
 
-    // Billing: count the successful generation for the partner
-    trackPartnerEvent(partnerId, 'export');
+    // Billing + affiliate attribution: count the successful generation,
+    // tagged with the partner (embed) and/or the referring affiliate
+    trackPartnerEvent(partnerId, 'export', getAffiliateRef());
     } catch (err: unknown) {
       console.error('[Export] FAILED:', err);
       alert('Export failed: ' + (err instanceof Error ? err.message : String(err)));
