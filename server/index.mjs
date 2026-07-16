@@ -99,14 +99,33 @@ setInterval(() => {
   for (const [ip, b] of rateBuckets) if (b.windowStart < cutoff) rateBuckets.delete(ip);
 }, 60_000).unref();
 
+function isPrivateAddr(addr) {
+  const a = (addr || '').replace(/^::ffff:/, '');
+  return a === '127.0.0.1' || a === '::1'
+    || /^10\./.test(a) || /^192\.168\./.test(a)
+    || /^172\.(1[6-9]|2\d|3[01])\./.test(a)
+    || /^(fc|fd|fe80)/i.test(a);
+}
+
 function clientIp(req) {
-  // nginx sets X-Real-IP; fall back to the socket for direct/dev access
+  // Trust X-Real-IP only when the direct peer is private/loopback (i.e. our
+  // nginx inside the docker network) — a directly-reached service must not
+  // let callers spoof their IP to dodge rate limits and daily caps
+  const sock = req.socket.remoteAddress || '';
   const real = req.headers['x-real-ip'];
-  return (typeof real === 'string' && real) || req.socket.remoteAddress || 'unknown';
+  if (typeof real === 'string' && real && isPrivateAddr(sock)) return real;
+  return sock || 'unknown';
 }
 
 function hashIp(ip) {
   return crypto.createHmac('sha256', IP_HASH_SECRET).update(ip).digest('hex').slice(0, 32);
+}
+
+function adminAuthorized(req) {
+  if (!ADMIN_TOKEN) return false;
+  const got = Buffer.from(req.headers.authorization || '');
+  const expected = Buffer.from(`Bearer ${ADMIN_TOKEN}`);
+  return got.length === expected.length && crypto.timingSafeEqual(got, expected);
 }
 
 function originAllowed(req) {
@@ -181,15 +200,19 @@ async function handleTrack(req, res) {
 }
 
 /**
- * remaining = SUM(credits) − all-time counted exports; null when the partner
- * has no credits journal at all (strict prepaid → treated as blocked).
+ * remaining = SUM(credits) − counted exports since the FIRST top-up; null when
+ * the partner has no credits journal at all (strict prepaid → blocked).
+ * Exports that happened before the partner ever prepaid (legacy/postpaid era)
+ * do not consume new credits — the prepaid clock starts at the first grant.
  */
 async function remainingFor(partner) {
   const [{ rows: cr }, { rows: ex }] = await Promise.all([
     db.execute({ sql: `SELECT SUM(amount) AS total, COUNT(*) AS n FROM credits WHERE partner = ?`, args: [partner] }),
     db.execute({
-      sql: `SELECT COUNT(*) AS n FROM events WHERE partner = ? AND event = 'export' AND status = 'counted'`,
-      args: [partner],
+      sql: `SELECT COUNT(*) AS n FROM events
+            WHERE partner = ? AND event = 'export' AND status = 'counted'
+              AND created_at >= (SELECT MIN(created_at) FROM credits WHERE partner = ?)`,
+      args: [partner, partner],
     }),
   ]);
   if (Number(cr[0].n) === 0) return null; // never topped up
@@ -199,8 +222,7 @@ async function remainingFor(partner) {
 const MAX_CREDIT_AMOUNT = 1_000_000;
 
 async function handleCredits(req, res) {
-  const auth = req.headers.authorization || '';
-  if (!ADMIN_TOKEN || auth !== `Bearer ${ADMIN_TOKEN}`) return send(res, 401, { error: 'unauthorized' });
+  if (!adminAuthorized(req)) return send(res, 401, { error: 'unauthorized' });
 
   let data;
   try {
@@ -220,7 +242,13 @@ async function handleCredits(req, res) {
     sql: `INSERT INTO credits (partner, amount, note) VALUES (?, ?, ?)`,
     args: [partner, amount, note],
   });
-  return send(res, 200, { partner, remaining: await remainingFor(partner) });
+  const body = { partner, remaining: await remainingFor(partner) };
+  // Guard against admin typos: crediting an id outside the allowlist means the
+  // real partner stays blocked while the credits land on a ghost
+  if (PARTNERS.length > 0 && !PARTNERS.includes(partner)) {
+    body.warning = `partner "${partner}" is not in the PARTNERS allowlist — its events are rejected`;
+  }
+  return send(res, 200, body);
 }
 
 async function handleStatus(req, res, url) {
@@ -234,8 +262,7 @@ async function handleStatus(req, res, url) {
 }
 
 async function handleReport(req, res, url) {
-  const auth = req.headers.authorization || '';
-  if (!ADMIN_TOKEN || auth !== `Bearer ${ADMIN_TOKEN}`) return send(res, 401, { error: 'unauthorized' });
+  if (!adminAuthorized(req)) return send(res, 401, { error: 'unauthorized' });
 
   const month = url.searchParams.get('month') || new Date().toISOString().slice(0, 7);
   if (!/^\d{4}-\d{2}$/.test(month)) return send(res, 400, { error: 'month must be YYYY-MM' });
@@ -250,8 +277,11 @@ async function handleReport(req, res, url) {
       args: [`${month}-%`],
     }),
     db.execute(`SELECT partner, SUM(amount) AS total FROM credits GROUP BY partner`),
-    db.execute(`SELECT partner, COUNT(*) AS n FROM events
-                WHERE partner != '' AND event = 'export' AND status = 'counted' GROUP BY partner`),
+    // Same prepaid-clock rule as remainingFor: only exports since the first top-up
+    db.execute(`SELECT e.partner, COUNT(*) AS n FROM events e
+                WHERE e.partner != '' AND e.event = 'export' AND e.status = 'counted'
+                  AND e.created_at >= (SELECT MIN(c.created_at) FROM credits c WHERE c.partner = e.partner)
+                GROUP BY e.partner`),
   ]);
 
   const creditTotals = new Map(creditRows.map(r => [r.partner, Number(r.total)]));
@@ -278,8 +308,7 @@ async function handleReport(req, res, url) {
 }
 
 async function handleAffiliateReport(req, res, url) {
-  const auth = req.headers.authorization || '';
-  if (!ADMIN_TOKEN || auth !== `Bearer ${ADMIN_TOKEN}`) return send(res, 401, { error: 'unauthorized' });
+  if (!adminAuthorized(req)) return send(res, 401, { error: 'unauthorized' });
 
   const month = url.searchParams.get('month') || new Date().toISOString().slice(0, 7);
   if (!/^\d{4}-\d{2}$/.test(month)) return send(res, 400, { error: 'month must be YYYY-MM' });

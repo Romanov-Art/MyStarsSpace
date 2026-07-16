@@ -45,12 +45,15 @@ export function trackPartnerEvent(
   track(event, { partner: partnerId, ref });
 }
 
-/** Track the page/embed view once per browser session (partner embeds). */
+/** Track the page/embed view once per browser session per partner. */
 export function trackPartnerViewOnce(partnerId: string | undefined): void {
   if (!partnerId) return;
   try {
-    if (sessionStorage.getItem(VIEW_SENT_KEY)) return;
-    sessionStorage.setItem(VIEW_SENT_KEY, '1');
+    // Namespaced per partner: visiting partner A then B in one session must
+    // count a view for each
+    const guard = `${VIEW_SENT_KEY}:${partnerId}`;
+    if (sessionStorage.getItem(guard)) return;
+    sessionStorage.setItem(guard, '1');
   } catch { /* sessionStorage unavailable → still track, just without the guard */ }
   trackPartnerEvent(partnerId, 'view');
 }
