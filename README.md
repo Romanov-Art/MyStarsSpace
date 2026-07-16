@@ -19,6 +19,9 @@
 - [Темы карты](#-темы-карты)
 - [Размеры постеров](#-размеры-постеров)
 - [Ценообразование](#-ценообразование)
+- [Партнёрская система (white-label)](#-партнёрская-система-white-label)
+- [Реферальная программа](#-реферальная-программа)
+- [Track-сервис (API)](#-track-сервис-api)
 - [Деплой](#-деплой)
 
 ---
@@ -36,6 +39,10 @@
 - **Экспорт в PDF** высокого разрешения (300 DPI)
 - **Embed-режим** — iframe-виджет для интеграции на любой сайт
 - **JSON-шаблоны** для быстрой настройки под клиентов
+- **Часовые пояса** — время постера интерпретируется как местное время города (IANA)
+- **Партнёрская система (white-label)** — шаблон на партнёра, наценка, предоплаченные генерации
+- **Реферальная программа** — `?ref=CODE`, атрибуция 30 дней (last-click), учёт конверсий
+- **Track-сервис** — микросервис учёта генераций (LibSQL) с анти-фродом
 - **Локализация стран** через `Intl.DisplayNames` API
 
 ---
@@ -53,7 +60,8 @@
 | **Шрифты** | Google Fonts API (динамическая загрузка) |
 | **Курсы валют** | ExchangeRate API (автообновление) |
 | **Тесты** | Vitest |
-| **Хостинг** | Статический (Vercel / Netlify / GitHub Pages) |
+| **Backend (учёт/биллинг)** | Node 20 + LibSQL (`server/`), без фреймворков |
+| **Хостинг** | Docker Compose: nginx (статика + прокси `/api/`) + track-сервис |
 
 ---
 
@@ -114,10 +122,12 @@ src/
 ├── main.tsx                   # Entry point
 ├── index.css                  # Глобальные стили + CSS Custom Properties
 │
-├── core/                      # Астрономический движок
+├── core/                      # Астрономический движок + embed-логика
 │   ├── astronomy.ts           # Julian Date, Sidereal Time
-│   ├── coordinates.ts         # Проекции, конверсии координат
-│   └── starmap.ts             # Фильтрация звёзд, SkySnapshot
+│   ├── coordinates.ts         # Проекции, быстрый путь projectStarStereographic
+│   ├── starmap.ts             # Фильтрация звёзд, SkySnapshot
+│   ├── timezone.ts            # IANA-таймзоны: местное время города → UTC
+│   └── embedConfig.ts         # Шаблоны/партнёры: резолвинг, санитизация, merge
 │
 ├── components/                # React-компоненты
 │   ├── PosterPreview.tsx      # Рендеринг постера (Canvas)
@@ -150,7 +160,10 @@ src/
 │       └── ... (39 others)
 │
 ├── services/                  # Внешние сервисы
-│   └── exchangeRates.ts       # Курсы валют (auto-refresh)
+│   ├── exchangeRates.ts       # Курсы валют (auto-refresh)
+│   ├── partnerTracking.ts     # Beacon'ы учёта (view / export / click)
+│   ├── partnerStatus.ts       # Проверка блокировки (предоплата, fail-open)
+│   └── affiliate.ts           # Реферальная атрибуция (30 дней, last-click)
 │
 └── types/                     # TypeScript типы
     └── index.ts
@@ -164,7 +177,16 @@ public/
 └── templates/                 # JSON-шаблоны для embed
     ├── default.json
     ├── sky-blue.json
-    └── dark-elegant.json
+    ├── dark-elegant.json
+    └── partners/              # Шаблоны партнёров (?partner=id)
+        └── demo.json
+```
+
+```
+server/                        # Track-сервис (учёт генераций, биллинг)
+├── index.mjs                  # HTTP API: track / status / credits / отчёты
+├── package.json               # Единственная зависимость: @libsql/client
+└── Dockerfile
 ```
 
 ---
@@ -239,6 +261,19 @@ MyStarsSpace работает как iframe-виджет. Вставьте на 
 ></iframe>
 ```
 
+### Партнёрский эмбед (white-label)
+
+```html
+<!-- Автоматически подтянет /templates/partners/myshop.json:
+     брендинг, валюту, наценку + учёт генераций для биллинга -->
+<iframe
+  src="https://your-domain.com/?partner=myshop"
+  width="100%"
+  height="900"
+  frameborder="0"
+></iframe>
+```
+
 ### Шаблон + переопределение
 
 ```html
@@ -305,6 +340,7 @@ MyStarsSpace работает как iframe-виджет. Вставьте на 
 | `timeFormat` | string | Формат времени | `24h`, `12h` |
 | `units` | string | Единицы размеров | `cm`, `inch` |
 | `fullMonthName` | bool | Полное название месяца | `true`, `false` |
+| `markup` | number | Наценка партнёра в USD (только из шаблона, не из URL) | `3`, `5.5` |
 
 ### Готовые шаблоны
 
@@ -320,11 +356,20 @@ MyStarsSpace работает как iframe-виджет. Вставьте на 
 2. Заполните нужные параметры (все опциональные)
 3. Используйте: `?template=my-brand`
 
+### Шаблоны партнёров
+
+`?partner=id` автоматически загружает `/templates/partners/{id}.json` — один
+файл на партнёра. Явный `?template=` имеет приоритет над партнёрским шаблоном.
+У каждого партнёра свой namespace в localStorage — настройки не смешиваются.
+Подробности: [docs/PARTNER_EMBED.md](docs/PARTNER_EMBED.md).
+
 ### Приоритет настроек
 
 ```
-URL-параметры  >  Шаблон  >  localStorage  >  Дефолт
+URL-параметры  >  Шаблон (?template= | ?partner=)  >  localStorage  >  Дефолт
 ```
+
+Исключение: `markup` (цена) читается только из шаблона — URL его перебить не может.
 
 ---
 
@@ -347,7 +392,8 @@ URL-параметры  >  Шаблон  >  localStorage  >  Дефолт
 | `panel` | Цвет панелей | `16213e` |
 | `radius` | Скругление (px) | `12` |
 | `theme` | Тема карты | `navy` |
-| `partner` | ID партнёра | `myshop123` |
+| `partner` | ID партнёра (white-label, биллинг) | `myshop123` |
+| `ref` | Код реферала (атрибуция 30 дней) | `blogger` |
 
 ---
 
@@ -467,49 +513,101 @@ URL-параметры  >  Шаблон  >  localStorage  >  Дефолт
 - Зачёркнутая "старая" цена = цена максимального размера (60×90)
 - Валюта выбирается пользователем или задаётся через `?currency=RUB`
 
+**В партнёрских эмбедах:** цена = `max(база, $5) + наценка партнёра`.
+Минимум **$5** — жёсткий пол, никакая конфигурация не опускает цену ниже.
+Наценка (`markup`, до $500) задаётся только в JSON партнёра и не
+переопределяется URL-параметрами.
+
+---
+
+## 🤝 Партнёрская система (white-label)
+
+Партнёр (shopid) встраивает конструктор через `?partner=id` со своим брендингом
+и **предоплачивает генерации**:
+
+1. Партнёр переводит деньги (вне системы) → админ начисляет кредиты:
+   ```bash
+   curl -X POST https://домен/api/credits \
+     -H "Authorization: Bearer $TRACK_ADMIN_TOKEN" \
+     -H 'Content-Type: application/json' \
+     -d '{"partner":"demo","amount":100,"note":"перевод 16.07"}'
+   ```
+2. Каждая успешная генерация (export) списывает 1 кредит. Остаток **вычисляется**
+   (`SUM(пополнений) − counted-экспорты`), не хранится — рассинхрон невозможен.
+3. Остаток ≤ 0 → эмбед блокирует кнопку заказа (локализовано на 41 язык).
+   Партнёр без единого пополнения заблокирован (строгая предоплата, триал = малое начисление).
+4. При недоступности API эмбед **fail-open** — продажи партнёра не встают.
+
+Анти-фрод: rate-limit nginx + приложение, allowlist партнёров, дневные капы
+на IP (превышение → `flagged`, в биллинг не идёт), IP хранятся как HMAC-хэши.
+
+Подробно: [docs/PARTNER_EMBED.md](docs/PARTNER_EMBED.md).
+
+---
+
+## 🔗 Реферальная программа
+
+Ссылка `https://домен/?ref=CODE` атрибуцирует посетителя рефералу на **30 дней**
+(кука + localStorage, **last-click** — стандарт индустрии). Переход = `click`,
+генерация в окне атрибуции = конверсия. Комиссия считается поверх месячного
+отчёта. Коды рефералов — в allowlist `TRACK_AFFILIATES`.
+
+Подробно: [docs/AFFILIATE_PROGRAM.md](docs/AFFILIATE_PROGRAM.md).
+
+---
+
+## 📡 Track-сервис (API)
+
+Микросервис `server/` (Node 20 + LibSQL, одна зависимость) — source of truth
+по генерациям, кредитам и рефералам. nginx проксирует `/api/` с rate-limit.
+
+| Endpoint | Auth | Назначение |
+|----------|------|------------|
+| `POST /api/track` | публичный (beacon) | События `view` / `export` / `click` |
+| `GET /api/status?partner=id` | публичный (кеш 60с) | `{blocked}` — предоплата исчерпана? |
+| `POST /api/credits` | Bearer | Начисление/корректировка кредитов |
+| `GET /api/report?month=` | Bearer | Партнёры: exports, views, flagged, remaining |
+| `GET /api/affiliate-report?month=` | Bearer | Рефералы: clicks, conversions, flagged |
+| `GET /api/health` | публичный | Healthcheck |
+
+Хранилище — файл LibSQL на docker-volume; переключается на удалённый
+libsql/Turso через `LIBSQL_URL` + `LIBSQL_AUTH_TOKEN`.
+
 ---
 
 ## 🏗 Деплой
 
-### Vercel (рекомендуется)
+### Docker Compose (основной способ)
+
+Два сервиса: `app` (nginx: статика + прокси `/api/`) и `track` (учёт/биллинг):
 
 ```bash
-npm install -g vercel
-vercel --prod
+# .env рядом с docker-compose.yml
+TRACK_ADMIN_TOKEN=<случайная строка — токен отчётов и начислений>
+TRACK_IP_HASH_SECRET=<случайная строка — соль для HMAC IP-адресов>
+TRACK_ALLOWED_ORIGINS=https://ваш-домен      # origin-check beacon'ов
+TRACK_PARTNERS=demo                           # allowlist партнёров
+TRACK_AFFILIATES=blogger,promo1               # allowlist рефералов
+
+docker compose up -d --build
+# → http://localhost:3000
 ```
 
-### Netlify
+`TRACK_ADMIN_TOKEN` и `TRACK_IP_HASH_SECRET` обязательны — compose не
+стартует без них (защита от деплоя без токенов). База track-сервиса живёт
+на volume `track-data`.
+
+### Статический хостинг (без партнёрки)
+
+Сам конструктор — полностью клиентский. Если учёт генераций не нужен,
+`dist/` можно выложить на Vercel / Netlify / GitHub Pages:
 
 ```bash
-npm run build
-# Загрузите папку dist/ на Netlify
+npm run build   # → dist/
 ```
 
-### GitHub Pages
-
-```bash
-npm run build
-# Настройте GitHub Pages на папку dist/
-```
-
-### Docker
-
-```dockerfile
-FROM node:18-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-```
-
-### Переменные окружения
-
-Не требуются — приложение полностью клиентское. Все данные (звёзды, города, курсы валют) загружаются с публичных API или из статических файлов.
+Beacon'ы и проверка статуса деградируют молча (fail-open) — конструктор
+работает, но биллинг и рефералка требуют track-сервис.
 
 ---
 
