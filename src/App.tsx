@@ -10,6 +10,7 @@ import { getDefaultFormats, formatDate, formatTime } from './config/formats.js';
 import { getBasePrice, getPartnerPrice, SIZE_PRICES_USD } from './config/pricing.js';
 import { trackPartnerEvent, trackPartnerViewOnce, trackAffiliateClick } from './services/partnerTracking.js';
 import { captureAffiliateRef, getAffiliateRef } from './services/affiliate.js';
+import { fetchPartnerBlocked } from './services/partnerStatus.js';
 import { useExchangeRates, convertPrice, formatPrice } from './services/exchangeRates.js';
 import { CURRENCIES } from './config/currencies.js';
 import type { FormatSettings } from './config/formats.js';
@@ -184,6 +185,14 @@ export default function App() {
 
   // Billing: count the embed view once per session
   useEffect(() => { trackPartnerViewOnce(partnerId); }, [partnerId]);
+
+  // Prepaid credits: exhausted partner balance disables ordering (fail-open)
+  const [embedBlocked, setEmbedBlocked] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    fetchPartnerBlocked(partnerId).then(b => { if (!cancelled) setEmbedBlocked(b); });
+    return () => { cancelled = true; };
+  }, [partnerId]);
 
   // Affiliate: capture ?ref=CODE (30-day last-click attribution) and report the click
   useEffect(() => {
@@ -614,10 +623,12 @@ export default function App() {
             const showStrike = maxPrice !== null && currentPrice !== null && maxPrice > currentPrice;
             return (
               <div className="order-block">
-                <button className="export-btn" onClick={handleExport} disabled={isExporting}>
-                  {isExporting
-                    ? t('ui.exporting', locale)
-                    : `${t('ui.order_pdf', locale)}: ${currentPrice !== null ? formatPrice(currentPrice, currency, sym) : '...'}`
+                <button className="export-btn" onClick={handleExport} disabled={isExporting || embedBlocked}>
+                  {embedBlocked
+                    ? t('ui.order_unavailable', locale)
+                    : isExporting
+                      ? t('ui.exporting', locale)
+                      : `${t('ui.order_pdf', locale)}: ${currentPrice !== null ? formatPrice(currentPrice, currency, sym) : '...'}`
                   }
                 </button>
                 <div className="order-block__price">

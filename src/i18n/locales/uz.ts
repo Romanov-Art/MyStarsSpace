@@ -8,7 +8,7 @@ const uz: Record<string, string> = {
   'ui.city': 'Shahar', 'ui.date': 'Sana', 'ui.time': 'Vaqt', 'ui.theme': 'Mavzu',
   'ui.layers': 'Qatlamlar', 'ui.meridians': 'Meridianlar', 'ui.constellations': 'Yulduz turkumlari',
   'ui.constellation_names': 'Nomlar', 'ui.milky_way': 'Somon yo\'li',
-  'ui.export_png': 'PNG yuklash', 'ui.order_pdf': 'PDF versiyasini buyurtma qilish',
+  'ui.export_png': 'PNG yuklash', 'ui.order_pdf': 'PDF versiyasini buyurtma qilish', 'ui.order_unavailable': 'Buyurtma vaqtincha mavjud emas',
   'ui.total': 'Jami:', 'ui.preview_info': 'Ko\'rib chiqish o\'lchami tanlangan ramka o\'lchamiga mos keladi.',
   'ui.phrase': 'Ibora', 'ui.size': 'O\'lcham', 'ui.language': 'Til',
   'category.birthday': 'Tug\'ilgan kun', 'category.wedding': 'To\'y',

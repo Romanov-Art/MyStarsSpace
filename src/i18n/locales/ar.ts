@@ -11,6 +11,7 @@ const ar: Record<string, string> = {
   'ui.constellation_names': 'الأسماء', 'ui.milky_way': 'درب التبانة',
   'ui.export_png': 'تحميل PNG',
   'ui.order_pdf': 'اطلب نسخة PDF',
+  'ui.order_unavailable': 'الطلب غير متاح مؤقتاً',
   'ui.total': 'المجموع:',
   'ui.preview_info': 'حجم المعاينة يتطابق مع حجم الإطار المحدد.',
   'category.birthday': 'عيد ميلاد', 'category.wedding': 'زفاف',

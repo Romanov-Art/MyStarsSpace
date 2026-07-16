@@ -8,7 +8,7 @@ const uk: Record<string, string> = {
   'ui.city': 'Місто', 'ui.date': 'Дата', 'ui.time': 'Час', 'ui.theme': 'Тема',
   'ui.layers': 'Шари', 'ui.meridians': 'Меридіани', 'ui.constellations': 'Сузір\'я',
   'ui.constellation_names': 'Назви', 'ui.milky_way': 'Чумацький Шлях',
-  'ui.export_png': 'Завантажити PNG', 'ui.order_pdf': 'Замовити PDF версію',
+  'ui.export_png': 'Завантажити PNG', 'ui.order_pdf': 'Замовити PDF версію', 'ui.order_unavailable': 'Замовлення тимчасово недоступне',
   'ui.total': 'Разом:', 'ui.preview_info': 'Розмір попереднього перегляду відповідає вибраному розміру рамки.',
   'ui.phrase': 'Фраза', 'ui.size': 'Розмір', 'ui.language': 'Мова',
   'category.birthday': 'День народження', 'category.wedding': 'Весілля',

@@ -8,7 +8,7 @@ const kk: Record<string, string> = {
   'ui.city': 'Қала', 'ui.date': 'Күн', 'ui.time': 'Уақыт', 'ui.theme': 'Тақырып',
   'ui.layers': 'Қабаттар', 'ui.meridians': 'Меридиандар', 'ui.constellations': 'Шоқжұлдыздар',
   'ui.constellation_names': 'Атаулар', 'ui.milky_way': 'Құс жолы',
-  'ui.export_png': 'PNG жүктеу', 'ui.order_pdf': 'PDF нұсқасын тапсырыс беру',
+  'ui.export_png': 'PNG жүктеу', 'ui.order_pdf': 'PDF нұсқасын тапсырыс беру', 'ui.order_unavailable': 'Тапсырыс уақытша қолжетімсіз',
   'ui.total': 'Барлығы:', 'ui.preview_info': 'Алдын ала қарау өлшемі таңдалған жақтау өлшеміне сәйкес.',
   'ui.phrase': 'Сөйлем', 'ui.size': 'Өлшем', 'ui.language': 'Тіл',
   'category.birthday': 'Туған күн', 'category.wedding': 'Үйлену тойы',

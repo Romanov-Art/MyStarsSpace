@@ -11,6 +11,7 @@ const ko: Record<string, string> = {
   'ui.constellation_names': '이름', 'ui.milky_way': '은하수',
   'ui.export_png': 'PNG 다운로드',
   'ui.order_pdf': 'PDF 버전 주문',
+  'ui.order_unavailable': '주문이 일시적으로 불가능합니다',
   'ui.total': '합계:',
   'ui.preview_info': '미리보기 크기는 선택한 프레임 크기와 일치합니다.',
   'category.birthday': '생일', 'category.wedding': '결혼식',

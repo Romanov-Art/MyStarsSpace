@@ -11,6 +11,7 @@ const id: Record<string, string> = {
   'ui.constellation_names': 'Nama', 'ui.milky_way': 'Bimasakti',
   'ui.export_png': 'Unduh PNG',
   'ui.order_pdf': 'Pesan versi PDF',
+  'ui.order_unavailable': 'Pemesanan sementara tidak tersedia',
   'ui.total': 'Total:',
   'ui.preview_info': 'Ukuran pratinjau sesuai dengan ukuran bingkai yang dipilih.',
   'category.birthday': 'Ulang tahun', 'category.wedding': 'Pernikahan',

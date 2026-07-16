@@ -85,6 +85,35 @@ A plain link (`https://YOUR-DOMAIN/?partner=demo`) works the same way.
   (`starmap-settings:{partnerId}`), so visitor settings never leak between
   the main site and partner embeds.
 
+## Prepaid credits (billing model)
+
+Partners **prepay for generations**. The partner transfers money off-system;
+the admin tops up their credit counter:
+
+```bash
+curl -X POST https://YOUR-DOMAIN/api/credits \
+  -H "Authorization: Bearer $TRACK_ADMIN_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"partner":"demo","amount":100,"note":"transfer 2026-07-16"}'
+# → {"partner":"demo","remaining":103}
+```
+
+Rules:
+
+- `remaining = SUM(top-ups) − all-time counted exports`. It is derived, never
+  stored — nothing can desynchronize.
+- **Strict prepaid**: a partner with no top-ups at all is blocked. A trial is
+  just a small grant (`amount: 10`).
+- When `remaining ≤ 0`, `GET /api/status?partner=id` (public, cached 60s)
+  returns `{"blocked": true}` and the embed disables its Order button with a
+  localized message. Unblocking after a top-up propagates within ~1 minute.
+- Negative `amount` is an admin correction.
+- The status endpoint exposes only the boolean; the count is visible in the
+  admin report (`remaining` per partner).
+- The embed **fails open**: if the status endpoint is unreachable, ordering
+  stays enabled (an outage must not halt partner sales; exports are still
+  counted).
+
 ## Generation tracking & billing
 
 Every partner embed reports two events to the `track` microservice

@@ -8,7 +8,7 @@ const el: Record<string, string> = {
   'ui.city': 'Πόλη', 'ui.date': 'Ημερομηνία', 'ui.time': 'Ώρα', 'ui.theme': 'Θέμα',
   'ui.layers': 'Επίπεδα', 'ui.meridians': 'Μεσημβρινοί', 'ui.constellations': 'Αστερισμοί',
   'ui.constellation_names': 'Ονόματα', 'ui.milky_way': 'Γαλαξίας',
-  'ui.export_png': 'Λήψη PNG', 'ui.order_pdf': 'Παραγγελία έκδοσης PDF',
+  'ui.export_png': 'Λήψη PNG', 'ui.order_pdf': 'Παραγγελία έκδοσης PDF', 'ui.order_unavailable': 'Η παραγγελία δεν είναι προσωρινά διαθέσιμη',
   'ui.total': 'Σύνολο:', 'ui.preview_info': 'Το μέγεθος προεπισκόπησης αντιστοιχεί στο επιλεγμένο μέγεθος πλαισίου.',
   'ui.phrase': 'Φράση', 'ui.size': 'Μέγεθος', 'ui.language': 'Γλώσσα',
   'category.birthday': 'Γενέθλια', 'category.wedding': 'Γάμος',

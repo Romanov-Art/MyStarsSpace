@@ -11,6 +11,7 @@ const nl: Record<string, string> = {
   'ui.constellation_names': 'Namen', 'ui.milky_way': 'Melkweg',
   'ui.export_png': 'PNG downloaden',
   'ui.order_pdf': 'Bestel PDF-versie',
+  'ui.order_unavailable': 'Bestellen is tijdelijk niet beschikbaar',
   'ui.total': 'Totaal:',
   'ui.preview_info': 'Het voorbeeldformaat komt overeen met het geselecteerde lijstformaat.',
   'category.birthday': 'Verjaardag', 'category.wedding': 'Bruiloft',

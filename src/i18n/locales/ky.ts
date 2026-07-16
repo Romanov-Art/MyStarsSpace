@@ -8,7 +8,7 @@ const ky: Record<string, string> = {
   'ui.city': 'Шаар', 'ui.date': 'Күн', 'ui.time': 'Убакыт', 'ui.theme': 'Тема',
   'ui.layers': 'Катмарлар', 'ui.meridians': 'Меридиандар', 'ui.constellations': 'Чоку жылдыздар',
   'ui.constellation_names': 'Аттар', 'ui.milky_way': 'Саман жолу',
-  'ui.export_png': 'PNG жүктөө', 'ui.order_pdf': 'PDF нускасын заказ кылуу',
+  'ui.export_png': 'PNG жүктөө', 'ui.order_pdf': 'PDF нускасын заказ кылуу', 'ui.order_unavailable': 'Буйрутма убактылуу жеткиликсиз',
   'ui.total': 'Жалпы:', 'ui.preview_info': 'Алдын ала көрүүнүн өлчөмү тандалган алкактын өлчөмүнө дал келет.',
   'ui.phrase': 'Сүйлөм', 'ui.size': 'Өлчөм', 'ui.language': 'Тил',
   'category.birthday': 'Туулган күн', 'category.wedding': 'Той',

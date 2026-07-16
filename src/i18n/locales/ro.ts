@@ -8,7 +8,7 @@ const ro: Record<string, string> = {
   'ui.city': 'Oraș', 'ui.date': 'Dată', 'ui.time': 'Oră', 'ui.theme': 'Temă',
   'ui.layers': 'Straturi', 'ui.meridians': 'Meridiane', 'ui.constellations': 'Constelații',
   'ui.constellation_names': 'Nume', 'ui.milky_way': 'Calea Lactee',
-  'ui.export_png': 'Descarcă PNG', 'ui.order_pdf': 'Comandă versiunea PDF',
+  'ui.export_png': 'Descarcă PNG', 'ui.order_pdf': 'Comandă versiunea PDF', 'ui.order_unavailable': 'Comanda este temporar indisponibilă',
   'ui.total': 'Total:', 'ui.preview_info': 'Dimensiunea previzualizării corespunde dimensiunii ramei selectate.',
   'ui.phrase': 'Frază', 'ui.size': 'Dimensiune', 'ui.language': 'Limbă',
   'category.birthday': 'Zi de naștere', 'category.wedding': 'Nuntă',

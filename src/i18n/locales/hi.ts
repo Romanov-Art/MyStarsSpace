@@ -11,6 +11,7 @@ const hi: Record<string, string> = {
   'ui.constellation_names': 'नाम', 'ui.milky_way': 'आकाशगंगा',
   'ui.export_png': 'PNG डाउनलोड करें',
   'ui.order_pdf': 'PDF संस्करण ऑर्डर करें',
+  'ui.order_unavailable': 'ऑर्डर अस्थायी रूप से अनुपलब्ध है',
   'ui.total': 'कुल:',
   'ui.preview_info': 'पूर्वावलोकन का आकार चयनित फ्रेम के आकार से मेल खाता है।',
   'category.birthday': 'जन्मदिन', 'category.wedding': 'शादी',

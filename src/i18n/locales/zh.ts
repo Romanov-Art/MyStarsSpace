@@ -11,6 +11,7 @@ const zh: Record<string, string> = {
   'ui.constellation_names': '星座名称', 'ui.milky_way': '银河',
   'ui.export_png': '下载PNG',
   'ui.order_pdf': '订购PDF版本',
+  'ui.order_unavailable': '订购暂时不可用',
   'ui.total': '合计:',
   'ui.preview_info': '预览尺寸与所选画框尺寸一致。',
   'category.birthday': '生日', 'category.wedding': '婚礼',

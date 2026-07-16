@@ -11,6 +11,7 @@ const ms: Record<string, string> = {
   'ui.constellation_names': 'Nama', 'ui.milky_way': 'Bima Sakti',
   'ui.export_png': 'Muat turun PNG',
   'ui.order_pdf': 'Pesan versi PDF',
+  'ui.order_unavailable': 'Pesanan tidak tersedia buat sementara',
   'ui.total': 'Jumlah:',
   'ui.preview_info': 'Saiz pratonton sepadan dengan saiz bingkai yang dipilih.',
   'category.birthday': 'Hari lahir', 'category.wedding': 'Perkahwinan',

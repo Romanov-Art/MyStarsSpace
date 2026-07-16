@@ -8,7 +8,7 @@ const hu: Record<string, string> = {
   'ui.city': 'Város', 'ui.date': 'Dátum', 'ui.time': 'Idő', 'ui.theme': 'Téma',
   'ui.layers': 'Rétegek', 'ui.meridians': 'Meridiánok', 'ui.constellations': 'Csillagképek',
   'ui.constellation_names': 'Nevek', 'ui.milky_way': 'Tejút',
-  'ui.export_png': 'PNG letöltése', 'ui.order_pdf': 'PDF verzió rendelése',
+  'ui.export_png': 'PNG letöltése', 'ui.order_pdf': 'PDF verzió rendelése', 'ui.order_unavailable': 'A rendelés átmenetileg nem elérhető',
   'ui.total': 'Összesen:', 'ui.preview_info': 'Az előnézet mérete megfelel a kiválasztott keret méretének.',
   'ui.phrase': 'Idézet', 'ui.size': 'Méret', 'ui.language': 'Nyelv',
   'category.birthday': 'Születésnap', 'category.wedding': 'Esküvő',

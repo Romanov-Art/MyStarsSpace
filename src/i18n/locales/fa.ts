@@ -8,7 +8,7 @@ const fa: Record<string, string> = {
   'ui.city': 'شهر', 'ui.date': 'تاریخ', 'ui.time': 'زمان', 'ui.theme': 'تم',
   'ui.layers': 'لایه‌ها', 'ui.meridians': 'نصف‌النهار', 'ui.constellations': 'صورت‌های فلکی',
   'ui.constellation_names': 'نام‌ها', 'ui.milky_way': 'کهکشان راه شیری',
-  'ui.export_png': 'دانلود PNG', 'ui.order_pdf': 'سفارش نسخه PDF',
+  'ui.export_png': 'دانلود PNG', 'ui.order_pdf': 'سفارش نسخه PDF', 'ui.order_unavailable': 'سفارش موقتاً در دسترس نیست',
   'ui.total': 'جمع:', 'ui.preview_info': 'اندازه پیش‌نمایش با اندازه قاب انتخابی مطابقت دارد.',
   'ui.phrase': 'عبارت', 'ui.size': 'اندازه', 'ui.language': 'زبان',
   'category.birthday': 'تولد', 'category.wedding': 'عروسی',

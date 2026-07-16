@@ -11,6 +11,7 @@ const ja: Record<string, string> = {
   'ui.constellation_names': '名前', 'ui.milky_way': '天の川',
   'ui.export_png': 'PNGをダウンロード',
   'ui.order_pdf': 'PDF版を注文',
+  'ui.order_unavailable': 'ご注文は一時的にご利用いただけません',
   'ui.total': '合計:',
   'ui.preview_info': 'プレビューサイズは選択したフレームサイズと一致します。',
   'category.birthday': '誕生日', 'category.wedding': '結婚式',

@@ -8,7 +8,7 @@ const pa: Record<string, string> = {
   'ui.city': 'ਸ਼ਹਿਰ', 'ui.date': 'ਮਿਤੀ', 'ui.time': 'ਸਮਾਂ', 'ui.theme': 'ਥੀਮ',
   'ui.layers': 'ਪਰਤਾਂ', 'ui.meridians': 'ਮੈਰੀਡੀਅਨ', 'ui.constellations': 'ਤਾਰਾ ਮੰਡਲ',
   'ui.constellation_names': 'ਨਾਮ', 'ui.milky_way': 'ਆਕਾਸ਼ਗੰਗਾ',
-  'ui.export_png': 'PNG ਡਾਊਨਲੋਡ', 'ui.order_pdf': 'PDF ਵਰਜ਼ਨ ਆਰਡਰ ਕਰੋ',
+  'ui.export_png': 'PNG ਡਾਊਨਲੋਡ', 'ui.order_pdf': 'PDF ਵਰਜ਼ਨ ਆਰਡਰ ਕਰੋ', 'ui.order_unavailable': 'ਆਰਡਰ ਅਸਥਾਈ ਤੌਰ ਤੇ ਉਪਲਬਧ ਨਹੀਂ ਹੈ',
   'ui.total': 'ਕੁੱਲ:', 'ui.preview_info': 'ਪੂਰਵ ਦਰਸ਼ਨ ਦਾ ਆਕਾਰ ਚੁਣੇ ਗਏ ਫਰੇਮ ਦੇ ਆਕਾਰ ਨਾਲ ਮੇਲ ਖਾਂਦਾ ਹੈ।',
   'ui.phrase': 'ਵਾਕਾਂਸ਼', 'ui.size': 'ਆਕਾਰ', 'ui.language': 'ਭਾਸ਼ਾ',
   'category.birthday': 'ਜਨਮਦਿਨ', 'category.wedding': 'ਵਿਆਹ',

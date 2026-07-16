@@ -11,6 +11,7 @@ const it: Record<string, string> = {
   'ui.constellation_names': 'Nomi', 'ui.milky_way': 'Via Lattea',
   'ui.export_png': 'Scarica PNG',
   'ui.order_pdf': 'Ordina versione PDF',
+  'ui.order_unavailable': 'Ordine temporaneamente non disponibile',
   'ui.total': 'Totale:',
   'ui.preview_info': "La dimensione dell'anteprima corrisponde alla dimensione della cornice selezionata.",
   'category.birthday': 'Compleanno', 'category.wedding': 'Matrimonio',

@@ -11,6 +11,7 @@ const tr: Record<string, string> = {
   'ui.constellation_names': 'İsimler', 'ui.milky_way': 'Samanyolu',
   'ui.export_png': 'PNG İndir',
   'ui.order_pdf': 'PDF sürümü sipariş et',
+  'ui.order_unavailable': 'Sipariş geçici olarak kullanılamıyor',
   'ui.total': 'Toplam:',
   'ui.preview_info': 'Önizleme boyutu seçilen çerçeve boyutuyla eşleşir.',
   'category.birthday': 'Doğum günü', 'category.wedding': 'Düğün',

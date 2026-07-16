@@ -8,7 +8,7 @@ const ta: Record<string, string> = {
   'ui.city': 'நகரம்', 'ui.date': 'தேதி', 'ui.time': 'நேரம்', 'ui.theme': 'தீம்',
   'ui.layers': 'அடுக்குகள்', 'ui.meridians': 'மெரிடியன்கள்', 'ui.constellations': 'நட்சத்திர கூட்டங்கள்',
   'ui.constellation_names': 'பெயர்கள்', 'ui.milky_way': 'பால்வீதி',
-  'ui.export_png': 'PNG பதிவிறக்கம்', 'ui.order_pdf': 'PDF பதிப்பை ஆர்டர் செய்யுங்கள்',
+  'ui.export_png': 'PNG பதிவிறக்கம்', 'ui.order_pdf': 'PDF பதிப்பை ஆர்டர் செய்யுங்கள்', 'ui.order_unavailable': 'ஆர்டர் தற்காலிகமாக கிடைக்கவில்லை',
   'ui.total': 'மொத்தம்:', 'ui.preview_info': 'முன்னோட்ட அளவு தேர்ந்தெடுக்கப்பட்ட சட்ட அளவுக்கு பொருந்துகிறது.',
   'ui.phrase': 'சொற்றொடர்', 'ui.size': 'அளவு', 'ui.language': 'மொழி',
   'category.birthday': 'பிறந்தநாள்', 'category.wedding': 'திருமணம்',

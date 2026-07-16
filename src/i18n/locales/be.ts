@@ -8,7 +8,7 @@ const be: Record<string, string> = {
   'ui.city': 'Горад', 'ui.date': 'Дата', 'ui.time': 'Час', 'ui.theme': 'Тэма',
   'ui.layers': 'Пласты', 'ui.meridians': 'Мерыдыяны', 'ui.constellations': 'Сузор\'і',
   'ui.constellation_names': 'Назвы', 'ui.milky_way': 'Млечны Шлях',
-  'ui.export_png': 'Спампаваць PNG', 'ui.order_pdf': 'Замовіць версію PDF',
+  'ui.export_png': 'Спампаваць PNG', 'ui.order_pdf': 'Замовіць версію PDF', 'ui.order_unavailable': 'Заказ часова недаступны',
   'ui.total': 'Разам:', 'ui.preview_info': 'Памер папярэдняга прагляду адпавядае абранаму памеру рамкі.',
   'ui.phrase': 'Фраза', 'ui.size': 'Памер', 'ui.language': 'Мова',
   'category.birthday': 'Дзень нараджэння', 'category.wedding': 'Вяселле',

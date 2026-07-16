@@ -8,7 +8,7 @@ const ka: Record<string, string> = {
   'ui.city': 'ქალაქი', 'ui.date': 'თარიღი', 'ui.time': 'დრო', 'ui.theme': 'თემა',
   'ui.layers': 'ფენები', 'ui.meridians': 'მერიდიანები', 'ui.constellations': 'თანავარსკვლავედები',
   'ui.constellation_names': 'სახელები', 'ui.milky_way': 'ირმის ნახტომი',
-  'ui.export_png': 'PNG-ის ჩამოტვირთვა', 'ui.order_pdf': 'PDF ვერსიის შეკვეთა',
+  'ui.export_png': 'PNG-ის ჩამოტვირთვა', 'ui.order_pdf': 'PDF ვერსიის შეკვეთა', 'ui.order_unavailable': 'შეკვეთა დროებით მიუწვდომელია',
   'ui.total': 'სულ:', 'ui.preview_info': 'გადახედვის ზომა შეესაბამება არჩეული ჩარჩოს ზომას.',
   'ui.phrase': 'ფრაზა', 'ui.size': 'ზომა', 'ui.language': 'ენა',
   'category.birthday': 'დაბადების დღე', 'category.wedding': 'ქორწილი',

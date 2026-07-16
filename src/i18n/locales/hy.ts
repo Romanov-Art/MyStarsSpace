@@ -8,7 +8,7 @@ const hy: Record<string, string> = {
   'ui.city': 'Քաղաք', 'ui.date': 'Ամսաթիվ', 'ui.time': 'Ժամ', 'ui.theme': 'Թեմա',
   'ui.layers': 'Շերտեր', 'ui.meridians': 'Միջօրեականներ', 'ui.constellations': 'Համաստեղություններ',
   'ui.constellation_names': 'Անուններ', 'ui.milky_way': 'Ծիր Կաթին',
-  'ui.export_png': 'Ներբեռնել PNG', 'ui.order_pdf': 'Պատվիրել PDF տարբերակ',
+  'ui.export_png': 'Ներբեռնել PNG', 'ui.order_pdf': 'Պատվիրել PDF տարբերակ', 'ui.order_unavailable': 'Պատվերը ժամանակավորապես անհասանելի է',
   'ui.total': 'Ընդամենը:', 'ui.preview_info': 'Նախադիտման չափը համապատասխանում է ընտրված շրջանակի չափին։',
   'ui.phrase': 'Արտահայտություն', 'ui.size': 'Չափ', 'ui.language': 'Լեզու',
   'category.birthday': 'Ծննդյան օր', 'category.wedding': 'Հարսանիք',

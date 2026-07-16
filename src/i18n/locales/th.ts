@@ -11,6 +11,7 @@ const th: Record<string, string> = {
   'ui.constellation_names': 'ชื่อ', 'ui.milky_way': 'ทางช้างเผือก',
   'ui.export_png': 'ดาวน์โหลด PNG',
   'ui.order_pdf': 'สั่งซื้อเวอร์ชัน PDF',
+  'ui.order_unavailable': 'ไม่สามารถสั่งซื้อได้ชั่วคราว',
   'ui.total': 'รวม:',
   'ui.preview_info': 'ขนาดตัวอย่างตรงกับขนาดกรอบที่เลือก',
   'category.birthday': 'วันเกิด', 'category.wedding': 'งานแต่งงาน',

@@ -22,6 +22,7 @@ const bn: Record<string, string> = {
   'ui.milky_way': 'আকাশগঙ্গা',
   'ui.export_png': 'PNG ডাউনলোড',
   'ui.order_pdf': 'PDF সংস্করণ অর্ডার করুন',
+  'ui.order_unavailable': 'অর্ডার সাময়িকভাবে অনুপলব্ধ',
   'ui.total': 'মোট:',
   'ui.preview_info': 'প্রিভিউ সাইজ নির্বাচিত ফ্রেম সাইজের সাথে মিলে।',
   'ui.phrase': 'বাক্যাংশ',

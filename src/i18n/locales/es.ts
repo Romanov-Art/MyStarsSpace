@@ -11,6 +11,7 @@ const es: Record<string, string> = {
   'ui.constellation_names': 'Nombres', 'ui.milky_way': 'Vía Láctea',
   'ui.export_png': 'Descargar PNG',
   'ui.order_pdf': 'Pedir versión PDF',
+  'ui.order_unavailable': 'El pedido no está disponible temporalmente',
   'ui.total': 'Total:',
   'ui.preview_info': 'El tamaño de la vista previa coincide con el tamaño del marco seleccionado.',
   'category.birthday': 'Cumpleaños', 'category.wedding': 'Boda',

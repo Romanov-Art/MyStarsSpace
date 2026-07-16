@@ -22,6 +22,7 @@ const ru: Record<string, string> = {
   'ui.milky_way': 'Млечный Путь',
   'ui.export_png': 'Скачать PNG',
   'ui.order_pdf': 'Заказать PDF версию',
+  'ui.order_unavailable': 'Заказ временно недоступен',
   'ui.total': 'К оплате:',
   'ui.preview_info': 'Размер превью постера совпадает с размером выбранной рамки.',
   'ui.phrase': 'Фраза',

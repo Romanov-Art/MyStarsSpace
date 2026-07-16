@@ -8,7 +8,7 @@ const ur: Record<string, string> = {
   'ui.city': 'شہر', 'ui.date': 'تاریخ', 'ui.time': 'وقت', 'ui.theme': 'تھیم',
   'ui.layers': 'تہیں', 'ui.meridians': 'میریڈیئن', 'ui.constellations': 'ستارہ جھرمٹ',
   'ui.constellation_names': 'نام', 'ui.milky_way': 'کہکشاں',
-  'ui.export_png': 'PNG ڈاؤنلوڈ کریں', 'ui.order_pdf': 'PDF ورژن آرڈر کریں',
+  'ui.export_png': 'PNG ڈاؤنلوڈ کریں', 'ui.order_pdf': 'PDF ورژن آرڈر کریں', 'ui.order_unavailable': 'آرڈر عارضی طور پر دستیاب نہیں ہے',
   'ui.total': 'کل:', 'ui.preview_info': 'پیش نظارہ سائز منتخب فریم سائز سے مماثل ہے۔',
   'ui.phrase': 'جملہ', 'ui.size': 'سائز', 'ui.language': 'زبان',
   'category.birthday': 'سالگرہ', 'category.wedding': 'شادی',

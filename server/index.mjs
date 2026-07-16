@@ -2,9 +2,15 @@
  * Generation counter — billing + affiliate attribution source of truth.
  *
  * POST /api/track   {event: "view"|"export"|"click", partner?, ref?} → 204
+ * POST /api/credits {partner, amount, note?}       (Bearer ADMIN_TOKEN) — prepaid top-up
+ * GET  /api/status?partner=id                       (public) → {blocked}
  * GET  /api/report?month=YYYY-MM            (Bearer ADMIN_TOKEN) — partner billing
  * GET  /api/affiliate-report?month=YYYY-MM  (Bearer ADMIN_TOKEN) — affiliate stats
  * GET  /api/health
+ *
+ * Prepaid model: partners buy generation credits (append-only `credits`
+ * journal, admin-only). remaining = SUM(credits) − all-time counted exports.
+ * No credits at all → blocked (strict prepaid; a trial is just a small grant).
  *
  * `partner` = whitelabel embed (billed per export). `ref` = affiliate that
  * referred the visitor to our own site. A payload may carry either or both.
@@ -66,6 +72,14 @@ async function initDb() {
   await db.execute(`CREATE INDEX IF NOT EXISTS idx_events_partner_day ON events(partner, day)`);
   await db.execute(`CREATE INDEX IF NOT EXISTS idx_events_ref_day ON events(ref, day)`);
   await db.execute(`CREATE INDEX IF NOT EXISTS idx_events_dedupe ON events(partner, ref, event, ip_hash, day, status)`);
+  await db.execute(`CREATE TABLE IF NOT EXISTS credits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    partner TEXT NOT NULL,
+    amount INTEGER NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`);
+  await db.execute(`CREATE INDEX IF NOT EXISTS idx_credits_partner ON credits(partner)`);
 }
 
 // --- in-memory per-IP rate limiter (fixed 1-minute windows) ---
@@ -166,6 +180,59 @@ async function handleTrack(req, res) {
   return send(res, 204);
 }
 
+/**
+ * remaining = SUM(credits) − all-time counted exports; null when the partner
+ * has no credits journal at all (strict prepaid → treated as blocked).
+ */
+async function remainingFor(partner) {
+  const [{ rows: cr }, { rows: ex }] = await Promise.all([
+    db.execute({ sql: `SELECT SUM(amount) AS total, COUNT(*) AS n FROM credits WHERE partner = ?`, args: [partner] }),
+    db.execute({
+      sql: `SELECT COUNT(*) AS n FROM events WHERE partner = ? AND event = 'export' AND status = 'counted'`,
+      args: [partner],
+    }),
+  ]);
+  if (Number(cr[0].n) === 0) return null; // never topped up
+  return Number(cr[0].total) - Number(ex[0].n);
+}
+
+const MAX_CREDIT_AMOUNT = 1_000_000;
+
+async function handleCredits(req, res) {
+  const auth = req.headers.authorization || '';
+  if (!ADMIN_TOKEN || auth !== `Bearer ${ADMIN_TOKEN}`) return send(res, 401, { error: 'unauthorized' });
+
+  let data;
+  try {
+    data = JSON.parse(await readBody(req));
+  } catch (err) {
+    return send(res, err && err.tooLarge ? 413 : 400, { error: 'bad json' });
+  }
+
+  const { partner, amount } = data || {};
+  const note = typeof data?.note === 'string' ? data.note.slice(0, 200) : '';
+  if (typeof partner !== 'string' || !ID_RE.test(partner)) return send(res, 400, { error: 'bad partner' });
+  if (!Number.isInteger(amount) || amount === 0 || Math.abs(amount) > MAX_CREDIT_AMOUNT) {
+    return send(res, 400, { error: 'amount must be a non-zero integer within ±1000000' });
+  }
+
+  await db.execute({
+    sql: `INSERT INTO credits (partner, amount, note) VALUES (?, ?, ?)`,
+    args: [partner, amount, note],
+  });
+  return send(res, 200, { partner, remaining: await remainingFor(partner) });
+}
+
+async function handleStatus(req, res, url) {
+  const partner = url.searchParams.get('partner');
+  if (typeof partner !== 'string' || !ID_RE.test(partner)) return send(res, 400, { error: 'bad partner' });
+  const remaining = await remainingFor(partner);
+  // Public response deliberately exposes only the flag, not the count
+  const json = JSON.stringify({ blocked: remaining === null || remaining <= 0 });
+  res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60' });
+  res.end(json);
+}
+
 async function handleReport(req, res, url) {
   const auth = req.headers.authorization || '';
   if (!ADMIN_TOKEN || auth !== `Bearer ${ADMIN_TOKEN}`) return send(res, 401, { error: 'unauthorized' });
@@ -173,23 +240,41 @@ async function handleReport(req, res, url) {
   const month = url.searchParams.get('month') || new Date().toISOString().slice(0, 7);
   if (!/^\d{4}-\d{2}$/.test(month)) return send(res, 400, { error: 'month must be YYYY-MM' });
 
-  const { rows } = await db.execute({
-    sql: `SELECT partner,
-                 SUM(CASE WHEN event = 'export' AND status = 'counted' THEN 1 ELSE 0 END) AS exports,
-                 SUM(CASE WHEN event = 'view'   AND status = 'counted' THEN 1 ELSE 0 END) AS views,
-                 SUM(CASE WHEN status = 'flagged' THEN 1 ELSE 0 END) AS flagged
-          FROM events WHERE day LIKE ? AND partner != '' GROUP BY partner ORDER BY exports DESC`,
-    args: [`${month}-%`],
-  });
-  return send(res, 200, {
-    month,
-    partners: rows.map(r => ({
+  const [{ rows }, { rows: creditRows }, { rows: alltimeRows }] = await Promise.all([
+    db.execute({
+      sql: `SELECT partner,
+                   SUM(CASE WHEN event = 'export' AND status = 'counted' THEN 1 ELSE 0 END) AS exports,
+                   SUM(CASE WHEN event = 'view'   AND status = 'counted' THEN 1 ELSE 0 END) AS views,
+                   SUM(CASE WHEN status = 'flagged' THEN 1 ELSE 0 END) AS flagged
+            FROM events WHERE day LIKE ? AND partner != '' GROUP BY partner ORDER BY exports DESC`,
+      args: [`${month}-%`],
+    }),
+    db.execute(`SELECT partner, SUM(amount) AS total FROM credits GROUP BY partner`),
+    db.execute(`SELECT partner, COUNT(*) AS n FROM events
+                WHERE partner != '' AND event = 'export' AND status = 'counted' GROUP BY partner`),
+  ]);
+
+  const creditTotals = new Map(creditRows.map(r => [r.partner, Number(r.total)]));
+  const alltimeExports = new Map(alltimeRows.map(r => [r.partner, Number(r.n)]));
+  // remaining is all-time; partners with credits but no activity this month still appear
+  const partners = new Map();
+  for (const r of rows) {
+    partners.set(r.partner, {
       partner: r.partner,
       exports: Number(r.exports),
       views: Number(r.views),
       flagged: Number(r.flagged),
-    })),
-  });
+    });
+  }
+  for (const partner of creditTotals.keys()) {
+    if (!partners.has(partner)) partners.set(partner, { partner, exports: 0, views: 0, flagged: 0 });
+  }
+  for (const p of partners.values()) {
+    p.remaining = creditTotals.has(p.partner)
+      ? creditTotals.get(p.partner) - (alltimeExports.get(p.partner) || 0)
+      : null; // never topped up → blocked
+  }
+  return send(res, 200, { month, partners: [...partners.values()] });
 }
 
 async function handleAffiliateReport(req, res, url) {
@@ -224,6 +309,8 @@ const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://localhost');
     if (req.method === 'POST' && url.pathname === '/api/track') return await handleTrack(req, res);
+    if (req.method === 'POST' && url.pathname === '/api/credits') return await handleCredits(req, res);
+    if (req.method === 'GET' && url.pathname === '/api/status') return await handleStatus(req, res, url);
     if (req.method === 'GET' && url.pathname === '/api/report') return await handleReport(req, res, url);
     if (req.method === 'GET' && url.pathname === '/api/affiliate-report') return await handleAffiliateReport(req, res, url);
     if (req.method === 'GET' && url.pathname === '/api/health') return send(res, 200, { ok: true });

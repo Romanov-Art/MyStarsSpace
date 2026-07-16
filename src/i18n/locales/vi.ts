@@ -11,6 +11,7 @@ const vi: Record<string, string> = {
   'ui.constellation_names': 'Tên', 'ui.milky_way': 'Dải Ngân Hà',
   'ui.export_png': 'Tải PNG',
   'ui.order_pdf': 'Đặt phiên bản PDF',
+  'ui.order_unavailable': 'Tạm thời không thể đặt hàng',
   'ui.total': 'Tổng:',
   'ui.preview_info': 'Kích thước xem trước khớp với kích thước khung đã chọn.',
   'category.birthday': 'Sinh nhật', 'category.wedding': 'Đám cưới',

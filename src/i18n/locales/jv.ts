@@ -8,7 +8,7 @@ const jv: Record<string, string> = {
   'ui.city': 'Kutha', 'ui.date': 'Tanggal', 'ui.time': 'Wektu', 'ui.theme': 'Tema',
   'ui.layers': 'Lapisan', 'ui.meridians': 'Meridian', 'ui.constellations': 'Rasi Bintang',
   'ui.constellation_names': 'Jeneng', 'ui.milky_way': 'Bima Sakti',
-  'ui.export_png': 'Unduh PNG', 'ui.order_pdf': 'Pesen Versi PDF',
+  'ui.export_png': 'Unduh PNG', 'ui.order_pdf': 'Pesen Versi PDF', 'ui.order_unavailable': 'Pesenan sementara ora kasedhiya',
   'ui.total': 'Total:', 'ui.preview_info': 'Ukuran pratinjau cocog karo ukuran pigura sing dipilih.',
   'ui.phrase': 'Ukara', 'ui.size': 'Ukuran', 'ui.language': 'Basa',
   'category.birthday': 'Ulang Tahun', 'category.wedding': 'Pernikahan',

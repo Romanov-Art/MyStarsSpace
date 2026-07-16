@@ -8,7 +8,7 @@ const fi: Record<string, string> = {
   'ui.city': 'Kaupunki', 'ui.date': 'Päivämäärä', 'ui.time': 'Aika', 'ui.theme': 'Teema',
   'ui.layers': 'Kerrokset', 'ui.meridians': 'Meridiaanit', 'ui.constellations': 'Tähtikuviot',
   'ui.constellation_names': 'Nimet', 'ui.milky_way': 'Linnunrata',
-  'ui.export_png': 'Lataa PNG', 'ui.order_pdf': 'Tilaa PDF-versio',
+  'ui.export_png': 'Lataa PNG', 'ui.order_pdf': 'Tilaa PDF-versio', 'ui.order_unavailable': 'Tilaus ei ole tilapäisesti saatavilla',
   'ui.total': 'Yhteensä:', 'ui.preview_info': 'Esikatselun koko vastaa valittua kehyksen kokoa.',
   'ui.phrase': 'Lause', 'ui.size': 'Koko', 'ui.language': 'Kieli',
   'category.birthday': 'Syntymäpäivä', 'category.wedding': 'Häät',

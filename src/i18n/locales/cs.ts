@@ -8,7 +8,7 @@ const cs: Record<string, string> = {
   'ui.city': 'Město', 'ui.date': 'Datum', 'ui.time': 'Čas', 'ui.theme': 'Motiv',
   'ui.layers': 'Vrstvy', 'ui.meridians': 'Poledníky', 'ui.constellations': 'Souhvězdí',
   'ui.constellation_names': 'Názvy', 'ui.milky_way': 'Mléčná dráha',
-  'ui.export_png': 'Stáhnout PNG', 'ui.order_pdf': 'Objednat PDF verzi',
+  'ui.export_png': 'Stáhnout PNG', 'ui.order_pdf': 'Objednat PDF verzi', 'ui.order_unavailable': 'Objednávka je dočasně nedostupná',
   'ui.total': 'Celkem:', 'ui.preview_info': 'Velikost náhledu odpovídá vybrané velikosti rámečku.',
   'ui.phrase': 'Fráze', 'ui.size': 'Velikost', 'ui.language': 'Jazyk',
   'category.birthday': 'Narozeniny', 'category.wedding': 'Svatba',

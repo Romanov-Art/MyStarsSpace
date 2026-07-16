@@ -22,6 +22,7 @@ const en: Record<string, string> = {
   'ui.milky_way': 'Milky Way',
   'ui.export_png': 'Download PNG',
   'ui.order_pdf': 'Order PDF version',
+  'ui.order_unavailable': 'Ordering is temporarily unavailable',
   'ui.total': 'Total:',
   'ui.preview_info': 'The preview size matches the selected frame size.',
   'ui.phrase': 'Phrase',

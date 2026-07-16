@@ -8,7 +8,7 @@ const da: Record<string, string> = {
   'ui.city': 'By', 'ui.date': 'Dato', 'ui.time': 'Tid', 'ui.theme': 'Tema',
   'ui.layers': 'Lag', 'ui.meridians': 'Meridianer', 'ui.constellations': 'Stjernebilleder',
   'ui.constellation_names': 'Navne', 'ui.milky_way': 'Mælkevejen',
-  'ui.export_png': 'Download PNG', 'ui.order_pdf': 'Bestil PDF-version',
+  'ui.export_png': 'Download PNG', 'ui.order_pdf': 'Bestil PDF-version', 'ui.order_unavailable': 'Bestilling er midlertidigt utilgængelig',
   'ui.total': 'I alt:', 'ui.preview_info': 'Forhåndsvisningsstørrelsen svarer til den valgte rammestørrelse.',
   'ui.phrase': 'Sætning', 'ui.size': 'Størrelse', 'ui.language': 'Sprog',
   'category.birthday': 'Fødselsdag', 'category.wedding': 'Bryllup',

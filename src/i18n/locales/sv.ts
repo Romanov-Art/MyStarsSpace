@@ -11,6 +11,7 @@ const sv: Record<string, string> = {
   'ui.constellation_names': 'Namn', 'ui.milky_way': 'Vintergatan',
   'ui.export_png': 'Ladda ner PNG',
   'ui.order_pdf': 'Beställ PDF-version',
+  'ui.order_unavailable': 'Beställning är tillfälligt otillgänglig',
   'ui.total': 'Totalt:',
   'ui.preview_info': 'Förhandsgranskningens storlek matchar den valda ramens storlek.',
   'category.birthday': 'Födelsedag', 'category.wedding': 'Bröllop',
