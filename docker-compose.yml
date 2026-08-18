@@ -1,11 +1,14 @@
 services:
   app:
     build: .
-    ports:
-      - "3000:80"
     restart: unless-stopped
     depends_on:
       - track
+    # `default` keeps nginx able to reach `track` by name; `dokploy-network`
+    # is what Traefik routes the public domain through.
+    networks:
+      - default
+      - dokploy-network
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost/"]
       interval: 30s
@@ -34,3 +37,7 @@ services:
 
 volumes:
   track-data:
+
+networks:
+  dokploy-network:
+    external: true
