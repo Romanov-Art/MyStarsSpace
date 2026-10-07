@@ -1,0 +1,47 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "mystars",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-23",
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+
+  // The landing is the Vite build at the repo root (npm run build → dist/).
+  // Static files are served without invoking the Worker; only the API and
+  // partner templates (JSON 404 handling) go through code.
+  "assets": {
+    "directory": "../../dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/templates/*"]
+  },
+
+  // www → apex is a zone redirect rule (runs before the Worker); the custom
+  // domain keeps www resolvable and served even if that rule is removed.
+  "routes": [
+    { "pattern": "mystars.space", "custom_domain": true },
+    { "pattern": "www.mystars.space", "custom_domain": true }
+  ],
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mystars-track",
+      "database_id": "2d44bb11-f771-4f4b-bb81-e6fef2fd6392",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // Same budget as the old in-process limiter: 30 track events/min per IP.
+  "ratelimits": [
+    { "name": "TRACK_LIMITER", "namespace_id": "1001", "simple": { "limit": 30, "period": 60 } }
+  ],
+
+  // Secrets (wrangler secret put): ADMIN_TOKEN, IP_HASH_SECRET
+  "vars": {
+    "ALLOWED_ORIGINS": "https://mystars.space,https://www.mystars.space",
+    "PARTNERS": "",
+    "AFFILIATES": ""
+  }
+}

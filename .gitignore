@@ -5,3 +5,8 @@ dist/
 .env
 .env.*
 .claude/settings.local.json
+
+# Cloudflare Workers
+workers/node_modules/
+workers/.wrangler/
+.wrangler/

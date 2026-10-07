@@ -1,0 +1,21 @@
+{
+  "name": "mystars-workers",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare edge for mystars.space: landing + track API (mystars) and the GiftsCanva proxy (mystars-canva)",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "migrate": "wrangler d1 migrations apply mystars-track --remote -c site/wrangler.jsonc",
+    "deploy:site": "wrangler deploy -c site/wrangler.jsonc",
+    "deploy:canva": "wrangler deploy -c canva/wrangler.jsonc",
+    "deploy": "npm run migrate && npm run deploy:site && npm run deploy:canva"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "1.2.4",
+    "@cloudflare/workers-types": "5.20260923.1",
+    "typescript": "6.0.2",
+    "vitest": "4.1.11",
+    "wrangler": "4.137.0"
+  }
+}

@@ -60,8 +60,8 @@
 | **Шрифты** | Google Fonts API (динамическая загрузка) |
 | **Курсы валют** | ExchangeRate API (автообновление) |
 | **Тесты** | Vitest |
-| **Backend (учёт/биллинг)** | Node 20 + LibSQL (`server/`), без фреймворков |
-| **Хостинг** | Docker Compose: nginx (статика + прокси `/api/`) + track-сервис |
+| **Backend (учёт/биллинг)** | Cloudflare Worker + D1 (`workers/site/`); Node + LibSQL (`server/`) — для self-host |
+| **Хостинг** | Cloudflare Workers: Static Assets (лендинг) + D1 (track API); Docker Compose — self-host/откат |
 
 ---
 
@@ -183,7 +183,17 @@ public/
 ```
 
 ```
-server/                        # Track-сервис (учёт генераций, биллинг)
+workers/                       # Cloudflare edge (прод): деплой из CI, см. «Деплой»
+├── site/                      # Worker `mystars`: лендинг (dist/) + /api на D1
+│   ├── src/track.ts           # Track API — порт server/index.mjs на D1
+│   ├── migrations/            # Схема D1
+│   └── wrangler.jsonc
+├── canva/                     # Worker `mystars-canva`: прокси на GiftsCanva + edge-кэш рендеров
+└── shared/                    # Общие хелперы (JSON, auth, лимит тела)
+```
+
+```
+server/                        # Track-сервис для self-host (Docker), тот же API
 ├── index.mjs                  # HTTP API: track / status / credits / отчёты
 ├── package.json               # Единственная зависимость: @libsql/client
 └── Dockerfile
@@ -558,8 +568,9 @@ URL-параметры  >  Шаблон (?template= | ?partner=)  >  localStorag
 
 ## 📡 Track-сервис (API)
 
-Микросервис `server/` (Node 20 + LibSQL, одна зависимость) — source of truth
-по генерациям, кредитам и рефералам. nginx проксирует `/api/` с rate-limit.
+Source of truth по генерациям, кредитам и рефералам. В проде работает как
+Cloudflare Worker на D1 (`workers/site/src/track.ts`) с rate-limit через Workers
+Rate Limiting; для self-host есть идентичный по API сервис `server/` (Node + LibSQL).
 
 | Endpoint | Auth | Назначение |
 |----------|------|------------|
@@ -570,14 +581,56 @@ URL-параметры  >  Шаблон (?template= | ?partner=)  >  localStorag
 | `GET /api/affiliate-report?month=` | Bearer | Рефералы: clicks, conversions, flagged |
 | `GET /api/health` | публичный | Healthcheck |
 
-Хранилище — файл LibSQL на docker-volume; переключается на удалённый
-libsql/Turso через `LIBSQL_URL` + `LIBSQL_AUTH_TOKEN`.
+Хранилище в проде — D1 `mystars-track`. В self-host — файл LibSQL на
+docker-volume (или удалённый libsql/Turso через `LIBSQL_URL` + `LIBSQL_AUTH_TOKEN`).
 
 ---
 
 ## 🏗 Деплой
 
-### Docker Compose (основной способ)
+### Cloudflare (прод: mystars.space)
+
+Зона `mystars.space` на Cloudflare, весь трафик идёт через два Worker'а:
+
+| Хост | Worker | Что делает |
+|------|--------|------------|
+| `mystars.space` | `mystars` | Лендинг из Workers Static Assets (код не вызывается), `/api/*` — track API на D1 |
+| `www.mystars.space` | — | Редирект-правило зоны 301 → `mystars.space` |
+| `canva.mystars.space` | `mystars-canva` | Прокси на GiftsCanva (Dokploy) + edge-кэш одинаковых рендеров |
+
+Правила зоны: HTTP → HTTPS (кроме `/.well-known/acme-challenge/` — чтобы
+сертификат GiftsCanva на origin продлевался), `www` → апекс. SSL-режим — Full.
+
+**Автодеплой.** Каждый push в `main` запускает `.github/workflows/deploy-cloudflare.yml`:
+тесты сайта → сборка → typecheck и тесты Worker'ов → миграции D1 → деплой обоих
+Worker'ов. Секреты репозитория: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
+
+**Ручной деплой:**
+
+```bash
+npm run build                       # → dist/ (ассеты лендинга)
+cd workers && npm ci
+npm test                            # тесты в workerd с настоящей D1
+CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… npm run deploy
+```
+
+**Секреты Worker'ов** (`wrangler secret put <NAME> -c <site|canva>/wrangler.jsonc`):
+`mystars` — `ADMIN_TOKEN`, `IP_HASH_SECRET`; `mystars-canva` — `GIFTSCANVA_API_KEYS`
+(те же ключи, что `API_KEYS` у GiftsCanva). Allowlist'ы `PARTNERS` / `AFFILIATES`
+и `ALLOWED_ORIGINS` — в `vars` файла `workers/site/wrangler.jsonc`.
+
+**Кэш рендеров.** `POST /v1/render` (PNG) кэшируется на edge на `RENDER_CACHE_TTL`
+(сутки) по хэшу тела и отдаётся только с валидным ключом. После изменения
+шаблонов в GiftsCanva увеличьте `RENDER_CACHE_VERSION` в `workers/canva/wrangler.jsonc`.
+
+**D1:** новая миграция — файл в `workers/site/migrations/`, применяется в CI.
+Запрос вручную: `npx wrangler d1 execute mystars-track --remote -c site/wrangler.jsonc --command "…"`.
+
+**Откат на Dokploy.** Compose «Site» в проекте MyStars.Space на dokploy-ml
+остановлен, но сохранён: запустить его, вернуть в Cloudflare проксируемые
+A-записи `@`/`www` → origin и снять custom domains у Worker'а `mystars`.
+
+### Docker Compose (self-host)
 
 Два сервиса: `app` (nginx: статика + прокси `/api/`) и `track` (учёт/биллинг):
 
