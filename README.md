@@ -186,6 +186,7 @@ public/
 workers/                       # Cloudflare edge (прод): деплой из CI, см. «Деплой»
 ├── site/                      # Worker `mystars`: лендинг (dist/) + /api на D1
 │   ├── src/track.ts           # Track API — порт server/index.mjs на D1
+│   ├── src/canva.ts           # «Редактировать в Canva»: OAuth, токены, Design Import
 │   ├── migrations/            # Схема D1
 │   └── wrangler.jsonc
 ├── canva/                     # Worker `mystars-canva`: прокси на GiftsCanva + edge-кэш рендеров
@@ -625,6 +626,56 @@ CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… npm run deploy
 
 **D1:** новая миграция — файл в `workers/site/migrations/`, применяется в CI.
 Запрос вручную: `npx wrangler d1 execute mystars-track --remote -c site/wrangler.jsonc --command "…"`.
+
+### «Редактировать в Canva»
+
+Кнопка под «Order PDF» открывает текущий постер в **собственном аккаунте Canva
+клиента** — любой тариф Canva, включая бесплатный (Enterprise не нужен: это
+Design Import, а не Autofill).
+
+Как это работает:
+
+1. Браузер собирает PDF: карта, рамки и фон — одной картинкой, а фраза и
+   подписи — **настоящим текстом** во встроенном шрифте, ровно там, где они на
+   экране. Canva превращает такой текст в редактируемые блоки. Текст, которого
+   нет в наших шрифтах (иероглифы, арабский, деванагари и т.п.), остаётся частью
+   картинки — выглядит верно, но не редактируется. Шрифты для PDF лежат в
+   `public/fonts/pdf/`; после изменения `src/config/fonts.json` пересобрать:
+   `uv run scripts/build_pdf_fonts.py`.
+2. PDF уходит в Worker (`POST /api/canva/upload` → KV на час), а всё общение с
+   Canva идёт во всплывающем окне `mystars.space`: OAuth (PKCE, `state` привязан
+   к cookie), затем импорт и переход в редактор Canva. Окно — верхнего уровня,
+   поэтому кнопка работает и во встроенном у партнёра iframe.
+3. Токены Canva хранятся в D1 зашифрованными (AES-GCM, `CANVA_TOKEN_KEY`), сессия —
+   только хэшем HttpOnly-cookie.
+
+Правила те же, что у PDF-заказа: у партнёра без кредитов кнопка заблокирована,
+каждое открытие в Canva считается экспортом (`track`).
+
+**Включение (делается один раз владельцем Canva-аккаунта):**
+
+1. В аккаунте Canva включить двухфакторную аутентификацию — без неё портал не
+   даст создать интеграцию.
+2. [Canva Developer Portal](https://www.canva.com/developers/) → создать интеграцию →
+   **Outside Canva → Start integrating**.
+   - Scopes: только `design:content:write`.
+   - Redirect URL: `https://mystars.space/api/canva/callback`.
+3. Положить ключи в Worker:
+   ```bash
+   cd workers
+   npx wrangler secret put CANVA_CLIENT_ID -c site/wrangler.jsonc
+   npx wrangler secret put CANVA_CLIENT_SECRET -c site/wrangler.jsonc
+   ```
+   `CANVA_TOKEN_KEY` уже задан. Как только все три секрета на месте,
+   `/api/canva/status` отвечает `configured: true` и кнопка появляется на сайте сама.
+4. До одобрения Canva интеграцией может пользоваться только её создатель.
+   Чтобы кнопка работала у всех клиентов, отправить интеграцию на ревью в
+   портале (**Submit for review**: тестовый аккаунт, видео-демо, анкета,
+   обоснование scope).
+
+Ограничения: Canva — 20 импортов в минуту на пользователя; PDF до 22 МБ (при
+превышении разрешение снижается до 200/150 dpi); KV на бесплатном тарифе —
+1000 записей в сутки, то есть до ~1000 открытий в Canva в день.
 
 **Откат на Dokploy.** Compose «Site» в проекте MyStars.Space на dokploy-ml
 остановлен, но сохранён: запустить его, вернуть в Cloudflare проксируемые

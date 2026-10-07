@@ -33,12 +33,19 @@
     }
   ],
 
-  // Same budget as the old in-process limiter: 30 track events/min per IP.
+  // "Edit in Canva": PDFs the browser hands over to the Canva popup (1h TTL).
+  "kv_namespaces": [{ "binding": "CANVA_UPLOADS", "id": "4970a8f4f8a94212b60717a00bf1b687" }],
+
+  // TRACK: same budget as the old in-process limiter, 30 events/min per IP.
+  // CANVA: uploads per IP and imports per Canva session (Canva itself allows 20/min).
   "ratelimits": [
-    { "name": "TRACK_LIMITER", "namespace_id": "1001", "simple": { "limit": 30, "period": 60 } }
+    { "name": "TRACK_LIMITER", "namespace_id": "1001", "simple": { "limit": 30, "period": 60 } },
+    { "name": "CANVA_LIMITER", "namespace_id": "1002", "simple": { "limit": 20, "period": 60 } }
   ],
 
-  // Secrets (wrangler secret put): ADMIN_TOKEN, IP_HASH_SECRET
+  // Secrets (wrangler secret put): ADMIN_TOKEN, IP_HASH_SECRET, and for
+  // "Edit in Canva": CANVA_CLIENT_ID, CANVA_CLIENT_SECRET, CANVA_TOKEN_KEY
+  // (base64 of 32 random bytes). Until all three exist the button stays hidden.
   "vars": {
     "ALLOWED_ORIGINS": "https://mystars.space,https://www.mystars.space",
     "PARTNERS": "",

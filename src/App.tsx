@@ -1,13 +1,13 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { t, setLocale, getLocale, type Locale } from './i18n/index.js';
 import { cities, getCityName, getCountryDisplayName, sanitizeInput, formatCoordsDMS } from './data/cities.js';
-import { getTheme, themes } from './config/themes.js';
+import { themes } from './config/themes.js';
 import { posterSizes } from './config/celestial-config.js';
-import { getFrameForCompass } from './config/frames.js';
-import { renderStarMapToCanvas, drawPosterFrame } from './components/PosterPreview.js';
-import { zonedTimeToUtc } from './core/timezone.js';
 import { getDefaultFormats, formatDate, formatTime } from './config/formats.js';
 import { getBasePrice, getPartnerPrice, SIZE_PRICES_USD } from './config/pricing.js';
+import { renderPosterRaster } from './services/posterRaster.js';
+import { buildEditablePdf } from './services/canva/editablePdf.js';
+import { fetchCanvaConfigured, openCanvaWindow, sendToCanva, PopupBlockedError } from './services/canva/openInCanva.js';
 import { trackPartnerEvent, trackPartnerViewOnce, trackAffiliateClick } from './services/partnerTracking.js';
 import { captureAffiliateRef, getAffiliateRef } from './services/affiliate.js';
 import { fetchPartnerBlocked } from './services/partnerStatus.js';
@@ -27,21 +27,6 @@ import { DEFAULT_CURRENCY } from './config/currencies.js';
 
 // Partner embeds persist settings under their own namespace (see embedConfig)
 const LS_KEY = settingsStorageKey(new URLSearchParams(window.location.search));
-
-// Frame SVG text cache — avoids re-downloading the same frame on every export
-const frameSvgCache = new Map<string, Promise<string>>();
-function fetchFrameSvg(url: string): Promise<string> {
-  let promise = frameSvgCache.get(url);
-  if (!promise) {
-    promise = fetch(url).then(r => {
-      if (!r.ok) throw new Error(`Failed to fetch frame SVG: ${r.status}`);
-      return r.text();
-    });
-    promise.catch(() => frameSvgCache.delete(url));
-    frameSvgCache.set(url, promise);
-  }
-  return promise;
-}
 
 function loadSettings(): Record<string, any> {
   try {
@@ -188,6 +173,10 @@ export default function App() {
 
   // Prepaid credits: exhausted partner balance disables ordering (fail-open)
   const [embedBlocked, setEmbedBlocked] = useState(false);
+  // "Edit in Canva" appears only once the edge has Canva credentials configured
+  const [canvaAvailable, setCanvaAvailable] = useState(false);
+  const [canvaBusy, setCanvaBusy] = useState(false);
+  useEffect(() => { fetchCanvaConfigured().then(setCanvaAvailable); }, []);
   useEffect(() => {
     let cancelled = false;
     fetchPartnerBlocked(partnerId).then(b => { if (!cancelled) setEmbedBlocked(b); });
@@ -313,123 +302,15 @@ export default function App() {
     if (isExporting) return;
     setIsExporting(true);
     try {
-    const { default: html2canvas } = await import('html2canvas');
-
-    // 300 DPI: cm → pixels (1 inch = 2.54 cm)
-    const DPI = 300;
-    const W = Math.round((selectedSize.width / 2.54) * DPI);
-    const H = Math.round((selectedSize.height / 2.54) * DPI);
-
     // Find the poster DOM element
     const posterEl = document.querySelector('.poster-frame') as HTMLElement;
     if (!posterEl) throw new Error('Poster element not found');
 
-    // Calculate scale factor: export pixel size / DOM element size
-    const domRect = posterEl.getBoundingClientRect();
-    const scaleX = W / domRect.width;
-    const scaleY = H / domRect.height;
-    const scale = Math.max(scaleX, scaleY);
-
-    // Ensure all fonts are ready
-    await document.fonts.ready;
-
-    // Capture the poster DOM at high resolution
-    const domCanvas = await html2canvas(posterEl, {
-      scale: scale,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: null,
-      width: domRect.width,
-      height: domRect.height,
-      logging: false,
-      // Ignore star canvas and frame SVG bg — we re-render both at full resolution
-      ignoreElements: (el: Element) =>
-        el.classList.contains('poster__starmap-canvas') ||
-        el.classList.contains('poster__frame-bg'),
+    // 300 DPI print raster (DOM capture + full-resolution star map and frames)
+    const exportCanvas = await renderPosterRaster({
+      posterEl, dpi: 300, size: selectedSize, themeId, selectedCity, date, time,
+      layers, starColors, gridStyle, compassStyle, frameStyle, locale,
     });
-
-    // Create final export canvas at exact print dimensions
-    const exportCanvas = document.createElement('canvas');
-    exportCanvas.width = W;
-    exportCanvas.height = H;
-    const ctx = exportCanvas.getContext('2d')!;
-
-    const theme = getTheme(themeId);
-
-    // Opaque background first: JPEG has no alpha — any transparent pixels
-    // left by the DOM capture would otherwise turn black
-    ctx.fillStyle = theme.background;
-    ctx.fillRect(0, 0, W, H);
-
-    // Draw the DOM capture (contains all text, frames, background at exact layout)
-    ctx.drawImage(domCanvas, 0, 0, W, H);
-
-    // Now overlay the star map at full export resolution.
-    // The chosen wall-clock time is interpreted as LOCAL time of the city.
-    const exportDateTime = zonedTimeToUtc(date.year, date.month, date.day, time.hours, time.minutes, selectedCity.timezone);
-
-    // Find the star map container position relative to poster
-    const starmapContainer = posterEl.querySelector('.poster__starmap-container') as HTMLElement;
-    if (starmapContainer) {
-      const mapRect = starmapContainer.getBoundingClientRect();
-      // Star map is always square — use min dimension to guarantee
-      const mapDomSize = Math.min(mapRect.width, mapRect.height);
-      const mapX = Math.round((mapRect.left - domRect.left) * scale);
-      const mapY = Math.round((mapRect.top - domRect.top) * scale);
-      const mapSize = Math.round(mapDomSize * scale);
-
-      // Draw the SVG frame at full resolution
-      const frameUrl = `/${getFrameForCompass(compassStyle).filename}`;
-      const svgText = await fetchFrameSvg(frameUrl);
-      const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgText)}`;
-      const frameSvg = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = (e) => reject(new Error(`Failed to load frame SVG: ${e}`));
-        img.src = svgDataUrl;
-      });
-
-      if (theme.frameFilter !== 'none') {
-        const tmpCanvas = document.createElement('canvas');
-        tmpCanvas.width = mapSize;
-        tmpCanvas.height = mapSize;
-        const tmpCtx = tmpCanvas.getContext('2d')!;
-        tmpCtx.drawImage(frameSvg, 0, 0, mapSize, mapSize);
-        const imgData = tmpCtx.getImageData(0, 0, mapSize, mapSize);
-        const d = imgData.data;
-
-        const needsInvert = theme.frameFilter.includes('invert');
-        const brightnessMatch = theme.frameFilter.match(/brightness\(([^)]+)\)/);
-        const brightness = brightnessMatch ? parseFloat(brightnessMatch[1]) : 1;
-
-        for (let i = 0; i < d.length; i += 4) {
-          if (needsInvert) {
-            d[i] = 255 - d[i];
-            d[i + 1] = 255 - d[i + 1];
-            d[i + 2] = 255 - d[i + 2];
-          }
-          if (brightness !== 1) {
-            d[i] = Math.min(255, d[i] * brightness);
-            d[i + 1] = Math.min(255, d[i + 1] * brightness);
-            d[i + 2] = Math.min(255, d[i + 2] * brightness);
-          }
-        }
-        tmpCtx.putImageData(imgData, 0, 0);
-        ctx.drawImage(tmpCanvas, mapX, mapY, mapSize, mapSize);
-      } else {
-        ctx.drawImage(frameSvg, mapX, mapY, mapSize, mapSize);
-      }
-
-      // Render star map at FULL export resolution (crisp, no upscaling blur)
-      const starCanvas = await renderStarMapToCanvas(
-        mapSize, selectedCity, exportDateTime, themeId,
-        layers, starColors, gridStyle, compassStyle, locale,
-      );
-      ctx.drawImage(starCanvas, mapX, mapY, mapSize, mapSize);
-    }
-
-    // Poster frame border (rendered on canvas for print-quality export)
-    drawPosterFrame(ctx, W, H, frameStyle, theme.background);
 
     const baseName = `starmap-${selectedCity.name || 'custom'}-${selectedSize.width}x${selectedSize.height}cm-300dpi`;
 
@@ -459,6 +340,40 @@ export default function App() {
       setIsExporting(false);
     }
   }, [phrase, subtitles, themeId, selectedSize, selectedCity, date, time, phraseFont, phraseFontSize, subtitleFont, subtitleFontSize, isExporting, layers, starColors, gridStyle, frameStyle, compassStyle, locale, partnerId]);
+
+  // Opens the current poster in the customer's own Canva with editable texts.
+  // Same rules as the PDF order: blocked for partners without credits, and
+  // counted as an export for billing/affiliate attribution.
+  const handleEditInCanva = useCallback(() => {
+    if (canvaBusy || isExporting || embedBlocked) return;
+    let win: Window;
+    try {
+      // Synchronously, inside the click: popup blockers allow nothing later
+      win = openCanvaWindow(t('ui.canva_preparing', locale), locale);
+    } catch (err) {
+      if (err instanceof PopupBlockedError) alert(t('ui.canva_popup_blocked', locale));
+      return;
+    }
+    setCanvaBusy(true);
+    (async () => {
+      try {
+        const posterEl = document.querySelector('.poster-frame') as HTMLElement;
+        if (!posterEl) throw new Error('Poster element not found');
+        const { blob } = await buildEditablePdf({
+          posterEl, size: selectedSize, themeId, selectedCity, date, time,
+          layers, starColors, gridStyle, compassStyle, frameStyle, locale,
+        });
+        await sendToCanva(win, blob, phrase.trim() || 'MyStarsSpace');
+        trackPartnerEvent(partnerId, 'export', getAffiliateRef());
+      } catch (err) {
+        win.close();
+        console.error('[Canva] FAILED:', err);
+        alert(t('ui.canva_failed', locale, { error: err instanceof Error ? err.message : String(err) }));
+      } finally {
+        setCanvaBusy(false);
+      }
+    })();
+  }, [canvaBusy, isExporting, embedBlocked, locale, selectedSize, themeId, selectedCity, date, time, layers, starColors, gridStyle, compassStyle, frameStyle, phrase, partnerId]);
 
   return (
     <>
@@ -631,6 +546,17 @@ export default function App() {
                       : `${t('ui.order_pdf', locale)}: ${currentPrice !== null ? formatPrice(currentPrice, currency, sym) : '...'}`
                   }
                 </button>
+                {canvaAvailable && (
+                  <button
+                    type="button"
+                    className="canva-btn"
+                    onClick={handleEditInCanva}
+                    disabled={canvaBusy || isExporting || embedBlocked}
+                    title={t('ui.canva_hint', locale)}
+                  >
+                    {canvaBusy ? t('ui.canva_preparing', locale) : t('ui.edit_in_canva', locale)}
+                  </button>
+                )}
                 <div className="order-block__price">
                   <span className="order-block__label">{t('ui.total', locale)}</span>
                   <span className="order-block__current">

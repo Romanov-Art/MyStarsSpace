@@ -925,6 +925,31 @@ body {
   box-shadow: none;
 }
 
+.canva-btn {
+  padding: 12px 48px;
+  width: 100%;
+  background: transparent;
+  color: var(--color-accent);
+  border: 1.5px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  letter-spacing: 0.3px;
+}
+
+.canva-btn:hover:not(:disabled) {
+  background: var(--color-accent);
+  color: white;
+}
+
+.canva-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 /* ── Preview Info (hint style) ─── */
 .preview-info {
   text-align: center;

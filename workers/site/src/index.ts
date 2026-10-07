@@ -4,9 +4,10 @@
  * (see `run_worker_first` in wrangler.jsonc).
  */
 import { json } from '../../shared/http.js';
+import { handleCanvaApi, type CanvaEnv } from './canva.js';
 import { handleApi, type TrackEnv } from './track.js';
 
-export interface Env extends TrackEnv {
+export interface Env extends TrackEnv, CanvaEnv {
   ASSETS: Fetcher;
 }
 
@@ -26,6 +27,14 @@ async function serveTemplate(request: Request, env: Env): Promise<Response> {
 export default {
   async fetch(request, env): Promise<Response> {
     const { pathname } = new URL(request.url);
+    if (pathname.startsWith('/api/canva/')) {
+      try {
+        return await handleCanvaApi(request, env);
+      } catch (err) {
+        console.error(err);
+        return json(500, { error: { code: 'internal', message: 'Something went wrong' } });
+      }
+    }
     if (pathname.startsWith('/api/')) return handleApi(request, env);
     if (pathname.startsWith('/templates/')) return serveTemplate(request, env);
     return env.ASSETS.fetch(request);

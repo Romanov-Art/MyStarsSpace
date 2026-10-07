@@ -10,3 +10,4 @@ dist/
 workers/node_modules/
 workers/.wrangler/
 .wrangler/
+workers/**/.dev.vars
